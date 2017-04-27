@@ -171,22 +171,32 @@ def get_range(addr_range):
                 addr_range += '/%s' % mask
     return addr_range + ','
 
+def translate_ports(portstr):
+    res = []
+    if portstr:
+        for p in portstr.split(","):
+            if "-" in p:
+                # port range:
+                boundary = p.split("-")
+                res.append(">=" + boundary[0] + "&<=" + boundary[1])
+            else:
+                res.append("=" + p)
+        return ",".join(res)
+    else:
+        return ""
 
+import os
 def get_ports(rule):
-    if rule.port.all():
-        result = 'port'
-        for port in rule.port.all():
-            result += '=%s,' % port
+    os.write(2, "rule.port="+str(rule.port))
+    os.write(2, str(type(rule.port)))
+    if rule.port:
+        result = 'port'+translate_ports(rule.port.all())
     else:
         result = ''
-        if rule.destinationport.all():
-            result += 'dstport'
-            for port in rule.destinationport.all():
-                result += '=%s,' % port
-        if rule.sourceport.all():
-            result += 'srcport'
-            for port in rule.sourceport.all():
-                result += '=%s,' % port
+        if rule.destinationport:
+            result += 'dstport' + translate_ports(rule.destinationport)
+        if rule.sourceport:
+            result += 'srcport' + translate_ports(rule.sourceport)
     return result
 
 

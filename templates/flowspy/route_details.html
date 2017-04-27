@@ -66,6 +66,10 @@
 		 		{% endif %}
 		 	{% endif %}
 		</div>
+        <div>
+            <h2>Statistics</h2>
+            <canvas id="traffic-plot" width=300 height=100></canvas>
+        </div>
 	</div>
 	{% comment %}check if graphs plugin in installed apps{% endcomment %}
 	{% if 'graphs' in INSTALLED_APPS %}
@@ -88,6 +92,40 @@
 {% endblock %}
 
 {% block pagejsbottom %}
+
+<script type="text/javascript" src="{{STATIC_URL}}js/smoothie.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+var smoothie = new SmoothieChart({millisPerPixel:200, interpolation:'linear', 
+        grid: {fillStyle:'#ffffff', millisPerLine:5000, verticalSections:4},
+        labels: {fillStyle:'#000000'},
+        minValue: 0 //, maxValue: 400
+        });
+smoothie.streamTo(document.getElementById("traffic-plot"));
+var prev = null;
+var cur = null;
+var timeseries = new TimeSeries();
+smoothie.addTimeSeries(timeseries, {lineWidth: 2, strokeStyle:'#00c000', fillStyle: 'rgba(0,128,0,0.25)'});
+window.setInterval(function() {
+    var routename = $(this).data("routename");
+    var statsurl = "{% url routestats route.name %}";
+    $.ajax({
+        type: 'POST',
+        url: statsurl,
+        cache: false,
+        success: function(data) {
+            if (prev == null) {
+                cur = 0;
+            } else {
+                cur = data.value - prev;
+            }
+            timeseries.append(new Date().getTime(), cur);
+            prev = data.value;
+        }
+    });
+}, 10000);
+});
+</script>
 
 {% if 'graphs' in INSTALLED_APPS %}
 <script src="https://cdn.jsdelivr.net/momentjs/2.9.0/moment.min.js"></script>
