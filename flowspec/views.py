@@ -127,10 +127,7 @@ def dashboard(request):
                 'applier',
                 'applier',
                 'fragmenttype',
-                'port',
                 'protocol',
-                'destinationport',
-                'sourceport',
                 'dscp',
             ),
             'message': message
