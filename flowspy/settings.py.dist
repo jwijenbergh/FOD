@@ -349,12 +349,10 @@ PORTRANGE_LIMIT = 100
 SNMP_COMMUNITY = "abcd"
 # list of IP addresses
 SNMP_IP = ["10.0.0.1", "10.0.0.2"]
-# names of filter tables:
-SNMP_FILTERNAME =   "1.3.6.1.4.1.2636.3.5.2.1.6"
-# names of routes:
-SNMP_OBJ1 =         "1.3.6.1.4.1.2636.3.5.2.1.7"
-# counters of routes:
-SNMP_OBJ3 =         "1.3.6.1.4.1.2636.3.5.2.1.5"
+# OID of bytes counter (currently unused)
+SNMP_CNTBYTES =     "1.3.6.1.4.1.2636.3.5.2.1.5"
+# OID of packet counter
+SNMP_CNTPACKETS =   "1.3.6.1.4.1.2636.3.5.2.1.4"
 
 # get only statistics of specified tables
 SNMP_RULESFILTER = ["__flowspec_default_inet__", "__flowspec_IAS_inet__"]
