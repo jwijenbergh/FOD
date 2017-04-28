@@ -68,7 +68,8 @@
 		</div>
         <div>
             <h2>Statistics</h2>
-            <canvas id="traffic-plot" width=300 height=100></canvas>
+            <div><canvas id="traffic-plot" width=350 height=150></canvas></div>
+            <div>Number of packets <span id="traffic-plot-loading">(Loading)</span>
         </div>
 	</div>
 	{% comment %}check if graphs plugin in installed apps{% endcomment %}
@@ -96,7 +97,8 @@
 <script type="text/javascript" src="{{STATIC_URL}}js/smoothie.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-var smoothie = new SmoothieChart({millisPerPixel:200, interpolation:'linear', 
+var smoothie = new SmoothieChart({millisPerPixel:200, interpolation: 'step', //interpolation:'linear', 
+        timestampFormatter:SmoothieChart.timeFormatter,
         grid: {fillStyle:'#ffffff', millisPerLine:5000, verticalSections:4},
         labels: {fillStyle:'#000000'},
         minValue: 0 //, maxValue: 400
@@ -106,6 +108,7 @@ var prev = null;
 var cur = null;
 var timeseries = new TimeSeries();
 smoothie.addTimeSeries(timeseries, {lineWidth: 2, strokeStyle:'#00c000', fillStyle: 'rgba(0,128,0,0.25)'});
+
 window.setInterval(function() {
     var routename = $(this).data("routename");
     var statsurl = "{% url routestats route.name %}";
@@ -118,6 +121,7 @@ window.setInterval(function() {
                 cur = 0;
             } else {
                 cur = data.value - prev;
+                $("#traffic-plot-loading").hide();
             }
             timeseries.append(new Date().getTime(), cur);
             prev = data.value;

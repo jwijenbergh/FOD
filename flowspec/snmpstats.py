@@ -23,24 +23,14 @@ from pysnmp.entity.rfc3413.oneliner import cmdgen
 from django.conf import settings
 
 
-def getSNMPData(ip, comm, obj, walk = True):
+def getSNMPData(ip, comm, obj):
     cmdGen = cmdgen.CommandGenerator()
-    if walk:
-        cmd = cmdGen.bulkCmd
-        errorIndication, errorStatus, errorIndex, varBindTable = cmd(
-            cmdgen.CommunityData(comm),
-            cmdgen.UdpTransportTarget((ip, 161)), 0, 25,
-            *obj,
-            lookupValues=False
-        )
-    else:
-        cmd = cmdGen.getCmd
-        errorIndication, errorStatus, errorIndex, varBindTable = cmd(
-            cmdgen.CommunityData(comm),
-            cmdgen.UdpTransportTarget((ip, 161)),
-            *obj,
-            lookupValues=False
-        )
+    cmd = cmdGen.bulkCmd
+    errorIndication, errorStatus, errorIndex, varBindTable = cmd(
+        cmdgen.CommunityData(comm),
+        cmdgen.UdpTransportTarget((ip, 161)), 1, 10,
+        obj
+    )
     if errorIndication:
         print("error", str(errorIndication))
     else:
@@ -53,40 +43,42 @@ def getSNMPData(ip, comm, obj, walk = True):
         else:
             vars = []
             for varBindTableRow in varBindTable:
-                if walk:
-                    for name, val in varBindTableRow:
-                        vars.append((name, val))
-                else:
-                    for val in varBindTableRow:
-                        vars.append(str(val))
+                for name, val in varBindTableRow:
+                    vars.append((name, val))
             return vars
     return []
 
 def get_snmp_stats():
+    """Return dict() of the sum of counters per each selected routes, where
+    route identifier is the key in dict.  The sum is counted over all routers.
+
+    This function uses SNMP_IP list, SNMP_COMMUNITY, SNMP_CNTPACKETS and
+    SNMP_RULESFILTER list, all defined in settings."""
     results = {}
+    identoffset = len(settings.SNMP_CNTPACKETS) + 1
     if not isinstance(settings.SNMP_IP, list):
         settings.SNMP_IP = [settings.SNMP_IP]
 
     for ip in settings.SNMP_IP:
-        filteredVars = []
-        oids = []
-        data = getSNMPData(ip, settings.SNMP_COMMUNITY, [settings.SNMP_FILTERNAME])
+        # get values of counters using SNMP
+        data = getSNMPData(ip, settings.SNMP_COMMUNITY, settings.SNMP_CNTPACKETS)
         for name, val in data:
-            if val in settings.SNMP_RULESFILTER:
-                rule = str(name)
-                oids.append(settings.SNMP_OBJ1 + rule[len(settings.SNMP_FILTERNAME):])
-                oids.append(settings.SNMP_OBJ3 + rule[len(settings.SNMP_FILTERNAME):])
+            # each oid contains encoded identifier of table and route
+            ident = str(name)[identoffset:]
+            ordvals = [int(i) for i in ident.split(".")]
+            # the first byte is length of table name string
+            len1 = ordvals[0] + 1
+            tablename = "".join([chr(i) for i in ordvals[1:len1]])
+            if tablename in settings.SNMP_RULESFILTER:
+                # if the current route belongs to specified table from SNMP_RULESFILTER list,
+                # take the route identifier
+                len2 = ordvals[len1] + 1
+                routename = "".join([chr(i) for i in ordvals[len1 + 1:len1 + len2]])
 
-        data = getSNMPData(ip, settings.SNMP_COMMUNITY, oids, False)
-        for i in range(0, len(data), 2):
-            if data[i].startswith(settings.SNMP_OBJ1):
-                name = data[i + 1]
-            elif data[i].startswith(settings.SNMP_OBJ3):
-                val = data[i + 1]
-                if name in results:
-                    results[name] = results[name] + int(val)
+                # add value into dict
+                if routename in results:
+                    results[routename] = results[routename] + int(val)
                 else:
-                    results[name] = int(val)
+                    results[routename] = int(val)
     return results
-    
 
