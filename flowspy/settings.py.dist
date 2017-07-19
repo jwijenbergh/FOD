@@ -259,6 +259,11 @@ CELERYBEAT_SCHEDULE = {
         "schedule": crontab(minute=01, hour=02),
         "args": (),
     },
+    "snmp-stats-poll": {
+        "task": "flowspec.tasks.poll_snmp_statistics",
+        "schedule": crontab(minute="*/5"),
+        "args": (),
+    },
 }
 
 # List of modules to import when celery starts.
