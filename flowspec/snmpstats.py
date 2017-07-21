@@ -32,7 +32,7 @@ def getSNMPData(ip, port, comm, obj):
         obj
     )
     if errorIndication:
-        print("error", str(errorIndication))
+        print("error ({0}:{1}): {2}".format(ip, port, str(errorIndication)))
     else:
         if errorStatus:
             print('%s at %s' % (
