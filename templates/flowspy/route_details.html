@@ -73,6 +73,10 @@
 	    <div><canvas id="traffic-plot-pkts-abs" width=200 height=200></canvas></div>
             <h3>Number of packets (relative)</h3>
             <div><canvas id="traffic-plot-pkts-rel" width=200 height=200></canvas></div>
+            <h3>Number of bytes (absolute)</h3>
+	    <div><canvas id="traffic-plot-bytes-abs" width=200 height=200></canvas></div>
+            <h3>Number of bytes (relative)</h3>
+            <div><canvas id="traffic-plot-bytes-rel" width=200 height=200></canvas></div>
         </div>
     </div>
     {% comment %}check if graphs plugin in installed apps{% endcomment %}
@@ -104,24 +108,36 @@ function plotGraph(data)
    var xdata = Array();
    var ydata = Array();
    var ydatarel = Array();
+   var ybytesdata = Array();
+   var ybytesdatarel = Array();
 
    for (i=0; i<data["data"].length; i++) {
        var d = data["data"][data["data"].length - 1 - i];
        xdata[i] = d.ts.replace(/\..*/, '').replace('T', ' ');
-       ydata[i] = d.value;
+       ydata[i] = d.value.packets;
+       ybytesdata[i] = d.value.bytes;
        if (i == 0) {
            ydatarel[i] = 0;
+           ybytesdatarel[i] = 0;
        } else {
            ydatarel[i] = ydata[i] - ydata[i-1];
+           ybytesdatarel[i] = ybytesdata[i] - ybytesdata[i-1];
        }
    }
 
-   var graphabs = document.getElementById("traffic-plot-pkts-abs");
-   var graphrel = document.getElementById("traffic-plot-pkts-rel");
-   graphabs.width = 80;
-   graphabs.height = 20;
-   graphrel.width = 80;
-   graphrel.height = 20;
+   var graphpktsabs = document.getElementById("traffic-plot-pkts-abs");
+   var graphpktsrel = document.getElementById("traffic-plot-pkts-rel");
+   var graphbytesabs = document.getElementById("traffic-plot-bytes-abs");
+   var graphbytesrel = document.getElementById("traffic-plot-bytes-rel");
+   graphpktsabs.width = 80;
+   graphpktsabs.height = 20;
+   graphpktsrel.width = 80;
+   graphpktsrel.height = 20;
+   graphbytesabs.width = 80;
+   graphbytesabs.height = 20;
+   graphbytesrel.width = 80;
+   graphbytesrel.height = 20;
+
    var graphabssetting = {
        type: 'line',
        data: {
@@ -174,8 +190,62 @@ function plotGraph(data)
        }
        }
    }
-   var absChart = new Chart(graphabs, graphabssetting);
-   var relChart = new Chart(graphrel, graphrelsetting);
+   var graphbytesabssetting = {
+       type: 'line',
+       data: {
+       labels: xdata,
+       datasets: [{
+           label: '# bytes',
+           data: ybytesdata,
+           borderWidth: 2,
+           borderColor: "#3c37c6",
+           pointBackgroundColor:  "#3c37c6",
+           backgroundColor: "#99bfff"
+       }]
+       },
+       options: {
+       elements: {
+           line: { tension: 0, } // disables bezier curves
+       },
+       scales: {
+           yAxes: [{
+           ticks: {
+               beginAtZero:true
+           }
+           }]
+       }
+       }
+   }
+   var graphbytesrelsetting = {
+       type: 'bar',
+       data: {
+       labels: xdata,
+       datasets: [{
+           label: '# bytes',
+           data: ybytesdatarel,
+           borderWidth: 2,
+           borderColor: "#c63737",
+           pointBackgroundColor:  "#c63737",
+           backgroundColor: "#ff877a"
+       }]
+       },
+       options: {
+       elements: {
+           line: { tension: 0, } // disables bezier curves
+       },
+       scales: {
+           yAxes: [{
+           ticks: {
+               beginAtZero:true
+           }
+           }]
+       }
+       }
+   }
+   var pktsabsChart = new Chart(graphpktsabs, graphabssetting);
+   var pktsrelChart = new Chart(graphpktsrel, graphrelsetting);
+   var bytesabsChart = new Chart(graphbytesabs, graphbytesabssetting);
+   var bytesrelChart = new Chart(graphbytesrel, graphbytesrelsetting);
 }
 
 $(document).ready(function() {
