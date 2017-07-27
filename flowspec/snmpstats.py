@@ -143,31 +143,35 @@ def poll_snmp_statistics():
     # get new data
     now = datetime.now()
     nowstr = now.isoformat()
-    newdata = get_snmp_stats()
+    try:
+        newdata = get_snmp_stats()
 
-    # update history
-    samplecount = settings.SNMP_MAX_SAMPLECOUNT
-    for rule in newdata:
-        counter = {"ts": nowstr, "value": newdata[rule]}
-        if rule in history:
-            history[rule].insert(0, counter)
-            history[rule] = history[rule][:samplecount]
-        else:
-            history[rule] = [counter]
+        # update history
+        samplecount = settings.SNMP_MAX_SAMPLECOUNT
+        for rule in newdata:
+            counter = {"ts": nowstr, "value": newdata[rule]}
+            if rule in history:
+                history[rule].insert(0, counter)
+                history[rule] = history[rule][:samplecount]
+            else:
+                history[rule] = [counter]
 
-    # check for old rules and remove them
-    toremove = []
-    for rule in history:
-        ts = datetime.strptime(history[rule][0]["ts"], '%Y-%m-%dT%H:%M:%S.%f')
-        if (now - ts).total_seconds() >= settings.SNMP_REMOVE_RULES_AFTER:
-            toremove.append(rule)
-    for rule in toremove:
-        history.pop(rule, None)
+        # check for old rules and remove them
+        toremove = []
+        for rule in history:
+            ts = datetime.strptime(history[rule][0]["ts"], '%Y-%m-%dT%H:%M:%S.%f')
+            if (now - ts).total_seconds() >= settings.SNMP_REMOVE_RULES_AFTER:
+                toremove.append(rule)
+        for rule in toremove:
+            history.pop(rule, None)
 
-    # store updated history
-    tf = settings.SNMP_TEMP_FILE + "." + nowstr
-    with open(tf, "w") as f:
-        json.dump(history, f)
-    os.rename(tf, settings.SNMP_TEMP_FILE)
-    logger.info("Polling finished.")
+        # store updated history
+        tf = settings.SNMP_TEMP_FILE + "." + nowstr
+        with open(tf, "w") as f:
+            json.dump(history, f)
+        os.rename(tf, settings.SNMP_TEMP_FILE)
+        logger.info("Polling finished.")
+    except Exception as e:
+        logger.error(e)
+        logger.error("Polling failed.")
 
