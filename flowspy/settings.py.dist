@@ -273,6 +273,8 @@ CELERY_IMPORTS = ("flowspec.tasks", )
 SERVER_EMAIL = "Example FoD Service <noreply@example.com>"
 EMAIL_SUBJECT_PREFIX = "[FoD] "
 EXPIRATION_NOTIFY_DAYS = 4
+# max number of days into the future that is allowed to pick in rule expiration datepicker
+MAX_RULE_EXPIRE_DAYS = 30
 PREFIX_LENGTH = 29
 
 # Shibboleth
