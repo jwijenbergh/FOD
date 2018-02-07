@@ -252,8 +252,12 @@ function plotGraph(data)
 $(document).ready(function() {
    var statsurl = "{% url routestats route.name %}";
    $.get(statsurl).done(function(data) {
-      $("#traffic-plot-loading").hide();
-      plotGraph(data);
+      if (data["error"]) {
+          $("#traffic-plot-loading").text("No data, try later");
+      } else {
+          $("#traffic-plot-loading").hide();
+          plotGraph(data);
+      }
    });
 });
 </script> 
