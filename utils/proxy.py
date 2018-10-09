@@ -203,6 +203,37 @@ class Applier(object):
         else:
             return False
 
+    def get_existing_config_xml(self):
+        retriever0 = Retriever(xml=None)
+        config_xml_running = retriever0.fetch_xml()
+        logger.info("proxy::get_existing_config(): config_xml_running="+str(config_xml_running))
+        return config_xml_running
+
+    def get_existing_config(self):
+        retriever0 = Retriever(xml=None)
+        config_parsed = retriever0.proccess_xml()
+        logger.info("proxy::get_existing_config(): config_parsed="+str(config_parsed))
+        return config_parsed
+
+    def get_existing_routes(self):
+        config_parsed = self.get_existing_config()
+        if config_parsed.routing_options and config_parsed.routing_options.__len__()>0:
+          flow = config_parsed.routing_options[0]
+          logger.info("proxy::get_existing_routes(): config_parsed.flow="+str(flow))
+          routes_existing = flow.routes
+          logger.info("proxy::get_existing_routes(): config_parsed.flow.routes="+str(routes_existing))
+          return routes_existing
+        else:
+          logger.info("proxy::get_existing_routes(): no routing_options or is empty")
+          return []
+
+    def get_existing_route_names(self):
+      routes_existing = self.get_existing_routes()
+      route_ids_existing = [route.name for route in routes_existing]
+      logger.info("proxy::get_existing_route_names(): config_parsed.flow.routes.ids="+str(route_ids_existing))
+      return route_ids_existing
+
+
     def apply(self, configuration = None, operation=None):
         reason = None
         if not configuration:
