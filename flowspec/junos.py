@@ -224,11 +224,14 @@ def translate_frag(fragment_string): #TODO get number mapping right, order matte
 
 def translate_frag_list(frag_list):
     result = ",".join([translate_frag(frag) for frag in frag_list]) # needs to be sorted
+    return result
 
 def get_frag(rule):
     result=''
     if rule.fragmenttype:
-      result = ',frag'+translate_frag_list(rule.fragmenttype.all())
+      tmp = translate_frag_list(rule.fragmenttype.all())
+      if tmp != "":
+        result = ',frag'+tmp
     return result
 
 def create_junos_name(rule):
