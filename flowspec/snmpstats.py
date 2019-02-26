@@ -193,6 +193,16 @@ def helper_rule_ts_parse(ts_string):
   except Exception as e:
     logger.info("helper_rule_ts_parse(): ts_string="+str(ts_string)+": got exception "+str(e))
     ts = None
+
+  if ts==None: # other db may hav other time fmt:
+    logger.info("helper_rule_ts_parse(): trying with milli seconds fmt")
+    try:
+      ts = datetime.strptime(ts_string, '%Y-%m-%d %H:%M:%S.%f+00:00') # TODO TZ offset assumed to be 00:00
+    except Exception as e:
+      logger.info("helper_rule_ts_parse(): ts_string="+str(ts_string)+": got exception "+str(e))
+      ts = None
+    
+  logger.info("helper_rule_ts_parse(): => ts="+str(ts))
   return ts
 
 def poll_snmp_statistics():
@@ -255,7 +265,8 @@ def poll_snmp_statistics():
         toremove = []
         for rule in history:
           try:
-            if rule!='_last_poll_no_time' and rule!="_per_rule":
+            #if rule!='_last_poll_no_time' and rule!="_per_rule":
+            if rule[:1]!='_':
               #ts = datetime.strptime(history[rule][0]["ts"], '%Y-%m-%dT%H:%M:%S.%f')
               ts = helper_stats_store_parse_ts(history[rule][0]["ts"])
               if ts!=None and (now - ts).total_seconds() >= settings.SNMP_REMOVE_RULES_AFTER:
@@ -268,7 +279,8 @@ def poll_snmp_statistics():
         if settings.STATISTICS_PER_MATCHACTION_ADD_FINAL_ZERO == True:
           # for now workaround for low-level rules (by match params, not FoD rule id) no longer have data, typically because of haveing been deactivated
           for rule in history:
-            if rule!='_last_poll_no_time' and rule!="_per_rule":
+            #if rule!='_last_poll_no_time' and rule!="_per_rule":
+            if rule[:1]!='_':
               ts = history[rule][0]["ts"]
               if ts!=nowstr and ts==last_poll_no_time:
                 counter = {"ts": nowstr, "value": null_measurement }
@@ -298,7 +310,7 @@ def poll_snmp_statistics():
                 counter = {"ts": nowstr, "value": newdata[flowspec_params_str]}
                 counter_is_null = False
               except Exception as e:
-                logger.info("poll_snmp_statistics(): STATISTICS_PER_RULE: exception: rule_id="+str(rule_id)+" : "+str(e))
+                logger.info("poll_snmp_statistics(): 1 STATISTICS_PER_RULE: exception: rule_id="+str(rule_id)+" newdata for flowspec_params_str='"+str(flowspec_params_str)+"' missing : "+str(e))
                 counter = {"ts": nowstr, "value": null_measurement_missing }
                 counter_is_null = True
             else:
@@ -365,8 +377,9 @@ def poll_snmp_statistics():
         logger.info("poll_snmp_statistics(): Polling finished.")
 
     except Exception as e:
-        logger.error(e)
+        #logger.error(e)
         logger.error("poll_snmp_statistics(): Polling failed. exception: "+str(e))
+        logger.error("poll_snmp_statistics(): ", exc_info=True)        
         
     unlock_history_file()
     logger.info("poll_snmp_statistics(): Polling end: last_poll_no_time="+str(last_poll_no_time))
