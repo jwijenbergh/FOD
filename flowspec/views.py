@@ -531,7 +531,11 @@ def get_shibboleth_attrib_info_from_settings(attrib_key, add_long_info):
   if attrib_display_name != None and attrib_display_name!="":
     attrib_info = attrib_display_name
   else:
-    attrib_info = attrib_key # TODO: remove ^HTTP_ and then ^SHIB_
+    attrib_info = attrib_key # remove ^HTTP_ and then ^SHIB_
+    if attrib_info.startswith("HTTP_"):
+      attrib_info[len("HTTP_"):]
+    if attrib_info.startswith("SHIB_"):
+      attrib_info[len("SHIB_"):]
 
   if add_long_info and attrib_display_addinfo != None and attrib_display_addinfo!="":
     attrib_info = attrib_info+" ("+attrib_display_addinfo+")"
