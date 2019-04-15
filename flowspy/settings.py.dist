@@ -20,6 +20,8 @@
 #
 
 # _uuid_generate_random was deprecated and removed in newer python
+import uuid
+uuid._uuid_generate_random = None
 try:
     from uuid import _uuid_generate_random
 except ImportError:
