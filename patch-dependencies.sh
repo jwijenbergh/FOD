@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Patching trans_real.py" >&2
-patch ~vagrant/venv/lib/python2.7/site-packages/django/utils/translation/trans_real.py <<END
+patch /srv/venv/lib/python2.7/site-packages/django/utils/translation/trans_real.py <<END
 --- aaa/trans_real.py	2019-02-20 09:46:40.973999000 -0500
 +++ bbb/trans_real.py	2019-02-20 09:50:24.480000000 -0500
 @@ -143,7 +143,7 @@
@@ -16,7 +16,7 @@ patch ~vagrant/venv/lib/python2.7/site-packages/django/utils/translation/trans_r
 END
 
 echo "Patching widgets.py" >&2
-patch ~vagrant/venv/lib/python2.7/site-packages/tinymce/widgets.py <<END
+patch /srv/venv/lib/python2.7/site-packages/tinymce/widgets.py <<END
 --- aaa/widgets.py	2018-11-12 16:46:37.006000000 -0500
 +++ bbb/widgets.py	2018-11-12 16:46:58.576000000 -0500
 @@ -13,7 +13,11 @@
@@ -33,4 +33,6 @@ patch ~vagrant/venv/lib/python2.7/site-packages/tinymce/widgets.py <<END
  from django.utils.html import escape
  from django.utils.safestring import mark_safe
 END
+
+echo "Finished patching."
 
