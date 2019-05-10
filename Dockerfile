@@ -2,6 +2,7 @@ FROM debian:stable
 
 RUN apt-get -yqq update
 RUN apt-get -yqq install virtualenv python python-dev vim git gcc libevent-dev libxml2-dev libxslt-dev patch beanstalkd mariadb-server libmariadb-dev libmariadbclient-dev-compat sqlite3
+RUN apt-get -yqq install procps
 
 # RUN echo "create database fod;" | mysql -u root
 

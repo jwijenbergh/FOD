@@ -3,6 +3,15 @@
 export LC_ALL="C" # this will unfortunatelly break ./manage.py createsuperuser as locale string is literally used to derive encoding
 . /srv/venv/bin/activate
 
+if [ ! -e /srv/flowspy/pythonenv ]; then
+	cat > /srv/flowspy/pythonenv <<EOF
+#!/bin/bash
+. /srv/venv/bin/activate
+exec "\$@"
+EOF
+	chmod +x /srv/flowspy/pythonenv
+fi
+
 ##
 
 # fix needed to make sure gevent works # may be put into Dockerfile instead
@@ -20,8 +29,10 @@ cd "$(dirname "$0")"
 echo "Starting services FoD is depending on generically: beanstalkd" 1>&2
 service beanstalkd start
 
-echo "Starting DB services FoD might be depending on (depending on its config): mysql" 1>&2
-service mysql start
+if [ ! -x ./fodcli_db_is_mysql ] || ./fodcli_db_is_mysql; then
+  echo "Starting DB services FoD might be depending on (depending on its config): mysql" 1>&2
+  service mysql start
+fi
 
 # hook to initiallize (without any user interaction admin user and its peer data)
 [ -x ./fodcli_insert_basic_data.sh ] && ./fodcli_insert_basic_data.sh
