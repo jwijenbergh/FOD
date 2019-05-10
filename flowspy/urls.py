@@ -68,3 +68,13 @@ if 'graphs' in settings.INSTALLED_APPS:
     from graphs import urls as graphs_urls
     urlpatterns += (
         '', url(r'^graphs/', include(graphs_urls)),)
+
+
+try:
+    if settings.DEBUG:
+        # only for development / testing mode:
+        from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+        urlpatterns += staticfiles_urlpatterns()
+except:
+    pass
+

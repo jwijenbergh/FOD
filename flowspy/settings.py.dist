@@ -240,7 +240,8 @@ PEER_TECHC_MANAGED_TABLE = True
 COMMIT = True
 
 # Flowspy configuration
-EXPIRATION_DAYS_OFFSET = 7
+#EXPIRATION_DAYS_OFFSET = 7
+EXPIRATION_DAYS_OFFSET = 30
 
 USE_X_FORWARDED_HOST = True
 
@@ -434,6 +435,7 @@ SNMP_RULESFILTER = ["__flowspec_default_inet__", "__flowspec_IAS_inet__"]
 SNMP_POLL_INTERVAL = 8 #seconds
 # cache file for data
 SNMP_TEMP_FILE = "/tmp/snmp_temp_data"
+SNMP_POLL_LOCK = "/var/run/fod/snmppoll.lock"
 
 # Number of historical values to store for a route.
 # Polling interval must be set for "snmp-stats-poll" celery task in CELERYBEAT_SCHEDULE.
@@ -443,4 +445,25 @@ SNMP_MAX_SAMPLECOUNT = 12
 
 # Age of inactive routes that can be already removed (in seconds)
 SNMP_REMOVE_RULES_AFTER = 3600
+
+##############################################################################
+##############################################################################
+
+# REST API config (v1.6 only)
+
+DISABLE_RULE_OVERLAP_CHECK = False
+
+ALLOW_DELETE_FULL_FOR_NONADMIN = False
+
+MAIL_NOTIFICATION_TO_ALL_MATCHING_PEERS = True
+
+# statistics calc
+
+STATISTICS_PER_MATCHACTION_ADD_FINAL_ZERO = False # not necessary if STATISTICS_PER_RULE==True
+STATISTICS_PER_RULE = True
+
+STATISTICS_PER_RULE__ADD_INITIAL_ZERO = True
+
+##############################################################################
+##############################################################################
 
