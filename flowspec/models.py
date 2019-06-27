@@ -217,34 +217,35 @@ class Route(models.Model):
         send_message("[%s] Adding rule %s. Please wait..." % (self.applier.username, self.name), peer)
         response = add.delay(self)
         logger.info('Got add job id: %s' % response)
-        fqdn = Site.objects.get_current().domain
-        admin_url = 'https://%s%s' % (
-            fqdn,
-            reverse('edit-route', kwargs={'route_slug': self.name})
-        )
-        mail_body = render_to_string(
-            'rule_action.txt',
-            {
-                'route': self,
-                'address': self.requesters_address,
-                'action': 'creation',
-                'url': admin_url,
-                'peer': username
+        if not settings.DISABLE_EMAIL_NOTIFICATION:
+            fqdn = Site.objects.get_current().domain
+            admin_url = 'https://%s%s' % (
+                fqdn,
+                reverse('edit-route', kwargs={'route_slug': self.name})
+            )
+            mail_body = render_to_string(
+                'rule_action.txt',
+                {
+                    'route': self,
+                    'address': self.requesters_address,
+                    'action': 'creation',
+                    'url': admin_url,
+                    'peer': username
+                }
+            )
+            user_mail = '%s' % self.applier.email
+            user_mail = user_mail.split(';')
+            send_new_mail(
+                settings.EMAIL_SUBJECT_PREFIX + 'Rule %s creation request submitted by %s' % (self.name, self.applier.username),
+                mail_body,
+                settings.SERVER_EMAIL, user_mail,
+                get_peer_techc_mails(self.applier, username)
+            )
+            d = {
+                'clientip': '%s' % self.requesters_address,
+                'user': self.applier.username
             }
-        )
-        user_mail = '%s' % self.applier.email
-        user_mail = user_mail.split(';')
-        send_new_mail(
-            settings.EMAIL_SUBJECT_PREFIX + 'Rule %s creation request submitted by %s' % (self.name, self.applier.username),
-            mail_body,
-            settings.SERVER_EMAIL, user_mail,
-            get_peer_techc_mails(self.applier, username)
-        )
-        d = {
-            'clientip': '%s' % self.requesters_address,
-            'user': self.applier.username
-        }
-        logger.info(mail_body, extra=d)
+            logger.info(mail_body, extra=d)
 
     def commit_edit(self, *args, **kwargs):
         peers = self.applier.get_profile().peers.all()
@@ -270,36 +271,37 @@ class Route(models.Model):
         )
         response = edit.delay(self)
         logger.info('Got edit job id: %s' % response)
-        fqdn = Site.objects.get_current().domain
-        admin_url = 'https://%s%s' % (
-            fqdn,
-            reverse(
-                'edit-route',
-                kwargs={'route_slug': self.name}
+        if not settings.DISABLE_EMAIL_NOTIFICATION:
+            fqdn = Site.objects.get_current().domain
+            admin_url = 'https://%s%s' % (
+                fqdn,
+                reverse(
+                    'edit-route',
+                    kwargs={'route_slug': self.name}
+                )
             )
-        )
-        mail_body = render_to_string(
-            'rule_action.txt',
-            {
-                'route': self,
-                'address': self.requesters_address,
-                'action': 'edit',
-                'url': admin_url,
-                'peer': username
+            mail_body = render_to_string(
+                'rule_action.txt',
+                {
+                    'route': self,
+                    'address': self.requesters_address,
+                    'action': 'edit',
+                    'url': admin_url,
+                    'peer': username
+                }
+            )
+            user_mail = '%s' % self.applier.email
+            user_mail = user_mail.split(';')
+            send_new_mail(
+                settings.EMAIL_SUBJECT_PREFIX + 'Rule %s edit request submitted by %s' % (self.name, self.applier.username),
+                mail_body, settings.SERVER_EMAIL, user_mail,
+                get_peer_techc_mails(self.applier, username)
+            )
+            d = {
+                'clientip': self.requesters_address,
+                'user': self.applier.username
             }
-        )
-        user_mail = '%s' % self.applier.email
-        user_mail = user_mail.split(';')
-        send_new_mail(
-            settings.EMAIL_SUBJECT_PREFIX + 'Rule %s edit request submitted by %s' % (self.name, self.applier.username),
-            mail_body, settings.SERVER_EMAIL, user_mail,
-            get_peer_techc_mails(self.applier, username)
-        )
-        d = {
-            'clientip': self.requesters_address,
-            'user': self.applier.username
-        }
-        logger.info(mail_body, extra=d)
+            logger.info(mail_body, extra=d)
 
     def commit_delete(self, *args, **kwargs):
         username = None
@@ -330,38 +332,39 @@ class Route(models.Model):
         )
         response = delete.delay(self, reason=reason)
         logger.info('Got delete job id: %s' % response)
-        fqdn = Site.objects.get_current().domain
-        admin_url = 'https://%s%s' % (
-            fqdn,
-            reverse(
-                'edit-route',
-                kwargs={'route_slug': self.name}
+        if not settings.DISABLE_EMAIL_NOTIFICATION:
+            fqdn = Site.objects.get_current().domain
+            admin_url = 'https://%s%s' % (
+                fqdn,
+                reverse(
+                    'edit-route',
+                    kwargs={'route_slug': self.name}
+                )
             )
-        )
-        mail_body = render_to_string(
-            'rule_action.txt',
-            {
-                'route': self,
-                'address': self.requesters_address,
-                'action': 'removal',
-                'url': admin_url,
-                'peer': username
+            mail_body = render_to_string(
+                'rule_action.txt',
+                {
+                    'route': self,
+                    'address': self.requesters_address,
+                    'action': 'removal',
+                    'url': admin_url,
+                    'peer': username
+                }
+            )
+            user_mail = '%s' % self.applier.email
+            user_mail = user_mail.split(';')
+            send_new_mail(
+                settings.EMAIL_SUBJECT_PREFIX + 'Rule %s removal request submitted by %s' % (self.name, self.applier.username),
+                mail_body,
+                settings.SERVER_EMAIL,
+                user_mail,
+                get_peer_techc_mails(self.applier, username)
+            )
+            d = {
+                'clientip': self.requesters_address,
+                'user': self.applier.username
             }
-        )
-        user_mail = '%s' % self.applier.email
-        user_mail = user_mail.split(';')
-        send_new_mail(
-            settings.EMAIL_SUBJECT_PREFIX + 'Rule %s removal request submitted by %s' % (self.name, self.applier.username),
-            mail_body,
-            settings.SERVER_EMAIL,
-            user_mail,
-            get_peer_techc_mails(self.applier, username)
-        )
-        d = {
-            'clientip': self.requesters_address,
-            'user': self.applier.username
-        }
-        logger.info(mail_body, extra=d)
+            logger.info(mail_body, extra=d)
 
     def has_expired(self):
         today = datetime.date.today()

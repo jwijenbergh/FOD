@@ -277,6 +277,7 @@ CELERYBEAT_SCHEDULE = {
 CELERY_IMPORTS = ("flowspec.tasks", )
 
 # Notifications
+DISABLE_EMAIL_NOTIFICATION = True
 SERVER_EMAIL = "Example FoD Service <noreply@example.com>"
 EMAIL_SUBJECT_PREFIX = "[FoD] "
 EXPIRATION_NOTIFY_DAYS = 4

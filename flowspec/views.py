@@ -90,6 +90,7 @@ def welcome(request):
 def dashboard(request):
     all_group_routes = []
     message = ''
+    #message = eee.aa
     try:
         peers = request.user.get_profile().peers.select_related('user_profile')
     except UserProfile.DoesNotExist:
@@ -656,65 +657,66 @@ def user_login(request):
 
 
 def user_activation_notify(user):
-    current_site = Site.objects.get_current()
-    peers = user.get_profile().peers.all()
+    if not settings.DISABLE_EMAIL_NOTIFICATION:
+        current_site = Site.objects.get_current()
+        peers = user.get_profile().peers.all()
 
-    # Email subject *must not* contain newlines
-    # TechCs will be notified about new users.
-    # Platform admins will activate the users.
-    subject = render_to_string(
-        'registration/activation_email_subject.txt',
-        {
-            'site': current_site
-        }
-    )
-    subject = ''.join(subject.splitlines())
-    registration_profile = RegistrationProfile.objects.create_profile(user)
-    message = render_to_string(
-        'registration/activation_email.txt',
-        {
-            'activation_key': registration_profile.activation_key,
-            'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
-            'site': current_site,
-            'user': user
-        }
-    )
-    if settings.NOTIFY_ADMIN_MAILS:
-        admin_mails = settings.NOTIFY_ADMIN_MAILS
-        send_new_mail(
-            settings.EMAIL_SUBJECT_PREFIX + subject,
-            message,
-            settings.SERVER_EMAIL,
-            admin_mails,
-            []
+        # Email subject *must not* contain newlines
+        # TechCs will be notified about new users.
+        # Platform admins will activate the users.
+        subject = render_to_string(
+            'registration/activation_email_subject.txt',
+            {
+                'site': current_site
+            }
         )
-    for peer in peers:
-        try:
-            PeerNotify.objects.get(peer=peer, user=user)
-        except:
-            peer_notification = PeerNotify(peer=peer, user=user)
-            peer_notification.save()
-            # Mail to domain techCs plus platform admins (no activation hash sent)
-            subject = render_to_string(
-                'registration/activation_email_peer_notify_subject.txt',
-                {
-                    'site': current_site,
-                    'peer': peer
-                }
-            )
-            subject = ''.join(subject.splitlines())
-            message = render_to_string(
-                'registration/activation_email_peer_notify.txt',
-                {
-                    'user': user,
-                    'peer': peer
-                }
-            )
+        subject = ''.join(subject.splitlines())
+        registration_profile = RegistrationProfile.objects.create_profile(user)
+        message = render_to_string(
+            'registration/activation_email.txt',
+            {
+                'activation_key': registration_profile.activation_key,
+                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+                'site': current_site,
+                'user': user
+            }
+        )
+        if settings.NOTIFY_ADMIN_MAILS:
+            admin_mails = settings.NOTIFY_ADMIN_MAILS
             send_new_mail(
                 settings.EMAIL_SUBJECT_PREFIX + subject,
                 message,
                 settings.SERVER_EMAIL,
-                get_peer_techc_mails(user, peer), [])
+                admin_mails,
+                []
+            )
+        for peer in peers:
+            try:
+                PeerNotify.objects.get(peer=peer, user=user)
+            except:
+                peer_notification = PeerNotify(peer=peer, user=user)
+                peer_notification.save()
+                # Mail to domain techCs plus platform admins (no activation hash sent)
+                subject = render_to_string(
+                    'registration/activation_email_peer_notify_subject.txt',
+                    {
+                        'site': current_site,
+                        'peer': peer
+                    }
+                )
+                subject = ''.join(subject.splitlines())
+                message = render_to_string(
+                    'registration/activation_email_peer_notify.txt',
+                    {
+                        'user': user,
+                        'peer': peer
+                    }
+                )
+                send_new_mail(
+                    settings.EMAIL_SUBJECT_PREFIX + subject,
+                    message,
+                    settings.SERVER_EMAIL,
+                    get_peer_techc_mails(user, peer), [])
 
 
 @login_required

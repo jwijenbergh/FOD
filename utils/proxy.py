@@ -181,7 +181,7 @@ class Applier(object):
                 route.operation = operation
             device = device.export(netconf_config=True)
             result = ET.tostring(device)
-            logger.error(result)
+            logger.info("result="+str(result))
             return result
         else:
             return False
@@ -241,7 +241,8 @@ class Applier(object):
         edit_is_successful = False
         commit_confirmed_is_successful = False
         commit_is_successful = False
-        if configuration:
+        try:
+          if configuration:
             with manager.connect(host=self.device, port=self.port, username=self.username, password=self.password, hostkey_verify=False) as m:
                 assert(":candidate" in m.server_capabilities)
                 with m.locked(target='candidate'):
@@ -320,8 +321,14 @@ class Applier(object):
                                     cause=cause.replace('\n', '')
                                     logger.error(cause)
                                     return False, cause
-        else:
+          else:
             return False, "No configuration was supplied"
+        except Exception as e:
+                            cause="NETCONF connection exception: %s %s" %(e,reason)
+                            cause=cause.replace('\n', '')
+                            logger.error(cause)
+                            cause_user="NETCONF connection failed"
+                            return False, cause_user
 
 
 def is_successful(response):
