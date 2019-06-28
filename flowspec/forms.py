@@ -270,3 +270,8 @@ def get_matchingprotocol_route_pks(protocolist, routes):
         if rsp and rsp == protocols_value_list:
             route_pk_list.append(route.pk)
     return route_pk_list
+
+class SetupForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput(), label="Password")
+
+

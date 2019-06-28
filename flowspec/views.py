@@ -48,6 +48,7 @@ from copy import deepcopy
 from django.views.decorators.cache import never_cache
 from django.conf import settings
 from django.template.defaultfilters import slugify
+from django.core.exceptions import PermissionDenied
 from flowspec.helpers import send_new_mail, get_peer_techc_mails
 import datetime
 import os
@@ -919,4 +920,20 @@ def routestats(request, route_slug):
         logger.error('routestats failed: %s' % e)
         return HttpResponse(json.dumps({"error": "No data available. %s" % e}), mimetype="application/json", status=404)
 
+def setup(request):
+    if not User.objects.filter(username="admin"):
+        if request.method == "POST":
+            form = SetupForm(request.POST)
+            if form.is_valid():
+                u = User.objects.create_user(username="admin", email="email@example.com", password=form.cleaned_data["password"])
+                u.is_superuser = True
+                u.is_staff = True
+                u.save()
+                logger.error('TODO REMOVE: password: %s' % form.cleaned_data["password"])
+                return HttpResponseRedirect(reverse("welcome"))
+        else:
+            form = SetupForm()
+            return render(request, 'flowspy/setup.html', {'form': form})
+    else:
+        raise PermissionDenied
 

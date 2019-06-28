@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block contentplaceholder %}
+<div>
+	Set the password of admin user:
+	<form action="{% url setup %}" method="post">
+	{% csrf_token %}
+	{{ form }}
+	<input type="submit" value="Set">
+	</form>
+</div>
+{% endblock %}
+
+
