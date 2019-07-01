@@ -921,7 +921,7 @@ def routestats(request, route_slug):
         return HttpResponse(json.dumps({"error": "No data available. %s" % e}), mimetype="application/json", status=404)
 
 def setup(request):
-    if not User.objects.filter(username="admin"):
+    if User.objects.count() == 0:
         if request.method == "POST":
             form = SetupForm(request.POST)
             if form.is_valid():
@@ -929,6 +929,22 @@ def setup(request):
                 u.is_superuser = True
                 u.is_staff = True
                 u.save()
+                pr = PeerRange(network = form.cleaned_data["test_peer_addr"])
+                pr.save()
+                p = Peer(peer_name = "testpeer", peer_tag = "testpeer")
+                p.save()
+                p.networks.add(pr)
+                ua = UserProfile()
+                ua.user = u
+                ua.save()
+                ua.peers.add(p)
+
+                with open("flowspy/settings_local.py", "a") as f:
+                    f.write("NETCONF_DEVICE = \"%s\"\n" % form.cleaned_data["netconf_device"])
+                    f.write("NETCONF_USER = \"%s\"\n"   % form.cleaned_data["netconf_port"])
+                    f.write("NETCONF_PASS = \"%s\"\n"   % form.cleaned_data["netconf_user"])
+                    f.write("NETCONF_PORT = %s\n"       % form.cleaned_data["netconf_pass"])
+
                 logger.error('TODO REMOVE: password: %s' % form.cleaned_data["password"])
                 return HttpResponseRedirect(reverse("welcome"))
         else:

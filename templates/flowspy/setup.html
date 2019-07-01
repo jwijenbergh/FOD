@@ -6,7 +6,9 @@
 	Set the password of admin user:
 	<form action="{% url setup %}" method="post">
 	{% csrf_token %}
+	<table>
 	{{ form }}
+	</table>
 	<input type="submit" value="Set">
 	</form>
 </div>
