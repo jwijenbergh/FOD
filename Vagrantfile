@@ -62,10 +62,10 @@ Vagrant.configure(2) do |config|
    mysql -u root <<-SCRIPT
       create database fod;
 SCRIPT
-   mkdir -p /var/log/fod
-   virtualenv venv
+   mkdir -p /var/log/fod /srv
+   virtualenv /srv/venv
    (
-      source venv/bin/activate
+      source /srv/venv/bin/activate
       cp -r /vagrant/ /srv/flowspy
       cd /srv/flowspy/
       (
@@ -85,7 +85,7 @@ SCRIPT
    )
 
    echo "To set environment to English, run: export LC_ALL=en_US"
-   echo "To activate virualenv: source ~vagrant/venv/bin/activate"
+   echo "To activate virualenv: source /srv/venv/bin/activate"
    echo "To create a user run: cd /srv/flowspy; ./manage.py createsuperuser"
    echo "To start flowspy server: cd /srv/flowspy; ./manage.py runserver 0.0.0.0:8000"
    echo "To start celeryd: cd /srv/flowspy; ./manage.py celeryd"
