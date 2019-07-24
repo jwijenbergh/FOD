@@ -48,6 +48,7 @@ from copy import deepcopy
 from django.views.decorators.cache import never_cache
 from django.conf import settings
 from django.template.defaultfilters import slugify
+from django.core.exceptions import PermissionDenied
 from flowspec.helpers import send_new_mail, get_peer_techc_mails
 import datetime
 import os
@@ -919,4 +920,36 @@ def routestats(request, route_slug):
         logger.error('routestats failed: %s' % e)
         return HttpResponse(json.dumps({"error": "No data available. %s" % e}), mimetype="application/json", status=404)
 
+def setup(request):
+    if User.objects.count() == 0:
+        if request.method == "POST":
+            form = SetupForm(request.POST)
+            if form.is_valid():
+                u = User.objects.create_user(username="admin", email="email@example.com", password=form.cleaned_data["password"])
+                u.is_superuser = True
+                u.is_staff = True
+                u.save()
+                pr = PeerRange(network = form.cleaned_data["test_peer_addr"])
+                pr.save()
+                p = Peer(peer_name = "testpeer", peer_tag = "testpeer")
+                p.save()
+                p.networks.add(pr)
+                ua = UserProfile()
+                ua.user = u
+                ua.save()
+                ua.peers.add(p)
+
+                with open("flowspy/settings_local.py", "a") as f:
+                    f.write("NETCONF_DEVICE = \"%s\"\n" % form.cleaned_data["netconf_device"])
+                    f.write("NETCONF_USER = \"%s\"\n"   % form.cleaned_data["netconf_port"])
+                    f.write("NETCONF_PASS = \"%s\"\n"   % form.cleaned_data["netconf_user"])
+                    f.write("NETCONF_PORT = %s\n"       % form.cleaned_data["netconf_pass"])
+
+                logger.error('TODO REMOVE: password: %s' % form.cleaned_data["password"])
+                return HttpResponseRedirect(reverse("welcome"))
+        else:
+            form = SetupForm()
+            return render(request, 'flowspy/setup.html', {'form': form})
+    else:
+        raise PermissionDenied
 

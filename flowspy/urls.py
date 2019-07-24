@@ -62,6 +62,7 @@ urlpatterns = patterns(
     url(r'^details/(?P<route_slug>[\w\-]+)/$', 'flowspec.views.routedetails', name="route-details"),
     url(r'^routestats/(?P<route_slug>[\w\-]+)/$', 'flowspec.views.routestats', name="routestats"),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^setup/', 'flowspec.views.setup', name='setup'),
 )
 
 if 'graphs' in settings.INSTALLED_APPS:
