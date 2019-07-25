@@ -30,7 +30,7 @@ from rest_framework.authtoken.models import Token
 from accounts.models import UserProfile
 from peers.models import Peer
 from flowspec.forms import UserProfileForm
-from registration.models import RegistrationProfile
+# TODO from registration.models import RegistrationProfile
 
 
 def generate_token(request):
@@ -45,98 +45,99 @@ def generate_token(request):
 @never_cache
 def activate(request, activation_key):
     account = None
-    if request.method == "GET":
-        activation_key = activation_key.lower()  # Normalize before trying anything with it.
-        try:
-            rp = RegistrationProfile.objects.get(activation_key=activation_key)
+    # TODO
+    #if request.method == "GET":
+    #    activation_key = activation_key.lower()  # Normalize before trying anything with it.
+    #    try:
+    #        rp = RegistrationProfile.objects.get(activation_key=activation_key)
 
-        except RegistrationProfile.DoesNotExist:
-            return render(
-                request,
-                'registration/activate.html',
-                {
-                    'account': account,
-                    'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS
-                }
-            )
-        try:
-            userProfile = rp.user.get_profile()
-        except UserProfile.DoesNotExist:
-            return render(
-                request,
-                'registration/activate.html',
-                {
-                    'account': account,
-                    'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS
-                }
-            )
+    #    except RegistrationProfile.DoesNotExist:
+    #        return render(
+    #            request,
+    #            'registration/activate.html',
+    #            {
+    #                'account': account,
+    #                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS
+    #            }
+    #        )
+    #    try:
+    #        userProfile = rp.user.get_profile()
+    #    except UserProfile.DoesNotExist:
+    #        return render(
+    #            request,
+    #            'registration/activate.html',
+    #            {
+    #                'account': account,
+    #                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS
+    #            }
+    #        )
 
-        form = UserProfileForm(instance=userProfile)
+    #    form = UserProfileForm(instance=userProfile)
 
-        return render(
-            request,
-            'registration/activate_edit.html',
-            {
-                'account': account,
-                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
-                'form': form
-            },
-        )
+    #    return render(
+    #        request,
+    #        'registration/activate_edit.html',
+    #        {
+    #            'account': account,
+    #            'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+    #            'form': form
+    #        },
+    #    )
 
-    if request.method == "POST":
-        request_data = request.POST.copy()
-	try:
-            user = User.objects.get(pk=request_data['user'])
-            up = user.get_profile()
+    #if request.method == "POST":
+    #    request_data = request.POST.copy()
+    #    try:
+    #        user = User.objects.get(pk=request_data['user'])
+    #        up = user.get_profile()
 
-            # use getlist to get the list of peers (might be multiple)
-            profile_peers = request.POST.getlist('peers')
+    #        # use getlist to get the list of peers (might be multiple)
+    #        profile_peers = request.POST.getlist('peers')
 
-            # remove already assigned peers, as these are selected by
-            # the user, no admin has yet verified those. They will be
-            # replaced by the admin's selection.
-            up.peers.clear()
+    #        # remove already assigned peers, as these are selected by
+    #        # the user, no admin has yet verified those. They will be
+    #        # replaced by the admin's selection.
+    #        up.peers.clear()
 
-            for peer in profile_peers:
-                up.peers.add(Peer.objects.get(pk=peer))
-            up.save()
+    #        for peer in profile_peers:
+    #            up.peers.add(Peer.objects.get(pk=peer))
+    #        up.save()
 
-        except:
-            return render(
-                request,
-                'registration/activate_edit.html',
-                {
-                    'account': account,
-                    'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS
-                },
-            )
-        activation_key = activation_key.lower()  # Normalize before trying anything with it.
-        try:
-            rp = RegistrationProfile.objects.get(activation_key=activation_key)
-            account = RegistrationProfile.objects.activate_user(activation_key)
-        except Exception:
-            pass
+    #    except:
+    #        return render(
+    #            request,
+    #            'registration/activate_edit.html',
+    #            {
+    #                'account': account,
+    #                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS
+    #            },
+    #        )
+    #    activation_key = activation_key.lower()  # Normalize before trying anything with it.
+    #    try:
+    #        rp = RegistrationProfile.objects.get(activation_key=activation_key)
+    #        account = RegistrationProfile.objects.activate_user(activation_key)
+    #    except Exception:
+    #        pass
 
-        if account:
-            # A user has been activated
-            email = render_to_string(
-                'registration/activation_complete.txt',
-                {
-                    'site': Site.objects.get_current(),
-                    'user': account
-                }
-            )
-            send_mail(
-                _("%sUser account activated") % settings.EMAIL_SUBJECT_PREFIX,
-                email,
-                settings.SERVER_EMAIL,
-                [account.email]
-            )
-        return render(
-            request,
-            'registration/activate.html',
-            {
-                'account': account,
-                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS
-            },
-        )
+    #    if account:
+    #        # A user has been activated
+    #        email = render_to_string(
+    #            'registration/activation_complete.txt',
+    #            {
+    #                'site': Site.objects.get_current(),
+    #                'user': account
+    #            }
+    #        )
+    #        send_mail(
+    #            _("%sUser account activated") % settings.EMAIL_SUBJECT_PREFIX,
+    #            email,
+    #            settings.SERVER_EMAIL,
+    #            [account.email]
+    #        )
+    #    return render(
+    #        request,
+    #        'registration/activate.html',
+    #        {
+    #            'account': account,
+    #            'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS
+    #        },
+    #    )

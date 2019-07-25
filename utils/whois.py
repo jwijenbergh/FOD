@@ -18,7 +18,7 @@
 #
 
 import socket
-from ipaddr import *
+from ipaddress import *
 import re
 from django.conf import settings
 
@@ -43,15 +43,16 @@ def query(query, hostname, flags):
     for line in query:
         m = re.match(r"(^route6?\:\s+)(?P<subnets>\S+)", line)
         if m:
-            if IPNetwork(m.group('subnets')).version == 4:
-                routes4.append(IPNetwork(m.group('subnets')))
-            if IPNetwork(m.group('subnets')).version == 6:
-                routes6.append(IPNetwork(m.group('subnets')))
+            i = ipaddress.ip_interface(m.group('subnets'))
+            if i.version == 4:
+                routes4.append(i.network)
+            elif i.version == 6:
+                routes6.append(i.network)
     final_routes = []
     if len(routes4):
-        final_routes4 = collapse_address_list(routes4)
+        final_routes4 = collapse_address(routes4)
     if len(routes6):
-        final_routes6 = collapse_address_list(routes6)
+        final_routes6 = collapse_address(routes6)
     final_routes = final_routes4 + final_routes6
     return final_routes
 

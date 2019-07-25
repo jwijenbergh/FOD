@@ -4,7 +4,7 @@
 {% block contentplaceholder %}
 <div>
 	Set the password of admin user:
-	<form action="{% url setup %}" method="post">
+	<form action="{% url 'setup' %}" method="post">
 	{% csrf_token %}
 	<table>
 	{{ form }}

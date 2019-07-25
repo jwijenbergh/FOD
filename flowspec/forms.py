@@ -25,14 +25,13 @@ from django.template.defaultfilters import filesizeformat
 from flowspec.models import *
 from peers.models import *
 from accounts.models import *
-from ipaddr import *
 from flowspec.validators import (
     clean_source,
     clean_destination,
     clean_expires,
     clean_route_form
 )
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.models import User
 from django.conf import settings
 import datetime
@@ -84,6 +83,7 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
+        fields = "__all__"
 
 
 class RouteForm(forms.ModelForm):
@@ -92,6 +92,7 @@ class RouteForm(forms.ModelForm):
     port = PortRangeForm()
     class Meta:
         model = Route
+        fields = "__all__"
 
     def clean_applier(self):
         applier = self.cleaned_data['applier']
@@ -155,7 +156,7 @@ class RouteForm(forms.ModelForm):
         user = self.cleaned_data.get('applier', None)
 
         if source:
-            source = IPNetwork(source).compressed
+            source = ip_network(source).compressed
             existing_routes = existing_routes.filter(source=source)
         else:
             existing_routes = existing_routes.filter(source=None)
@@ -191,7 +192,7 @@ class RouteForm(forms.ModelForm):
         for route in existing_routes:
             if name != route.name:
                 existing_url = reverse('edit-route', args=[route.name])
-                if IPNetwork(destination) in IPNetwork(route.destination) or IPNetwork(route.destination) in IPNetwork(destination):
+                if ip_network(destination) in ip_network(route.destination) or ip_network(route.destination) in ip_network(destination):
                     raise forms.ValidationError('Found an exact %s rule, %s with destination prefix %s<br>To avoid overlapping try editing rule <a href=\'%s\'>%s</a>' % (route.status, route.name, route.destination, existing_url, route.name))
         return self.cleaned_data
 
@@ -200,6 +201,7 @@ class ThenPlainForm(forms.ModelForm):
 #    action = forms.CharField(initial='rate-limit')
     class Meta:
         model = ThenAction
+        fields = "__all__"
 
     def clean_action_value(self):
         action_value = self.cleaned_data['action_value']
@@ -226,6 +228,7 @@ class PortPlainForm(forms.ModelForm):
 #    action = forms.CharField(initial='rate-limit')
     class Meta:
         model = MatchPort
+        fields = "__all__"
 
     def clean_port(self):
         port = self.cleaned_data['port']

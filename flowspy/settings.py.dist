@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*- vim:fileencoding=utf-8:
 # vim: tabstop=4:shiftwidth=4:softtabstop=4:expandtab
 # Django settings for flowspy project.
-# Copyright © 2011-2015 Greek Research and Technology Network (GRNET S.A.)
-# Copyright © 2011-2014 Leonidas Poulopoulos (@leopoul)
-# Copyright © 2014-2015 Stavros Kroustouris (@kroustou)
+# Copyright Â© 2011-2015 Greek Research and Technology Network (GRNET S.A.)
+# Copyright Â© 2011-2014 Leonidas Poulopoulos (@leopoul)
+# Copyright Â© 2014-2015 Stavros Kroustouris (@kroustou)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@ except ImportError:
     _uuid_generate_random = None
 
 import os
-import djcelery
-djcelery.setup_loader()
 from celery.schedules import crontab
 
 DEBUG = False
@@ -97,7 +95,9 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+STATIC_ROOT = os.path.join(BASE_DIR)
+STATICFILES_DIRS = [ os.path.join(BASE_DIR, 'static'), ]
 STATIC_URL = '/static/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -105,8 +105,25 @@ STATICFILES_FINDERS = (
 )
 
 # Templates
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+             os.path.join(BASE_DIR, 'templates'),
+             os.path.join('/srv/venv/django/contrib/admin/templates/'),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                "django.contrib.auth.context_processors.auth",
+                'django_settings_export.settings_export',
+            ]
+        },
+    },
+]
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates'),
+    
 )
 
 TEMPLATE_LOADERS = (
@@ -124,14 +141,16 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "context.global_vars.settings_vars",
 )
 
-MIDDLEWARE_CLASSES = (
-    'django.middleware.cache.UpdateCacheMiddleware',
-    'django.middleware.common.CommonMiddleware',
+MIDDLEWARE = (
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 )
@@ -155,11 +174,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'flowspec',
     'poller',
-    'south',
     'django.contrib.admin',
-    'djcelery',
     'peers',
-    'registration',
+    #'registration',
     'accounts',
     'tinymce',
     'widget_tweaks',
@@ -258,12 +275,12 @@ POLL_SESSION_UPDATE = 60.0
 CELERYBEAT_SCHEDULE = {
     "every-day-sync": {
         "task": "flowspec.tasks.check_sync",
-        "schedule": crontab(minute=01, hour=01),
+        "schedule": crontab(minute="01", hour="01"),
         "args": (),
     },
     "notify-expired": {
         "task": "flowspec.tasks.notify_expired",
-        "schedule": crontab(minute=01, hour=02),
+        "schedule": crontab(minute="01", hour="02"),
         "args": (),
     },
     "snmp-stats-poll": {
@@ -468,4 +485,8 @@ STATISTICS_PER_RULE__ADD_INITIAL_ZERO = True
 
 ##############################################################################
 ##############################################################################
+
+SETTINGS_EXPORT = [
+    'BRANDING',
+]
 

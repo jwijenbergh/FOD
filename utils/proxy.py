@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import jncdevice as np
+from . import jncdevice as np
 from ncclient import manager
 from ncclient.transport.errors import AuthenticationError, SSHError
 from lxml import etree as ET
@@ -26,7 +26,7 @@ import logging
 from django.core.cache import cache
 import os
 from celery.exceptions import TimeLimitExceeded, SoftTimeLimitExceeded
-from portrange import parse_portrange
+from .portrange import parse_portrange
 
 cwd = os.getcwd()
 

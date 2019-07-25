@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load static %}
 
 {% block extrahead %}
-<link href="{{STATIC_URL}}css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+<link href="{% static 'css/plugins/dataTables/dataTables.bootstrap.css' %}" rel="stylesheet">
 <style type="text/css">
 
 
@@ -21,8 +22,8 @@ th{
 {% endblock %}
 {% block pagejsbottom %}
 
-    <script src="{{STATIC_URL}}js/dataTableslatest/jquery.dataTables.min.js"></script>
-    <script src="{{STATIC_URL}}js/dataTableslatest/dataTables.bootstrap.js"></script>
+    <script src="{% static 'js/dataTableslatest/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/dataTableslatest/dataTables.bootstrap.js' %}"></script>
 
 	<script type="text/javascript">
 $(document).ready(function(){
@@ -156,7 +157,7 @@ var start;
 var end;
 var oldhtml;
 var last_element = false;
-var refreshUrl = "{% url overview-ajax %}";
+var refreshUrl = "{% url 'overview-ajax' %}";
 
 
 
@@ -261,7 +262,7 @@ var refreshUrl = "{% url overview-ajax %}";
 	                     		return toolt+" title=\""+title+"\">"+"<small>{% trans 'Rule expired' %}</small>"+"</a>";
 	                     	}
                      		if (status == "PENDING"){
-                     				return '<img src="{{STATIC_URL}}dots.gif">';
+                     				return '<img src="{% static 'dots.gif' %}">';
                      			}
                      		return "<small>"+full.response+"</small>";
 

@@ -19,7 +19,7 @@
 
 from django.contrib import admin
 from django import forms
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.models import FlatPage
 

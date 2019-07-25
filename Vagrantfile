@@ -52,9 +52,9 @@ Vagrant.configure(2) do |config|
   # end
   #
    config.vm.provision "shell", inline: <<-SHELL
-   yum install -y python-virtualenv vim git gcc libevent-devel libxml2-devel libxslt-devel mariadb-server mysql-devel patch
    rpm -Uh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-   yum install -y beanstalkd
+   yum -q -y install python36 python36-setuptools python36-virtualenv vim git gcc libevent-devel libxml2-devel libxslt-devel mariadb-server mysql-devel patch
+   yum -q -y install beanstalkd
    systemctl enable beanstalkd.service
    service beanstalkd start
    systemctl enable mariadb.service
@@ -63,7 +63,7 @@ Vagrant.configure(2) do |config|
       create database fod;
 SCRIPT
    mkdir -p /var/log/fod /srv
-   virtualenv /srv/venv
+   virtualenv-3 /srv/venv
    (
       source /srv/venv/bin/activate
       cp -r /vagrant/ /srv/flowspy
@@ -74,8 +74,6 @@ SCRIPT
          patch settings.py < settings.py.patch
       )
       pip install -r requirements.txt
-
-      ./patch-dependencies.sh
 
       touch flowspy/settings_local.py
 

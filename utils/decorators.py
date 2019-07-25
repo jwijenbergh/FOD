@@ -18,7 +18,7 @@
 #
 
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 
 def shib_required(f):

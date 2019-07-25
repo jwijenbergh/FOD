@@ -53,8 +53,8 @@ class Peer(models.Model):
     # This needs to be converted to slug and an info message needs to be added.
     peer_tag = models.CharField(max_length=64)
     domain_name = models.CharField(max_length=128, null=True, blank=True)
-    networks = models.ManyToManyField(PeerRange, null=True, blank=True)
-    techc_emails = models.ManyToManyField(TechcEmail, null=True, blank=True)
+    networks = models.ManyToManyField(PeerRange, blank=True)
+    techc_emails = models.ManyToManyField(TechcEmail, blank=True)
 
     def __unicode__(self):
         return self.peer_name
@@ -78,6 +78,7 @@ class Peer(models.Model):
 
 
 class PeerNotify(models.Model):
-    peer = models.ForeignKey(Peer)
-    user = models.ForeignKey(User)
+    peer = models.ForeignKey(Peer, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     peer_activation_notified = models.BooleanField(default=True)
+

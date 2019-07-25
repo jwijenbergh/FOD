@@ -13,7 +13,7 @@ def send_new_mail(subject, message, from_email, recipient_list, bcc_list):
   try:
     logger.info("helpers::send_new_mail(): send mail: from_email="+str(from_email)+", recipient_list="+str(recipient_list)+", bcc_list="+str(bcc_list)) 
     return EmailMessage(subject, message, from_email, recipient_list, bcc_list).send()
-  except Exception, e:
+  except Exception as e:
     #os.write(3, "send_new_mail() failed: exc="+str(e)+"\n") 
     logger.error("helpers::send_new_mail() failed: exc="+str(e)) 
 

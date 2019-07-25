@@ -24,14 +24,14 @@ from django.contrib.auth import logout
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import get_object_or_404, render_to_response, render
+from django.shortcuts import get_object_or_404, render
 from django.template.context import RequestContext
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib import messages
 from accounts.models import *
-from ipaddr import *
+from ipaddress import *
 from django.db.models import Q
 from django.contrib.auth import authenticate, login
 
@@ -41,7 +41,8 @@ from flowspec.forms import *
 from flowspec.models import *
 from peers.models import *
 
-from registration.models import RegistrationProfile
+#TODO re-enable
+#from django_registration.models import RegistrationProfile
 
 from copy import deepcopy
 
@@ -82,7 +83,6 @@ def welcome(request):
     return render(
         request,
         'welcome.html',
-        {}
     )
 
 
@@ -93,7 +93,7 @@ def dashboard(request):
     message = ''
     #message = eee.aa
     try:
-        peers = request.user.get_profile().peers.select_related('user_profile')
+        peers = request.user.userprofile.peers.select_related()
     except UserProfile.DoesNotExist:
         error = "User <strong>%s</strong> does not belong to any peer or organization. It is not possible to create new firewall rules.<br>Please contact Helpdesk to resolve this issue" % request.user.username
         return render(
@@ -142,7 +142,7 @@ def dashboard(request):
 @never_cache
 def group_routes(request):
     try:
-        request.user.get_profile().peers.all()
+        request.user.userprofile.peers.select_related()
     except UserProfile.DoesNotExist:
         error = "User <strong>%s</strong> does not belong to any peer or organization. It is not possible to create new firewall rules.<br>Please contact Helpdesk to resolve this issue" % request.user.username
         return render(
@@ -164,7 +164,7 @@ def group_routes(request):
 def group_routes_ajax(request):
     all_group_routes = []
     try:
-        peers = request.user.get_profile().peers.prefetch_related('networks')
+        peers = request.user.userprofile.peers.prefetch_related('networks')
     except UserProfile.DoesNotExist:
         error = "User <strong>%s</strong> does not belong to any peer or organization. It is not possible to create new firewall rules.<br>Please contact Helpdesk to resolve this issue" % request.user.username
         return render(
@@ -182,7 +182,7 @@ def group_routes_ajax(request):
     jresp = {}
     routes = build_routes_json(all_group_routes, request.user.is_superuser)
     jresp['aaData'] = routes
-    return HttpResponse(json.dumps(jresp), mimetype='application/json')
+    return HttpResponse(json.dumps(jresp), content_type='application/json')
 
 
 @login_required
@@ -190,10 +190,11 @@ def group_routes_ajax(request):
 def overview_routes_ajax(request):
     all_group_routes = []
     try:
-        peers = request.user.get_profile().peers.all().select_related()
+        # TODO all()?
+        peers = request.user.userprofile.peers.all().select_related()
     except UserProfile.DoesNotExist:
         error = "User <strong>%s</strong> does not belong to any peer or organization. It is not possible to create new firewall rules.<br>Please contact Helpdesk to resolve this issue" % request.user.username
-        return render_to_response('error.html', {'error': error}, context_instance=RequestContext(request))
+        return render(request, 'error.html', {'error': error})
     query = Q()
     for peer in peers:
         query |= Q(applier__userprofile__in=peer.user_profile.all())
@@ -203,7 +204,7 @@ def overview_routes_ajax(request):
     jresp = {}
     routes = build_routes_json(all_group_routes, request.user.is_superuser)
     jresp['aaData'] = routes
-    return HttpResponse(json.dumps(jresp), mimetype='application/json')
+    return HttpResponse(json.dumps(jresp), content_type='application/json')
 
 
 def build_routes_json(groutes, is_superuser):
@@ -242,14 +243,14 @@ def build_routes_json(groutes, is_superuser):
             rd['applier'] = 'unknown'
             rd['peer'] = ''
         else:
-            peers = r.applier.get_profile().peers.select_related('networks')
+            peers = r.applier.userprofile.peers.select_related('networks')
             username = None
             for peer in peers:
                 if username:
                     break
                 for network in peer.networks.all():
-                    net = IPNetwork(network)
-                    if IPNetwork(r.destination) in net:
+                    net = ip_network(network)
+                    if ip_network(r.destination) in net:
                         username = peer.peer_name
                         break
             try:
@@ -271,7 +272,8 @@ def add_route(request):
     if request.user.is_superuser:
         applier_peer_networks = PeerRange.objects.all()
     else:
-        user_peers = request.user.get_profile().peers.all()
+        # TODO all()?
+        user_peers = request.user.userprofile.peers.all()
         for peer in user_peers:
             applier_peer_networks.extend(peer.networks.all())
     if not applier_peer_networks:
@@ -286,10 +288,9 @@ def add_route(request):
         if not request.user.is_superuser:
             form.fields['then'] = forms.ModelMultipleChoiceField(queryset=ThenAction.objects.filter(action__in=settings.UI_USER_THEN_ACTIONS).order_by('action'), required=True)
             form.fields['protocol'] = forms.ModelMultipleChoiceField(queryset=MatchProtocol.objects.filter(protocol__in=settings.UI_USER_PROTOCOLS).order_by('protocol'), required=False)
-        return render_to_response('apply.html', {'form': form,
+        return render(request, 'apply.html', {'form': form,
             'applier': applier,
-            'maxexpires': settings.MAX_RULE_EXPIRE_DAYS },
-            context_instance=RequestContext(request))
+            'maxexpires': settings.MAX_RULE_EXPIRE_DAYS })
 
     else:
         request_data = request.POST.copy()
@@ -308,8 +309,8 @@ def add_route(request):
                 route.applier = request.user
             route.status = "PENDING"
             route.response = "Applying"
-            route.source = IPNetwork('%s/%s' % (IPNetwork(route.source).network.compressed, IPNetwork(route.source).prefixlen)).compressed
-            route.destination = IPNetwork('%s/%s' % (IPNetwork(route.destination).network.compressed, IPNetwork(route.destination).prefixlen)).compressed
+            route.source = ip_network('%s/%s' % (ip_network(route.source).network.compressed, ip_network(route.source).prefixlen)).compressed
+            route.destination = ip_network('%s/%s' % (ip_network(route.destination).network.compressed, ip_network(route.destination).prefixlen)).compressed
             try:
                 route.requesters_address = request.META['HTTP_X_FORWARDED_FOR']
             except:
@@ -346,7 +347,7 @@ def edit_route(request, route_slug):
     if request.user.is_superuser:
         applier_peer_networks = PeerRange.objects.all()
     else:
-        user_peers = request.user.get_profile().peers.all()
+        user_peers = request.user.userprofile.peers.all()
         for peer in user_peers:
             applier_peer_networks.extend(peer.networks.all())
     if not applier_peer_networks:
@@ -390,8 +391,8 @@ def edit_route(request, route_slug):
             if bool(set(changed_data) & set(critical_changed_values)) or (not route_original.status == 'ACTIVE'):
                 route.status = "PENDING"
                 route.response = "Applying"
-                route.source = IPNetwork('%s/%s' % (IPNetwork(route.source).network.compressed, IPNetwork(route.source).prefixlen)).compressed
-                route.destination = IPNetwork('%s/%s' % (IPNetwork(route.destination).network.compressed, IPNetwork(route.destination).prefixlen)).compressed
+                route.source = ip_network('%s/%s' % (ip_network(route.source).network.compressed, ip_network(route.source).prefixlen)).compressed
+                route.destination = ip_network('%s/%s' % (ip_network(route.destination).network.compressed, ip_network(route.destination).prefixlen)).compressed
                 try:
                     route.requesters_address = request.META['HTTP_X_FORWARDED_FOR']
                 except:
@@ -407,16 +408,13 @@ def edit_route(request, route_slug):
             if not request.user.is_superuser:
                 form.fields['then'] = forms.ModelMultipleChoiceField(queryset=ThenAction.objects.filter(action__in=settings.UI_USER_THEN_ACTIONS).order_by('action'), required=True)
                 form.fields['protocol'] = forms.ModelMultipleChoiceField(queryset=MatchProtocol.objects.filter(protocol__in=settings.UI_USER_PROTOCOLS).order_by('protocol'), required=False)
-            return render_to_response(
-                'apply.html',
+            return render(request, 'apply.html',
                 {
                     'form': form,
                     'edit': True,
                     'applier': applier,
                     'maxexpires': settings.MAX_RULE_EXPIRE_DAYS
-                },
-                context_instance=RequestContext(request)
-            )
+                })
     else:
         if (not route_original.status == 'ACTIVE'):
             route_edit.expires = datetime.date.today() + datetime.timedelta(days=settings.EXPIRATION_DAYS_OFFSET-1)
@@ -432,16 +430,13 @@ def edit_route(request, route_slug):
         if not request.user.is_superuser:
             form.fields['then'] = forms.ModelMultipleChoiceField(queryset=ThenAction.objects.filter(action__in=settings.UI_USER_THEN_ACTIONS).order_by('action'), required=True)
             form.fields['protocol'] = forms.ModelMultipleChoiceField(queryset=MatchProtocol.objects.filter(protocol__in=settings.UI_USER_PROTOCOLS).order_by('protocol'), required=False)
-        return render_to_response(
-            'apply.html',
+        return render(request, 'apply.html',
             {
                 'form': form,
                 'edit': True,
                 'applier': applier,
                 'maxexpires': settings.MAX_RULE_EXPIRE_DAYS
-            },
-            context_instance=RequestContext(request)
-        )
+            })
 
 
 @login_required
@@ -449,25 +444,25 @@ def edit_route(request, route_slug):
 def delete_route(request, route_slug):
     if request.is_ajax():
         route = get_object_or_404(Route, name=route_slug)
-        peers = route.applier.get_profile().peers.all()
+        peers = route.applier.userprofile.peers.all()
         username = None
         for peer in peers:
             if username:
                 break
             for network in peer.networks.all():
-                net = IPNetwork(network)
-                if IPNetwork(route.destination) in net:
+                net = ip_network(network)
+                if ip_network(route.destination) in net:
                     username = peer
                     break
         applier_peer = username
-        peers = request.user.get_profile().peers.all()
+        peers = request.user.userprofile.peers.all()
         username = None
         for peer in peers:
             if username:
                 break
             for network in peer.networks.all():
-                net = IPNetwork(network)
-                if IPNetwork(route.destination) in net:
+                net = ip_network(network)
+                if ip_network(route.destination) in net:
                     username = peer
                     break
         requester_peer = username
@@ -495,7 +490,7 @@ def delete_route(request, route_slug):
 def user_profile(request):
     user = request.user
     try:
-        peers = request.user.get_profile().peers.all()
+        peers = request.user.userprofile.peers.all()
         if user.is_superuser:
             peers = Peer.objects.all()
     except UserProfile.DoesNotExist:
@@ -617,12 +612,12 @@ def user_login(request):
 
         if user is not None:
             try:
-                user.get_profile().peers.all()
+                user.userprofile.peers.all()
             except:
                 form = UserProfileForm()
                 form.fields['user'] = forms.ModelChoiceField(queryset=User.objects.filter(pk=user.pk), empty_label=None)
                 form.fields['peer'] = forms.ModelChoiceField(queryset=Peer.objects.all(), empty_label=None)
-                return render_to_response('registration/select_institution.html', {'form': form}, context_instance=RequestContext(request))
+                return render(request, 'registration/select_institution.html', {'form': form})
             if not user_exists:
                 user_activation_notify(user)
             if user.is_active:
@@ -659,7 +654,7 @@ def user_login(request):
 def user_activation_notify(user):
     if not settings.DISABLE_EMAIL_NOTIFICATION:
         current_site = Site.objects.get_current()
-        peers = user.get_profile().peers.all()
+        peers = user.userprofile.peers.all()
 
         # Email subject *must not* contain newlines
         # TechCs will be notified about new users.
@@ -671,11 +666,12 @@ def user_activation_notify(user):
             }
         )
         subject = ''.join(subject.splitlines())
-        registration_profile = RegistrationProfile.objects.create_profile(user)
+        #TODO registration_profile = RegistrationProfile.objects.create_profile(user)
+        registration_profile="TODO - key"
         message = render_to_string(
             'registration/activation_email.txt',
             {
-                'activation_key': registration_profile.activation_key,
+                'activation_key': registration_profile, #TODO registration_profile.activation_key,
                 'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
                 'site': current_site,
                 'user': user
@@ -742,7 +738,7 @@ def add_rate_limit(request):
             response_data['value'] = "%s:%s" % (then.action, then.action_value)
             return HttpResponse(
                 json.dumps(response_data),
-                mimetype='application/json'
+                content_type='application/json'
             )
         else:
             return render(
@@ -775,7 +771,7 @@ def add_port(request):
             response_data['text'] = "%s" % port.port
             return HttpResponse(
                 json.dumps(response_data),
-                mimetype='application/json'
+                content_type='application/json'
             )
         else:
             return render(
@@ -832,7 +828,7 @@ def selectinst(request):
 @never_cache
 def overview(request):
     user = request.user
-    if user.is_authenticated():
+    if user.is_authenticated:
         if user.has_perm('accounts.overview'):
             users = User.objects.all()
             return render(
@@ -865,7 +861,7 @@ def user_logout(request):
 @never_cache
 def load_jscript(request, file):
     long_polling_timeout = int(settings.POLL_SESSION_UPDATE) * 1000 + 10000
-    return render_to_response('%s.js' % file, {'timeout': long_polling_timeout}, context_instance=RequestContext(request), mimetype="text/javascript")
+    return render(request, '%s.js' % file, {'timeout': long_polling_timeout}, content_type="text/javascript")
 
 
 def lookupShibAttr(attrmap, requestMeta):
@@ -907,18 +903,18 @@ def routestats(request, route_slug):
             raise Exception("No data stored in the existing file.")
         if settings.STATISTICS_PER_RULE==False:
             if routename in res:
-              return HttpResponse(json.dumps({"name": routename, "data": res[routename]}), mimetype="application/json")
+              return HttpResponse(json.dumps({"name": routename, "data": res[routename]}), content_type="application/json")
             else:
-              return HttpResponse(json.dumps({"error": "Route '{}' was not found in statistics.".format(routename)}), mimetype="application/json", status=404)
+              return HttpResponse(json.dumps({"error": "Route '{}' was not found in statistics.".format(routename)}), content_type="application/json", status=404)
         else:
             if route_id in res['_per_rule']:
-              return HttpResponse(json.dumps({"name": routename, "data": res['_per_rule'][route_id]}), mimetype="application/json")
+              return HttpResponse(json.dumps({"name": routename, "data": res['_per_rule'][route_id]}), content_type="application/json")
             else:
-              return HttpResponse(json.dumps({"error": "Route '{}' was not found in statistics.".format(route_id)}), mimetype="application/json", status=404)
+              return HttpResponse(json.dumps({"error": "Route '{}' was not found in statistics.".format(route_id)}), content_type="application/json", status=404)
 
     except Exception as e:
         logger.error('routestats failed: %s' % e)
-        return HttpResponse(json.dumps({"error": "No data available. %s" % e}), mimetype="application/json", status=404)
+        return HttpResponse(json.dumps({"error": "No data available. %s" % e}), content_type="application/json", status=404)
 
 def setup(request):
     if User.objects.count() == 0:

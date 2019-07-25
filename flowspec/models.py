@@ -22,21 +22,21 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from flowspec.helpers import send_new_mail, get_peer_techc_mails
 from utils import proxy as PR
-from ipaddr import *
+from ipaddress import *
 import datetime
 import logging
 
-from junos import create_junos_name
+from flowspec.junos import create_junos_name
 
 
 import beanstalkc
 from utils.randomizer import id_generator as id_gen
 
-from tasks import *
+from flowspec.tasks import *
 
 
 FORMAT = '%(asctime)s %(levelname)s: %(message)s'
@@ -138,18 +138,18 @@ class ThenAction(models.Model):
 
 class Route(models.Model):
     name = models.SlugField(max_length=128, verbose_name=_("Name"))
-    applier = models.ForeignKey(User, blank=True, null=True)
+    applier = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     source = models.CharField(max_length=32, help_text=_("Network address. Use address/CIDR notation"), verbose_name=_("Source Address"))
     sourceport = models.CharField(max_length=65535, blank=True, null=True, verbose_name=_("Source Port"))
     destination = models.CharField(max_length=32, help_text=_("Network address. Use address/CIDR notation"), verbose_name=_("Destination Address"))
     destinationport = models.CharField(max_length=65535, blank=True, null=True, verbose_name=_("Destination Port"))
     port = models.CharField(max_length=65535, blank=True, null=True, verbose_name=_("Port"))
-    dscp = models.ManyToManyField(MatchDscp, blank=True, null=True, verbose_name="DSCP")
-    fragmenttype = models.ManyToManyField(FragmentType, blank=True, null=True, verbose_name="Fragment Type")
+    dscp = models.ManyToManyField(MatchDscp, blank=True, verbose_name="DSCP")
+    fragmenttype = models.ManyToManyField(FragmentType, blank=True, verbose_name="Fragment Type")
     icmpcode = models.CharField(max_length=32, blank=True, null=True, verbose_name="ICMP Code")
     icmptype = models.CharField(max_length=32, blank=True, null=True, verbose_name="ICMP Type")
     packetlength = models.IntegerField(blank=True, null=True, verbose_name="Packet Length")
-    protocol = models.ManyToManyField(MatchProtocol, blank=True, null=True, verbose_name=_("Protocol"))
+    protocol = models.ManyToManyField(MatchProtocol, blank=True, verbose_name=_("Protocol"))
     tcpflag = models.CharField(max_length=128, blank=True, null=True, verbose_name="TCP flag")
     then = models.ManyToManyField(ThenAction, verbose_name=_("Then"))
     filed = models.DateTimeField(auto_now_add=True)
@@ -203,7 +203,7 @@ class Route(models.Model):
         from django.core.exceptions import ValidationError
         if self.destination:
             try:
-                address = IPNetwork(self.destination)
+                address = ipaddress.ip_network(self.destination)
                 self.destination = address.exploded
             except Exception:
                 raise ValidationError(_('Invalid network address format at Destination Field'))
@@ -642,3 +642,4 @@ def send_message(msg, user):
     tube_message = json.dumps({'message': str(msg), 'username': peer})
     b.put(tube_message)
     b.close()
+

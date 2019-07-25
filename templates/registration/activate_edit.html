@@ -12,8 +12,8 @@
 		}
 }
 </style>
-<link href="{{STATIC_URL}}js/select2/select2.css" rel="stylesheet">
-<link href="{{STATIC_URL}}js/select2/select2-bootstrap.css" rel="stylesheet">
+<link href="{% static 'js/select2/select2.css' %}" rel="stylesheet">
+<link href="{% static 'js/select2/select2-bootstrap.css' %}" rel="stylesheet">
 {% endblock %}
 
        {% block contentplaceholder %}
@@ -70,7 +70,7 @@
 	{% endblock %}
 
 {% block pagejsbottom %}
-	<script type="text/javascript" src="{{STATIC_URL}}js/select2/select2.js"></script>
+	<script type="text/javascript" src="{% static 'js/select2/select2.js' %}"></script>
 	<script>
 		$(document).ready( function(){
 			$('#id_peers').select2();

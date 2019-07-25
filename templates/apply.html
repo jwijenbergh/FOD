@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% load widget_tweaks %}
 {% load i18n %}
 
@@ -20,9 +21,9 @@
 </li>
 {% endblock %}
 {% block extrahead %}
-    <link href="{{STATIC_URL}}css/plugins/morris/morris-0.4.3.min.css" rel="stylesheet">
-    <link href="{{STATIC_URL}}css/plugins/timeline/timeline.css" rel="stylesheet">
-    <link href="{{STATIC_URL}}datepicker/css/datepicker.css" rel="stylesheet">
+    <link href="{% static 'b3theme/css/plugins/morris/morris-0.4.3.min.css' %}" rel="stylesheet">
+    <link href="{% static 'b3theme/css/plugins/timeline/timeline.css' %}" rel="stylesheet">
+    <link href="{% static 'datepicker/css/datepicker.css' %}" rel="stylesheet">
 
 {% endblock %}
 
@@ -75,13 +76,13 @@
 }
 
 </style>
- <link href="{{STATIC_URL}}js/select2/select2.css" rel="stylesheet">
- <link href="{{STATIC_URL}}js/select2/select2-bootstrap.css" rel="stylesheet">
+ <link href="{% static 'js/select2/select2.css' %}" rel="stylesheet">
+ <link href="{% static 'js/select2/select2-bootstrap.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block pagejsbottom %}
-<script type="text/javascript" src="{{STATIC_URL}}datepicker/js/bootstrap-datepicker.js"></script>
-<script type="text/javascript" src="{{STATIC_URL}}js/select2/select2.js"></script>
+<script type="text/javascript" src="{% static 'datepicker/js/bootstrap-datepicker.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/select2/select2.js' %}"></script>
 <script>
 	$(document).ready( function(){
 		$('#id_then').removeAttr("multiple");
@@ -115,7 +116,7 @@
 			buttons: {
 		'{% trans "Add" %}': function() {
 			$.ajax({
-			url:"{% url add-rate-limit %}",
+			url:"{% url 'add-rate-limit' %}",
 			data:$("#add_rl_form").serialize(),
 			type: "POST",
 			cache: false,
@@ -147,7 +148,7 @@
 			})
 			.click(function(){
 				$.ajax({
-					url: "{% url add-rate-limit %}",
+					url: "{% url 'add-rate-limit' %}",
 					cache: false,
 					success: function(data){
 						$("#then_diag").html(data);
@@ -232,7 +233,7 @@
 		            {% endif %}
 		        </div>
 		        <div class="col-md-2">
-		            <img src="{{STATIC_URL}}threat_source.png" style="height: 30px;"/> &nbsp;&nbsp;<button type="button" class="btn btn-md btn-info btn-outline" id="setFromAll">Any</button>
+		            <img src="{% static 'threat_source.png' %}" style="height: 30px;"/> &nbsp;&nbsp;<button type="button" class="btn btn-md btn-info btn-outline" id="setFromAll">Any</button>
 		        </div>
 		        </div>
 
@@ -244,7 +245,7 @@
 		            {% endif %}
 		        </div>
 		        <div class="col-md-2">
-		            <img src="{{STATIC_URL}}secure_destination.png" style="height: 30px;"/>
+		            <img src="{% static 'secure_destination.png' %}" style="height: 30px;"/>
 		        </div>
 		        </div>
 

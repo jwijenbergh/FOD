@@ -40,6 +40,7 @@ class PeerAdminForm(ModelForm):
 
     class Meta:
         model = Peer
+        fields = "__all__"
 
 
 class PeerAdmin(admin.ModelAdmin):

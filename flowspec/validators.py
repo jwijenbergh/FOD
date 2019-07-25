@@ -1,16 +1,16 @@
-from ipaddr import IPNetwork
+from ipaddress import ip_network
 import datetime
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.translation import ugettext as _
 from peers.models import PeerRange, Peer
 from flowspec.models import Route
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 
 def get_network(ip):
     try:
-        address = IPNetwork(ip)
+        address = ip_network(ip)
     except Exception:
         return (False, _('Invalid network address format'))
     else:
@@ -54,7 +54,7 @@ def clean_source(user, source):
     if not success:
         return address
     for net in settings.PROTECTED_SUBNETS:
-        if address in IPNetwork(net):
+        if address in ip_network(net):
             mail_body = "User %s %s attempted to set %s as the source address in a firewall rule" % (user.username, user.email, source)
             send_mail(
                 settings.EMAIL_SUBJECT_PREFIX + "Caught an attempt to set a protected IP/network as a source address",
@@ -72,7 +72,7 @@ def clean_destination(user, destination):
     if not success:
         return address
     for net in settings.PROTECTED_SUBNETS:
-        if address in IPNetwork(net):
+        if address in ip_network(net):
             mail_body = "User %s %s attempted to set %s as the destination address in a firewall rule" % (user.username, user.email, destination)
             send_mail(
                 settings.EMAIL_SUBJECT_PREFIX + "Caught an attempt to set a protected IP/network as the destination address",
@@ -98,8 +98,8 @@ def clean_destination(user, destination):
         networks = PeerRange.objects.filter(peer__in=Peer.objects.all()).distinct()
     network_is_mine = False
     for network in networks:
-        net = IPNetwork(network.network)
-        if IPNetwork(destination) in net:
+        net = ip_network(network.network)
+        if ip_network(destination) in net:
             network_is_mine = True
     if not network_is_mine:
         return (_('Destination address/network should belong to your administrative address space. Check My Profile to review your networks'))
@@ -185,7 +185,7 @@ def check_if_rule_exists(fields, queryset):
 
     routes = queryset.filter(
         source=fields.get('source'),
-        destination=IPNetwork(fields.get('destination')).compressed,
+        destination=ip_network(fields.get('destination')).compressed,
     )
     if routes:
         ids = [str(item[0]) for item in routes.values_list('pk')]
@@ -195,7 +195,7 @@ def check_if_rule_exists(fields, queryset):
 
     routes = Route.objects.filter(
         source=fields.get('source'),
-        destination=IPNetwork(fields.get('destination')).compressed,
+        destination=ip_network(fields.get('destination')).compressed,
     )
     for route in routes:
         return (

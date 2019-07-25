@@ -22,13 +22,13 @@ import json
 
 import uuid
 import datetime
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from gevent.event import Event
 from django.conf import settings
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from peers.models import Peer
 
 import beanstalkc
@@ -78,7 +78,7 @@ class Msgs(object):
     def main(self, request):
         if self.user_cache:
             request.session['cursor'] = self.user_cache[-1]['id']
-        return render_to_response('poll.html', {'messages': self.user_cache})
+        return render(request, 'poll.html', {'messages': self.user_cache})
 
     def message_existing(self, request, peer_id):
         if request.is_ajax():
@@ -137,7 +137,7 @@ class Msgs(object):
             try:
                 cursor[user] = self.user_cursor[user]
             except:
-                return HttpResponse(content='', mimetype=None, status=400)
+                return HttpResponse(content='', content_type=None, status=400)
 
             try:
                 if not isinstance(self.user_cache[user], list):
