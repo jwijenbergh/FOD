@@ -1,6 +1,8 @@
 #FROM debian:stable
 FROM debian:stretch
 
+ENV LC_ALL="C.UTF-8"
+
 RUN [ -z "$NOAPT" ] && apt-get -yqq update
 RUN [ -z "$NOAPT" ] && apt-get -yqq upgrade
 
