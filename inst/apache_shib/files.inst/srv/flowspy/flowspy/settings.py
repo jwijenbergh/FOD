@@ -275,6 +275,7 @@ CELERYBEAT_SCHEDULE = {
 CELERY_IMPORTS = ("flowspec.tasks", )
 
 # Notifications
+DISABLE_EMAIL_NOTIFICATION = True
 SERVER_EMAIL = "Example FoD Service <noreply@example.com>"
 EMAIL_SUBJECT_PREFIX = "[FoD] "
 EXPIRATION_NOTIFY_DAYS = 4
@@ -466,9 +467,16 @@ STATISTICS_PER_RULE = True
 
 STATISTICS_PER_RULE__ADD_INITIAL_ZERO = True
 
-#
+##############################################################################
+##############################################################################
 
-DISABLE_EMAIL_NOTIFICATION = True
+#MYSETTING1="default"
+#from settings_local import *
+from flowspy.settings_local import *
+
+#print "MYSETTING1="+MYSETTING1
+#print("MYSETTING1="+MYSETTING1, file=sys.stderr)
+#print "debug settings.NOTIFY_ADMIN_MAILS="+str(NOTIFY_ADMIN_MAILS)
 
 ##############################################################################
 ##############################################################################
