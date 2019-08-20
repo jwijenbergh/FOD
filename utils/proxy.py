@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import nxpy as np
+import jncdevice as np
 from ncclient import manager
 from ncclient.transport.errors import AuthenticationError, SSHError
 from lxml import etree as ET
@@ -269,15 +269,23 @@ class Applier(object):
                         return False, cause
                     if edit_is_successful:
                         try:
-                            commit_confirmed_response = m.commit(confirmed=True, timeout=settings.COMMIT_CONFIRMED_TIMEOUT)
-                            commit_confirmed_is_successful, reason = is_successful(commit_confirmed_response)
-
-                            if not commit_confirmed_is_successful:
-                                raise Exception()
+                            if ":confirmed-commit" in m.server_capabilities:
+                                commit_confirmed_response = m.commit(confirmed=True, timeout=settings.COMMIT_CONFIRMED_TIMEOUT)
+                                commit_confirmed_is_successful, reason = is_successful(commit_confirmed_response)
+                                if not commit_confirmed_is_successful:
+                                    raise Exception()
+                                else:
+                                    logger.info("Successfully confirmed committed @ %s" % self.device)
+                                    if not settings.COMMIT:
+                                        return True, "Successfully confirmed committed"
                             else:
-                                logger.info("Successfully confirmed committed @ %s" % self.device)
-                                if not settings.COMMIT:
-                                    return True, "Successfully confirmed committed"
+                                commit_response = m.commit(confirmed=False, timeout=settings.COMMIT_CONFIRMED_TIMEOUT)
+                                if commit_response.ok:
+                                    logger.info("Successfully committed @ %s" % self.device)
+                                    return True, "Successfully committed"
+                                else:
+                                    return False, "Failed to commit changes %s" % commit_response.errors
+
                         except SoftTimeLimitExceeded:
                             cause="Task timeout"
                             logger.error(cause)

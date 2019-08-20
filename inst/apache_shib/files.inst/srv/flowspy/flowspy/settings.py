@@ -32,7 +32,7 @@ import djcelery
 djcelery.setup_loader()
 from celery.schedules import crontab
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -53,8 +53,8 @@ SECRET_KEY = '@sa@5234#$%345345^@#$%*()123^@12!&!()$JMNDF#$@(@#8FRNJWX_'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',
+        'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'example-data',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',                      # Set to empty string for localhost.
@@ -97,7 +97,9 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+STATIC_ROOT = os.path.join(BASE_DIR)
+STATICFILES_DIRS = ( os.path.join(BASE_DIR, 'static'), )
 STATIC_URL = '/static/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -107,6 +109,7 @@ STATICFILES_FINDERS = (
 # Templates
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
+    os.path.join('/srv/venv/django/contrib/admin/templates/'),
 )
 
 TEMPLATE_LOADERS = (
@@ -178,25 +181,20 @@ GRAPHS_API_URL = 'http://127.0.0.1:8080/api/routes/'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
     'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
     },
     'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
             'propagate': True,
         },
-    }
+    },
 }
 
 LOGIN_URL = '/welcome'
@@ -287,7 +285,8 @@ PREFIX_LENGTH = 29
 POLL_SESSION_UPDATE = 60.0
 
 # Shibboleth
-SHIB_AUTH_ENTITLEMENT = 'urn:mace:example.com:pki:user'
+#SHIB_AUTH_ENTITLEMENT = 'urn:mace:example.com:pki:user'
+SHIB_AUTH_ENTITLEMENT = ''
 SHIB_ADMIN_DOMAIN = 'example.com'
 SHIB_LOGOUT_URL = 'https://example.com/Shibboleth.sso/Logout'
 
@@ -311,26 +310,28 @@ SHIB_LOGOUT_URL = 'https://example.com/Shibboleth.sso/Logout'
 #    <Attribute name="urn:mace:dir:attribute-def:eduPersonEntitlement" id="entitlement"/>
 #    <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.7" id="entitlement"-->
 
-SHIB_ENTITLEMENT = ['HTTP_SHIB_EP_ENTITLEMENT'] # value in settings.py.dist
-#SHIB_ENTITLEMENT = ['HTTP_ENTITLEMENT']
+#SHIB_ENTITLEMENT = ['HTTP_SHIB_EP_ENTITLEMENT'] # value in settings.py.dist
+SHIB_ENTITLEMENT = ['HTTP_ENTITLEMENT']
 SHIB_ENTITLEMENT_DISPLAY_NAME = "eduPersonEntitlement"
 SHIB_ENTITLEMENT_DISPLAY_ADDINFO = "urn:oid:1.3.6.1.4.1.5923.1.1.1.7; the value of this attribute also has to include 'urn:mace:example.com:pki:user'"
 #SHIB_ENTITLEMENT_DISPLAY_ADDINFO = "urn:oid:1.3.6.1.4.1.5923.1.1.1.7"
 
 # (";"-separated) part of value of attribute with key SHIB_ENTITLEMENT needed in order to be considered a valid user:
 # if SHIB_AUTH_ENTITLEMENT is empty no constraint on SHIB_ENTITLEMENT attribute value is enforced (can even be missing)
-SHIB_AUTH_ENTITLEMENT = 'urn:mace:example.com:pki:user'
-#SHIB_AUTH_ENTITLEMENT = '' # is also in settings_local.py so override it there
+#SHIB_AUTH_ENTITLEMENT = 'urn:mace:example.com:pki:user'
+SHIB_AUTH_ENTITLEMENT = '' # is also in settings_local.py so override it there
 
-SHIB_USERNAME = ['HTTP_EPPN'] # in settings.py.dist # originally used for SHIB_USERNAME
-SHIB_USERNAME_DISPLAY_NAME = "eduPersonPrincipalName"
-SHIB_USERNAME_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:eduPersonPrincipalName or urn:oid:1.3.6.1.4.1.5923.1.1.1.6"
+#SHIB_USERNAME = ['HTTP_EPPN'] # in settings.py.dist # originally used for SHIB_USERNAME
+#SHIB_USERNAME_DISPLAY_NAME = "eduPersonPrincipalName"
+#SHIB_USERNAME_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:eduPersonPrincipalName or urn:oid:1.3.6.1.4.1.5923.1.1.1.6"
 #SHIB_USERNAME = ['HTTP_PERSISTENT_ID']
-#SHIB_USERNAME_DISPLAY_NAME = "PERSISTENT_ID"
-#SHIB_USERNAME_DISPLAY_ADDINFO = "urn:oid:1.3.6.1.4.1.5923.1.1.1.10"
+SHIB_USERNAME = ['HTTP_PERSISTENT_ID', 'HTTP_PRINCIPALNAME']
+#SHIB_USERNAME = ['mail', 'HTTP_MAIL', 'HTTP_SHIB_INETORGPERSON_MAIL']
+SHIB_USERNAME_DISPLAY_NAME = "PERSISTENT_ID"
+SHIB_USERNAME_DISPLAY_ADDINFO = "urn:oid:1.3.6.1.4.1.5923.1.1.1.10"
 
-SHIB_SLUGIFY_USERNAME = False # value in settings.py.dist
-#SHIB_SLUGIFY_USERNAME = True
+#SHIB_SLUGIFY_USERNAME = False # value in settings.py.dist
+SHIB_SLUGIFY_USERNAME = True
 
 SHIB_MAIL = ['mail', 'HTTP_MAIL', 'HTTP_SHIB_INETORGPERSON_MAIL']
 SHIB_MAIL_DISPLAY_NAME = "MAIL"
