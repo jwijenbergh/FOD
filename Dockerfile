@@ -3,11 +3,11 @@ FROM debian:stretch
 
 ENV LC_ALL="C.UTF-8"
 
-RUN [ -z "$NOAPT" ] && apt-get -yqq update
-RUN [ -z "$NOAPT" ] && apt-get -yqq upgrade
+RUN if [ -z "$NOAPT" ]; then apt-get -yqq update; fi
+RUN if [ -z "$NOAPT" ]; then apt-get -yqq upgrade; fi
 
-RUN [ -z "$NOAPT" ] && apt-get -yqq install virtualenv python python-dev vim git gcc libevent-dev libxml2-dev libxslt-dev patch beanstalkd mariadb-server libmariadb-dev libmariadbclient-dev-compat sqlite3
-RUN [ -z "$NOAPT" ] && apt-get -yqq install procps
+RUN if [ -z "$NOAPT" ]; then apt-get -yqq install virtualenv python python-dev vim git gcc libevent-dev libxml2-dev libxslt-dev patch beanstalkd mariadb-server libmariadb-dev libmariadbclient-dev-compat sqlite3; fi
+RUN if [ -z "$NOAPT" ]; then apt-get -yqq install procps; fi
 
 # RUN echo "create database fod;" | mysql -u root
 
@@ -24,7 +24,7 @@ RUN (cd /srv/flowspy/; . /srv/venv/bin/activate && \
       ./manage.py syncdb --noinput && \
       ./manage.py migrate;)
 
-RUN [ "$INSTALL_TEST_APACHE_SHIB" = 1 ] && ./inst/apache_shib/apache_shib_init.sh
+RUN if [ "$INSTALL_TEST_APACHE_SHIB" = 1 ]; then ./inst/apache_shib/apache_shib_init.sh; else true; fi
 
 #  echo "To set environment to English, run: export LC_ALL=en_US"
 #  echo "To activate virualenv: source /srv/venv/bin/activate"
