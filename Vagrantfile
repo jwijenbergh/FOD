@@ -53,10 +53,16 @@ Vagrant.configure(2) do |config|
   #
    config.vm.provision "shell", inline: <<-SHELL
    rpm -Uh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-   yum -q -y install python36 python36-setuptools python36-virtualenv vim git gcc libevent-devel libxml2-devel libxslt-devel mariadb-server mysql-devel patch
-   yum -q -y install beanstalkd
-   systemctl enable beanstalkd.service
-   service beanstalkd start
+   yum -q -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+   yum -q -y install python36 python36-setuptools python36-virtualenv vim git gcc libevent-devel libxml2-devel libxslt-devel mariadb-server mysql-devel patch yum-utils
+
+
+   # Installation of redis from remi RPM repository
+   yum-config-manager --enable remi
+   yum -q -y install redis
+   systemctl enable redis
+   systemctl start redis
+
    systemctl enable mariadb.service
    service mariadb start
    mysql -u root <<-SCRIPT
