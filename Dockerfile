@@ -3,11 +3,11 @@ FROM debian:stretch
 
 ENV LC_ALL="C.UTF-8"
 
-RUN if [ -z "$NOAPT" ]; then apt-get -yqq update; fi
-RUN if [ -z "$NOAPT" ]; then apt-get -yqq upgrade; fi
+RUN if [ -z "$NOAPT" ]; then apt-get -yqq update; else true; fi
+RUN if [ -z "$NOAPT" ]; then apt-get -yqq upgrade; else true; fi
 
-RUN if [ -z "$NOAPT" ]; then apt-get -yqq install virtualenv python python-dev vim git gcc libevent-dev libxml2-dev libxslt-dev patch beanstalkd mariadb-server libmariadb-dev libmariadbclient-dev-compat sqlite3; fi
-RUN if [ -z "$NOAPT" ]; then apt-get -yqq install procps; fi
+RUN if [ -z "$NOAPT" ]; then apt-get -yqq install virtualenv python python-dev vim git gcc libevent-dev libxml2-dev libxslt-dev patch beanstalkd mariadb-server libmariadb-dev libmariadbclient-dev-compat sqlite3; else true; fi
+RUN if [ -z "$NOAPT" ]; then apt-get -yqq install procps; else true; fi
 
 # RUN echo "create database fod;" | mysql -u root
 
