@@ -19,7 +19,6 @@
 
 from django.contrib import admin
 from flowspec.models import MatchPort, MatchDscp, MatchProtocol, FragmentType, ThenAction, Route
-from flowspec.tasks import *
 from flowspec.forms import *
 from accounts.models import UserProfile
 from utils import proxy as PR

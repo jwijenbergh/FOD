@@ -36,7 +36,6 @@ from flowspec.junos import create_junos_name
 import beanstalkc
 from utils.randomizer import id_generator as id_gen
 
-from flowspec.tasks import *
 
 
 FORMAT = '%(asctime)s %(levelname)s: %(message)s'
