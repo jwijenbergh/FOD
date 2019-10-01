@@ -36,7 +36,7 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).SendKeys("Password");
             #endregion
             driver.FindElement(By.Id("applybutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("GÉANT OC FoD :: My rules"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
         }
 
         [Test]

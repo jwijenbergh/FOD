@@ -35,7 +35,7 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).SendKeys("1");
             #endregion
             driver.FindElement(By.Id("applybutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("GÉANT OC FoD :: My rules"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
 
             driver.FindElement(By.ClassName("fa-user")).Click();
             driver.FindElement(By.ClassName("fa-sign-out")).Click();

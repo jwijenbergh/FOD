@@ -37,10 +37,10 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).SendKeys("1");
             #endregion
             driver.FindElement(By.Id("applybutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("GÉANT OC FoD :: My rules"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
 
             driver.FindElement(By.Id("routebutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("Apply for a new rule"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'Apply for a new rule')]"));
 
             driver.FindElement(By.Id("id_name")).Click();
             driver.FindElement(By.Id("id_name")).SendKeys("npattack");
@@ -51,9 +51,9 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_destination")).Click();
             driver.FindElement(By.Id("id_destination")).SendKeys("0.0.0.0/29");
 
-            driver.FindElement(By.LinkText("Apply")).Click();
+            driver.FindElement(By.Id("applybutton")).Click();
 
-            //What should happend? 
+            //What should happen? 
         }
 
         [Test]
@@ -68,10 +68,10 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).SendKeys("1");
             #endregion
             driver.FindElement(By.Id("applybutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("GÉANT OC FoD :: My rules"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
 
             driver.FindElement(By.Id("routebutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("Apply for a new rule"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'Apply for a new rule')]"));
 
             driver.FindElement(By.Id("id_name")).Click();
             driver.FindElement(By.Id("id_name")).SendKeys("1' or '1' = '1 /*");
@@ -82,9 +82,9 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_destination")).Click();
             driver.FindElement(By.Id("id_destination")).SendKeys("0.0.0.0/29");
 
-            driver.FindElement(By.LinkText("Apply")).Click();
+            driver.FindElement(By.Id("applybutton")).Click();
 
-            driver.FindElement(By.XPath("//*[contains(text(), 'Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.')]"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'Enter a valid \'slug\' consisting of letters, numbers, underscores or hyphens.')]"));
         }
 
         [Test]
@@ -99,10 +99,10 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).SendKeys("1");
             #endregion
             driver.FindElement(By.Id("applybutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("GÉANT OC FoD :: My rules"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
 
             driver.FindElement(By.Id("routebutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("Apply for a new rule"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'Apply for a new rule')]"));
 
             driver.FindElement(By.Id("id_name")).Click();
             driver.FindElement(By.Id("id_name")).SendKeys("npattack");
@@ -113,7 +113,7 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_destination")).Click();
             driver.FindElement(By.Id("id_destination")).SendKeys("0.0.0.0/29");
 
-            driver.FindElement(By.LinkText("Apply")).Click();
+            driver.FindElement(By.Id("applybutton")).Click();
 
             driver.FindElement(By.XPath("//*[contains(text(), 'Invalid network address format')]"));
         }
@@ -130,10 +130,10 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).SendKeys("1");
             #endregion
             driver.FindElement(By.Id("applybutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("GÉANT OC FoD :: My rules"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
 
             driver.FindElement(By.Id("routebutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("Apply for a new rule"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'Apply for a new rule')]"));
 
             driver.FindElement(By.Id("id_name")).Click();
             driver.FindElement(By.Id("id_name")).SendKeys("npattack");
@@ -144,7 +144,7 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_destination")).Click();
             driver.FindElement(By.Id("id_destination")).SendKeys("drgr");
 
-            driver.FindElement(By.LinkText("Apply")).Click();
+            driver.FindElement(By.Id("applybutton")).Click();
 
             driver.FindElement(By.XPath("//*[contains(text(), 'Invalid network address format')]"));
         }
@@ -161,10 +161,10 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).SendKeys("1");
             #endregion
             driver.FindElement(By.Id("applybutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("GÉANT OC FoD :: My rules"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
 
             driver.FindElement(By.Id("routebutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("Apply for a new rule"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'Apply for a new rule')]"));
 
             driver.FindElement(By.Id("id_name")).Click();
             driver.FindElement(By.Id("id_name")).SendKeys("npattack");
@@ -178,7 +178,7 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_expires")).Click();
             driver.FindElement(By.Id("id_expires")).Clear();
 
-            driver.FindElement(By.LinkText("Apply")).Click();
+            driver.FindElement(By.Id("applybutton")).Click();
 
             driver.FindElement(By.XPath("//*[contains(text(), 'This field is required.')]"));
         }
@@ -195,10 +195,10 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).SendKeys("1");
             #endregion
             driver.FindElement(By.Id("applybutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("GÉANT OC FoD :: My rules"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
 
             driver.FindElement(By.Id("routebutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("Apply for a new rule"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'Apply for a new rule')]"));
 
             driver.FindElement(By.Id("id_name")).Click();
             driver.FindElement(By.Id("id_name")).SendKeys("npattack");
@@ -212,7 +212,7 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_sourceport")).Click();
             driver.FindElement(By.Id("id_sourceport")).SendKeys("f//");
 
-            driver.FindElement(By.LinkText("Apply")).Click();
+            driver.FindElement(By.Id("applybutton")).Click();
 
             driver.FindElement(By.XPath("//*[contains(text(), 'Malformed port range format, example: 80,1000-1100,6000-6010')]"));
         }
@@ -229,10 +229,10 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).SendKeys("1");
             #endregion
             driver.FindElement(By.Id("applybutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("GÉANT OC FoD :: My rules"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
 
             driver.FindElement(By.Id("routebutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("Apply for a new rule"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'Apply for a new rule')]"));
 
             driver.FindElement(By.Id("id_name")).Click();
             driver.FindElement(By.Id("id_name")).SendKeys("npattack");
@@ -246,7 +246,7 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_destinationport")).Click();
             driver.FindElement(By.Id("id_destinationport")).SendKeys("f//");
 
-            driver.FindElement(By.LinkText("Apply")).Click();
+            driver.FindElement(By.Id("applybutton")).Click();
 
             driver.FindElement(By.XPath("//*[contains(text(), 'Malformed port range format, example: 80,1000-1100,6000-6010')]"));
         }
@@ -263,10 +263,10 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).SendKeys("1");
             #endregion
             driver.FindElement(By.Id("applybutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("GÉANT OC FoD :: My rules"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
 
             driver.FindElement(By.Id("routebutton")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("Apply for a new rule"));
+            driver.FindElement(By.XPath("//*[contains(text(), 'Apply for a new rule')]"));
 
             driver.FindElement(By.Id("id_name")).Click();
             driver.FindElement(By.Id("id_name")).SendKeys("npattack");
@@ -280,7 +280,7 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_port")).Click();
             driver.FindElement(By.Id("id_port")).SendKeys("f//");
 
-            driver.FindElement(By.LinkText("Apply")).Click();
+            driver.FindElement(By.Id("applybutton")).Click();
 
             driver.FindElement(By.XPath("//*[contains(text(), 'Malformed port range format, example: 80,1000-1100,6000-6010')]"));
         }
