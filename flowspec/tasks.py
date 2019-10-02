@@ -223,7 +223,7 @@ def check_sync(route_name=None, selected_routes=[]):
 
 @shared_task(ignore_result=True)
 def notify_expired():
-    from flowspec.models import *
+    from flowspec.models import Route
     from django.contrib.sites.models import Site
     logger.info('Initializing expiration notification')
     routes = Route.objects.all()
