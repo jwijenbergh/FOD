@@ -28,6 +28,8 @@ class PeerRange(models.Model):
 
     def __unicode__(self):
         return self.network
+    def __str__(self):
+        return self.__unicode__()
 
     class Meta:
         db_table = u'peer_range'
@@ -40,6 +42,8 @@ class TechcEmail(models.Model):
 
     def __unicode__(self):
         return self.email
+    def __str__(self):
+        return self.__unicode__()
 
     class Meta:
         db_table = "techc_email"
@@ -58,6 +62,8 @@ class Peer(models.Model):
 
     def __unicode__(self):
         return self.peer_name
+    def __str__(self):
+        return self.__unicode__()
 
     class Meta:
         db_table = u'peer'

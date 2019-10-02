@@ -97,6 +97,8 @@ class MatchPort(models.Model):
     port = models.CharField(max_length=24, unique=True)
     def __unicode__(self):
         return self.port
+    def __str__(self):
+        return self.__unicode__()
     class Meta:
         db_table = u'match_port'
 
@@ -104,6 +106,8 @@ class MatchDscp(models.Model):
     dscp = models.CharField(max_length=24)
     def __unicode__(self):
         return self.dscp
+    def __str__(self):
+        return self.__unicode__()
     class Meta:
         db_table = u'match_dscp'
 
@@ -111,6 +115,8 @@ class MatchProtocol(models.Model):
     protocol = models.CharField(max_length=24, unique=True)
     def __unicode__(self):
         return self.protocol
+    def __str__(self):
+        return self.__unicode__()
     class Meta:
         db_table = u'match_protocol'
 
@@ -120,6 +126,9 @@ class FragmentType(models.Model):
     def __unicode__(self):
         return "%s" %(self.fragmenttype)
 
+    def __str__(self):
+        return self.__unicode__()
+
 
 class ThenAction(models.Model):
     action = models.CharField(max_length=60, choices=THEN_CHOICES, verbose_name="Action")
@@ -128,6 +137,9 @@ class ThenAction(models.Model):
     def __unicode__(self):
         ret = "%s:%s" %(self.action, self.action_value)
         return ret.rstrip(":")
+
+    def __str__(self):
+        return self.__unicode__()
 
     class Meta:
         db_table = u'then_action'
@@ -186,6 +198,9 @@ class Route(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def __str__(self):
+        return self.__unicode__()
 
     class Meta:
         db_table = u'route'
