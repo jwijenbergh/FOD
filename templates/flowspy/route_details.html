@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load static %}
 
 {% block contentplaceholder %}
 <script>
@@ -55,21 +56,21 @@ function myreloadPage() {
             {% endfor %}
             )
             {% endif %}
-             {% if route.status = 'EXPIRED' or route.status = 'ADMININACTIVE' or route.status = 'INACTIVE' %}
+
+             {% if route.status == "EXPIRED" or route.status == "ADMININACTIVE" or route.status == "INACTIVE" %}
                  <span class="label label-default">DEACTIVATED</span>
-             {% elif route.status = 'OUTOFSYNC'  %}
+             {% elif route.status == "OUTOFSYNC"  %}
                  <span class="label label-danger">ERROR</span>
-             {% elif route.status = 'ACTIVE'  %}
+             {% elif route.status == "ACTIVE"  %}
                  <span class="label label-success">{{ route.status }}</span>
-             {% elif route.status = 'PENDING'  %}
+             {% elif route.status == "PENDING"  %}
                  <span class="label label-info">{{ route.status }}</span>
              {% else %}
                  <span class="label label-danger">{{ route.status }}</span>
              {% endif %}
-             {% if route.status != 'PENDING'  %}
-
+             {% if route.status != "PENDING"  %}
                  <a href="{% url 'edit-route' route.name  %}" class="btn-info btn btn-sm btn-outline">{% trans "Edit" %}</a>
-                 {% if route.status = 'ACTIVE' %}
+                 {% if route.status == "ACTIVE" %}
                  <button class="del_button btn-warning btn btn-sm btn-outline" id="{{ route.name }}" data-routename="{{ route.name }}">{% trans "Deactivate" %}</button>
                  {% endif %}
              {% endif %}
