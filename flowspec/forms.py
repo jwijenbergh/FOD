@@ -87,9 +87,9 @@ class UserProfileForm(forms.ModelForm):
 
 
 class RouteForm(forms.ModelForm):
-    sourceport = PortRangeForm()
-    destinationport = PortRangeForm()
-    port = PortRangeForm()
+    sourceport = PortRangeForm(required=False)
+    destinationport = PortRangeForm(required=False)
+    port = PortRangeForm(required=False)
     class Meta:
         model = Route
         fields = "__all__"
