@@ -243,7 +243,7 @@ def build_routes_json(groutes, is_superuser):
             rd['applier'] = 'unknown'
             rd['peer'] = ''
         else:
-            peers = r.applier.userprofile.peers.select_related('networks')
+            peers = r.applier.userprofile.peers.select_related()
             username = None
             for peer in peers:
                 if username:

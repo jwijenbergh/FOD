@@ -51,7 +51,8 @@ logger.addHandler(handler)
 
 
 @shared_task(ignore_result=True)
-def add(route, callback=None):
+def add(routepk, callback=None):
+    route = Route.objects.get(pk=routepk)
     try:
         applier = PR.Applier(route_object=route)
         commit, response = applier.apply()

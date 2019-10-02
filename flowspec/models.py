@@ -23,20 +23,18 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse
+from flowspec.tasks import add
 
 from flowspec.helpers import send_new_mail, get_peer_techc_mails
 from utils import proxy as PR
 from ipaddress import *
 import datetime
 import logging
+import json
 
 from flowspec.junos import create_junos_name
 
-
-import beanstalkc
 from utils.randomizer import id_generator as id_gen
-
-
 
 FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -244,7 +242,7 @@ class Route(models.Model):
         else:
             peer = None
         send_message("[%s] Adding rule %s. Please wait..." % (self.applier_username_nice, self.name), peer)
-        response = add.delay(self)
+        response = add.delay(self.pk)
         logger.info('Got add job id: %s' % response)
         if not settings.DISABLE_EMAIL_NOTIFICATION:
             fqdn = Site.objects.get_current().domain
@@ -651,9 +649,9 @@ class Route(models.Model):
 def send_message(msg, user):
 #    username = user.username
     peer = user
-    b = beanstalkc.Connection()
-    b.use(settings.POLLS_TUBE)
+    #b = beanstalkc.Connection()
+    #b.use(settings.POLLS_TUBE)
     tube_message = json.dumps({'message': str(msg), 'username': peer})
-    b.put(tube_message)
-    b.close()
+    #b.put(tube_message)
+    #b.close()
 
