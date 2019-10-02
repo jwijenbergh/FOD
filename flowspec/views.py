@@ -309,8 +309,8 @@ def add_route(request):
                 route.applier = request.user
             route.status = "PENDING"
             route.response = "Applying"
-            route.source = ip_network('%s/%s' % (ip_network(route.source).network.compressed, ip_network(route.source).prefixlen)).compressed
-            route.destination = ip_network('%s/%s' % (ip_network(route.destination).network.compressed, ip_network(route.destination).prefixlen)).compressed
+            route.source = ip_network('%s/%s' % (ip_network(route.source).network_address.compressed, ip_network(route.source).prefixlen)).compressed
+            route.destination = ip_network('%s/%s' % (ip_network(route.destination).network_address.compressed, ip_network(route.destination).prefixlen)).compressed
             try:
                 route.requesters_address = request.META['HTTP_X_FORWARDED_FOR']
             except:
@@ -391,8 +391,8 @@ def edit_route(request, route_slug):
             if bool(set(changed_data) & set(critical_changed_values)) or (not route_original.status == 'ACTIVE'):
                 route.status = "PENDING"
                 route.response = "Applying"
-                route.source = ip_network('%s/%s' % (ip_network(route.source).network.compressed, ip_network(route.source).prefixlen)).compressed
-                route.destination = ip_network('%s/%s' % (ip_network(route.destination).network.compressed, ip_network(route.destination).prefixlen)).compressed
+                route.source = ip_network('%s/%s' % (ip_network(route.source).network_address.compressed, ip_network(route.source).prefixlen)).compressed
+                route.destination = ip_network('%s/%s' % (ip_network(route.destination).network_address.compressed, ip_network(route.destination).prefixlen)).compressed
                 try:
                     route.requesters_address = request.META['HTTP_X_FORWARDED_FOR']
                 except:

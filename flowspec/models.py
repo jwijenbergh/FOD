@@ -217,13 +217,13 @@ class Route(models.Model):
         from django.core.exceptions import ValidationError
         if self.destination:
             try:
-                address = ipaddress.ip_network(self.destination)
+                address = ip_network(self.destination)
                 self.destination = address.exploded
             except Exception:
                 raise ValidationError(_('Invalid network address format at Destination Field'))
         if self.source:
             try:
-                address = IPNetwork(self.source)
+                address = ip_network(self.source)
                 self.source = address.exploded
             except Exception:
                 raise ValidationError(_('Invalid network address format at Source Field'))
@@ -235,8 +235,8 @@ class Route(models.Model):
             if username:
                 break
             for network in peer.networks.all():
-                net = IPNetwork(network)
-                if IPNetwork(self.destination) in net:
+                net = ip_network(network)
+                if ip_network(self.destination) in net:
                     username = peer
                     break
         if username:
@@ -283,8 +283,8 @@ class Route(models.Model):
             if username:
                 break
             for network in peer.networks.all():
-                net = IPNetwork(network)
-                if IPNetwork(self.destination) in net:
+                net = ip_network(network)
+                if ip_network(self.destination) in net:
                     username = peer
                     break
         if username:
@@ -344,8 +344,8 @@ class Route(models.Model):
             if username:
                 break
             for network in peer.networks.all():
-                net = IPNetwork(network)
-                if IPNetwork(self.destination) in net:
+                net = ip_network(network)
+                if ip_network(self.destination) in net:
                     username = peer
                     break
         if username:

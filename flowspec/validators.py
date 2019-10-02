@@ -97,9 +97,11 @@ def clean_destination(user, destination):
     else:
         networks = PeerRange.objects.filter(peer__in=Peer.objects.all()).distinct()
     network_is_mine = False
+    dest_net = ip_network(destination)
     for network in networks:
         net = ip_network(network.network)
-        if ip_network(destination) in net:
+
+        if dest_net.network_address in net and dest_net.prefixlen >= net.prefixlen:
             network_is_mine = True
     if not network_is_mine:
         return (_('Destination address/network should belong to your administrative address space. Check My Profile to review your networks'))
