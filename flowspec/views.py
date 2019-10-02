@@ -109,7 +109,7 @@ def dashboard(request):
         else:
             query = Q()
             for peer in peers:
-                query |= Q(applier__userprofile__in=peer.user_profile.all())
+                query |= Q(applier__userprofile__in=peer.userprofile.all())
             all_group_routes = Route.objects.filter(query)
         if all_group_routes is None:
             message = 'You have not added any rules yet'
@@ -177,7 +177,7 @@ def group_routes_ajax(request):
     else:
         query = Q()
         for peer in peers:
-            query |= Q(applier__userprofile__in=peer.user_profile.all())
+            query |= Q(applier__userprofile__in=peer.userprofile.all())
         all_group_routes = Route.objects.filter(query)
     jresp = {}
     routes = build_routes_json(all_group_routes, request.user.is_superuser)
@@ -197,7 +197,7 @@ def overview_routes_ajax(request):
         return render(request, 'error.html', {'error': error})
     query = Q()
     for peer in peers:
-        query |= Q(applier__userprofile__in=peer.user_profile.all())
+        query |= Q(applier__userprofile__in=peer.userprofile.all())
     all_group_routes = Route.objects.filter(query)
     if request.user.is_superuser or request.user.has_perm('accounts.overview'):
         all_group_routes = Route.objects.all()
