@@ -18,7 +18,7 @@ RUN (cd /srv/flowspy/; ./patch-dependencies.sh;)
 
 RUN (cd /srv/flowspy/; . /srv/venv/bin/activate && \
       ./manage.py syncdb --noinput && \
-      ./manage.py migrate;)
+      ./manage.py migrate; ./manage.py loaddata initial_data;)
 
 #  echo "To set environment to English, run: export LC_ALL=en_US"
 #  echo "To activate virualenv: source /srv/venv/bin/activate"

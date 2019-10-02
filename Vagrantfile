@@ -85,6 +85,7 @@ SCRIPT
 
       ./manage.py syncdb --noinput
       ./manage.py migrate
+      ./manage.py loaddata initial_data
 
    )
 
