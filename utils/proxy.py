@@ -340,24 +340,11 @@ class Applier(object):
                             cause_user="NETCONF connection failed"
                             return False, cause_user
 
-
 def is_successful(response):
-    from StringIO import StringIO
-    doc = parsexml_(StringIO(response))
-    rootNode = doc.getroot()
-    success_list = rootNode.xpath("//*[local-name()='ok']")
-    if len(success_list) > 0:
+    if response.ok:
         return True, None
+    elif response.error:
+        return False, '%s %s' % (response.error.type, response.error.message)
     else:
-        reason_return = ''
-        reason_list = rootNode.xpath("//*[local-name()='error-message']")
-        for reason in reason_list:
-            reason_return = '%s %s' % (reason_return, reason.text)
-        return False, reason_return
+        return False, "Unknown error"
 
-
-def parsexml_(*args, **kwargs):
-    if 'parser' not in kwargs:
-        kwargs['parser'] = ET.ETCompatXMLParser()
-    doc = ET.parse(*args, **kwargs)
-    return doc
