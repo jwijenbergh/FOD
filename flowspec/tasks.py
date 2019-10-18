@@ -18,13 +18,9 @@
 #
 
 from utils import proxy as PR
-#from celery.task import task
 from celery import shared_task
-#from celery.task.sets import subtask
 import logging
 import json
-#from celery.task.http import *
-import beanstalkc
 from django.conf import settings
 import datetime
 from django.core.mail import send_mail
@@ -35,9 +31,9 @@ from ipaddress import *
 from os import fork,_exit
 from sys import exit
 import time
+import redis
 
 LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
-
 
 # FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 # logging.basicConfig(format=FORMAT)
@@ -49,9 +45,9 @@ handler = logging.FileHandler(LOG_FILENAME)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-
 @shared_task(ignore_result=True)
 def add(routepk, callback=None):
+    from flowspec.models import Route
     route = Route.objects.get(pk=routepk)
     try:
         applier = PR.Applier(route_object=route)
@@ -82,7 +78,9 @@ def add(routepk, callback=None):
 
 
 @shared_task(ignore_result=True)
-def edit(route, callback=None):
+def edit(routepk, callback=None):
+    from flowspec.models import Route
+    route = Route.objects.get(pk=routepk)
     try:
         applier = PR.Applier(route_object=route)
         commit, response = applier.apply(operation="replace")
@@ -116,7 +114,9 @@ def edit(route, callback=None):
 
 
 @shared_task(ignore_result=True)
-def delete(route, **kwargs):
+def delete(routepk, **kwargs):
+    from flowspec.models import Route
+    route = Route.objects.get(pk=routepk)
     try:
         applier = PR.Applier(route_object=route)
         commit, response = applier.apply(operation="delete")
@@ -183,29 +183,28 @@ def batch_delete(routes, **kwargs):
         return False
 
 
-#@shared_task(ignore_result=True)
+@shared_task(ignore_result=True)
 def announce(messg, user, route):
-    peers = user.get_profile().peers.all()
-    username = None
+    peers = user.userprofile.peers.all()
+    username = user.username
     for peer in peers:
         if username:
             break
         for network in peer.networks.all():
-            net = IPNetwork(network)
-            if IPNetwork(route.destination) in net:
+            net = ip_network(network)
+            if ip_network(route.destination) in net:
                 username = peer.peer_tag
                 break
     messg = str(messg)
-    b = beanstalkc.Connection()
-    b.use(settings.POLLS_TUBE)
-    tube_message = json.dumps({'message': messg, 'username': username})
-    b.put(tube_message)
-    b.close()
-
+    logger.info("announce " + messg)
+    r = redis.StrictRedis()
+    key = "msg_%s" % username
+    r.rpush(key, messg)
+    r.expire(key, 1800)
 
 @shared_task
 def check_sync(route_name=None, selected_routes=[]):
-    from flowspec.models import Route, MatchPort, MatchDscp, ThenAction
+    from flowspec.models import Route
     if not selected_routes:
         routes = Route.objects.all()
     else:

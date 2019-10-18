@@ -17,7 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import gevent
 import json
 
 import uuid
@@ -25,13 +24,11 @@ import datetime
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-from gevent.event import Event
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from peers.models import Peer
-
-import beanstalkc
+import redis
 
 import logging
 import os
@@ -47,7 +44,7 @@ logger.addHandler(handler)
 
 def create_message(message, user, time):
     data = {'id': str(uuid.uuid4()), 'body': message, 'user':user, 'time':time}
-    data['html'] = render_to_string('poll_message.html', dictionary={'message': data})
+    data['html'] = render_to_string('poll_message.html', {'message': data})
     return data
 
 
@@ -76,9 +73,10 @@ class Msgs(object):
         self.new_message_user_event = {}
 
     def main(self, request):
-        if self.user_cache:
-            request.session['cursor'] = self.user_cache[-1]['id']
-        return render(request, 'poll.html', {'messages': self.user_cache})
+        #if self.user_cache:
+        #    request.session['cursor'] = self.user_cache[-1]['id']
+        #return render(request, 'poll.html', {'messages': self.user_cache})
+        pass
 
     def message_existing(self, request, peer_id):
         if request.is_ajax():
@@ -129,46 +127,29 @@ class Msgs(object):
     def message_updates(self, request, peer_id):
         if request.is_ajax():
             cursor = {}
+            logger.info("Polling update")
             try:
                 user = Peer.objects.get(pk=peer_id).peer_tag
             except:
                 user = None
                 return False
-            try:
-                cursor[user] = self.user_cursor[user]
-            except:
+            r = redis.StrictRedis()
+            key = "msg_%s" % request.user.username
+            logger.info(str((key, user)))
+            size = r.llen(key)
+            msgs = []
+            now = datetime.datetime.now()
+            for i in range(size):
+                m = r.lpop(key)
+                if m:
+                    msgs.append(create_message(m.decode("utf-8"), request.user.username, now.strftime("%Y-%m-%d %H:%M:%S")))
+            #msgs = r.lrange(key, 0, size)
+            logger.info(str(msgs))
+            if not msgs:
                 return HttpResponse(content='', content_type=None, status=400)
+            return json_response({'messages': msgs})
 
-            try:
-                if not isinstance(self.user_cache[user], list):
-                    self.user_cache[user] = []
-            except:
-                self.user_cache[user] = []
-            if not self.user_cache[user] or cursor[user] == self.user_cache[user][-1]['id']:
-                self.new_message_user_event[user].wait(settings.POLL_SESSION_UPDATE)
-            try:
-                for index, m in enumerate(self.user_cache[user]):
-                    if m['id'] == cursor[user]:
-                        return json_response({'messages': self.user_cache[user][index + 1:]})
-                return json_response({'messages': self.user_cache[user]})
-            finally:
-                if self.user_cache[user]:
-                    self.user_cursor[user] = self.user_cache[user][-1]['id']
         return HttpResponseRedirect(reverse('group-routes'))
-
-    def monitor_polls(self):
-        b = beanstalkc.Connection()
-        b.watch(settings.POLLS_TUBE)
-        while True:
-            job = b.reserve()
-            msg = json.loads(job.body)
-            job.bury()
-            logger.info("Got New message")
-            self.message_new(msg)
-
-    def start_polling(self):
-        logger.info("Start Polling")
-        gevent.spawn(self.monitor_polls)
 
 
 msgs = Msgs()
@@ -178,5 +159,3 @@ message_updates = msgs.message_updates
 message_existing = msgs.message_existing
 
 
-poll = msgs.start_polling
-poll()

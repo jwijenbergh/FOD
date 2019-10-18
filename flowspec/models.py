@@ -23,7 +23,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse
-from flowspec.tasks import add
+from flowspec.tasks import *
 
 from flowspec.helpers import send_new_mail, get_peer_techc_mails
 from utils import proxy as PR
@@ -296,7 +296,7 @@ class Route(models.Model):
                 self.name
             ), peer
         )
-        response = edit.delay(self)
+        response = edit.delay(self.pk)
         logger.info('Got edit job id: %s' % response)
         if not settings.DISABLE_EMAIL_NOTIFICATION:
             fqdn = Site.objects.get_current().domain
@@ -357,7 +357,7 @@ class Route(models.Model):
                 reason_text
             ), peer
         )
-        response = delete.delay(self, reason=reason)
+        response = delete.delay(self.pk, reason=reason)
         logger.info('Got delete job id: %s' % response)
         if not settings.DISABLE_EMAIL_NOTIFICATION:
             fqdn = Site.objects.get_current().domain

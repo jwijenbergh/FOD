@@ -27,6 +27,7 @@ from django.core.cache import cache
 import os
 from celery.exceptions import TimeLimitExceeded, SoftTimeLimitExceeded
 from .portrange import parse_portrange
+import traceback
 
 cwd = os.getcwd()
 
@@ -248,7 +249,7 @@ class Applier(object):
                 with m.locked(target='candidate'):
                     m.discard_changes()
                     try:
-                        edit_response = m.edit_config(target='candidate', config=configuration, test_option='test-then-set')
+                        edit_response = m.edit_config(target='candidate', config=configuration.decode("utf-8"), test_option='test-then-set')
                         edit_is_successful, reason = is_successful(edit_response)
                         logger.info("Successfully edited @ %s" % self.device)
                         if not edit_is_successful:
@@ -262,7 +263,8 @@ class Applier(object):
                         logger.error(cause)
                         return False, cause
                     except Exception as e:
-                        cause = "Caught edit exception: %s %s" % (e, reason)
+                        traceback.print_exc()
+                        cause = "Caught edit exception: %s %s" % (str(e), reason)
                         cause = cause.replace('\n', '')
                         logger.error(cause)
                         m.discard_changes()
