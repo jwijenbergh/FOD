@@ -142,7 +142,7 @@ def lock_history_file(wait=1):
           logger.info("lock_history_file(): creating lock dir succeeded")
           success=1
           return success
-      except OSError, e:
+      except OSError as e:
           logger.error("lock_history_file(): creating lock dir failed: OSError: "+str(e))
           success=0
       except Exception as e:

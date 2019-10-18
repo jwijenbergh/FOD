@@ -38,16 +38,16 @@
 
             <ul class="nav navbar-top-links navbar-right">
             	<li class="dropdown">
-				            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Language" %}: {% for lang in LANGUAGES %}{% ifequal LANGUAGE_CODE lang.0 %}{% trans lang.1 %}{% endifequal %}{% endfor %}<b class="caret"></b></a>
+				            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Language" %}: {% for lang in settings.LANGUAGES %}{% ifequal settings.LANGUAGE_CODE lang.0 %}{% trans lang.1 %}{% endifequal %}{% endfor %}<b class="caret"></b></a>
 				            <ul class="dropdown-menu">
 				            <form action="{% url 'set_language' %}" method="post" style="display:inline;" id="langform">
 												{% csrf_token %}
 												<input name="next" type="hidden" value="{{ next }}" />
 												<input id="langsel" name="language" type="hidden" value="" />
 											</form>
-				            	{% for lang in LANGUAGES %}
+				            	{% for lang in settings.LANGUAGES %}
 				                <li>
-				                    <a class="select_lang" href="#" onclick="setlang('{{ lang.0 }}'); return false;" title="{{lang.1}}">{% trans lang.1 %}{% ifequal LANGUAGE_CODE lang.0 %}  <i class="icon-ok"></i>{% endifequal %}</a>
+				                    <a class="select_lang" href="#" onclick="setlang('{{ lang.0 }}'); return false;" title="{{lang.1}}">{% trans lang.1 %}{% ifequal settings.LANGUAGE_CODE lang.0 %}  <i class="icon-ok"></i>{% endifequal %}</a>
 				                </li>
 				              {% endfor %}
 				            </ul>
@@ -63,7 +63,7 @@
                     <ul class="dropdown-menu dropdown-user" role="menu" >
                     	<li role="presentation" class="dropdown-header">{{user}}</li>
                     	<li class="divider"></li>
-                    {% if user.get_profile.peers.all %}
+                    {% if user.userprofile.peers.all %}
 				        <li>
 				            <a href="{% url 'user-profile' %}"><i class="fa fa-user fa-fw"></i>{% trans "My profile" %}</a>
 				        </li>
@@ -110,7 +110,7 @@
                         <li><a href="{% url 'admin:index' %}"><i class="fa fa-cogs fa-fw"></i> {% trans "Admin" %}</a>
                         </li>
 						{% endif %}
-                    {% if user.get_profile.peers.all %}
+                    {% if user.userprofile.peers.all %}
 				        <li>
 				            <a href="{% url 'user-profile' %}"><i class="fa fa-user fa-fw"></i> {% trans "My profile" %}</a>
 				        </li>
@@ -137,7 +137,7 @@
 				</div>
 								</div>
 			</div>
-				{% endif %}
+		{% endif %}
 
         	{% block contentplaceholder %}
         	{% endblock %}
