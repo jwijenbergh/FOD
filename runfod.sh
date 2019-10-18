@@ -27,7 +27,7 @@ fi
 mkdir -p /var/run/fod
 
 echo "Starting FoD celeryd in background" 1>&2
-celery worker -A flowspy --concurrency=2 --detach -l info
+celery worker -A flowspy --concurrency=2 --detach -l debug -f celery.log
 
 echo "Starting FoD gunicorn in foreground" 1>&2
 #exec ./manage.py runserver 0.0.0.0:8000 
