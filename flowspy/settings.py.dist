@@ -263,11 +263,9 @@ EXPIRATION_DAYS_OFFSET = 30
 
 USE_X_FORWARDED_HOST = True
 
-# Beanstalk configuration (as a broker for celery)
-BROKER_HOST = "localhost"
-BROKER_PORT = 11300
+# configuration of celery task manager
 POLLS_TUBE = 'polls'
-BROKER_URL = "beanstalk://localhost:11300//"
+CELERY_BROKER_URL = "redis://localhost//"
 BROKER_VHOST = "/"
 CELERY_CONCURRENCY = 1
 POLL_SESSION_UPDATE = 60.0
