@@ -51,49 +51,22 @@ Vagrant.configure(2) do |config|
   #   vb.memory = "1024"
   # end
   #
+   config.vm.provision "shell", path: "install-centos.sh"
+
    config.vm.provision "shell", inline: <<-SHELL
-   rpm -Uh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-   yum -q -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
-   yum -q -y install python36 python36-setuptools python36-virtualenv vim git gcc libevent-devel libxml2-devel libxslt-devel mariadb-server mysql-devel patch yum-utils
+     systemctl enable redis
+     systemctl start redis
+     
+#     systemctl enable mariadb.service
+#     service mariadb start
+#     mysql -u root <<-SCRIPT
+#create database fod;
+#SCRIPT
 
-
-   # Installation of redis from remi RPM repository
-   yum-config-manager --enable remi
-   yum -q -y install redis
-   systemctl enable redis
-   systemctl start redis
-
-   systemctl enable mariadb.service
-   service mariadb start
-   mysql -u root <<-SCRIPT
-      create database fod;
-SCRIPT
-   mkdir -p /var/log/fod /srv
-   virtualenv-3 /srv/venv
-   (
-      source /srv/venv/bin/activate
-      cp -r /vagrant/ /srv/flowspy
-      cd /srv/flowspy/
-      (
-         cd flowspy
-         cp -f settings.py.dist settings.py
-         patch settings.py < settings.py.patch
-      )
-      pip install -r requirements.txt
-
-      touch flowspy/settings_local.py
-
-      ./manage.py syncdb --noinput
-      ./manage.py migrate
-      ./manage.py loaddata initial_data
-
-   )
-
-   echo "To set environment to English, run: export LC_ALL=en_US"
-   echo "To activate virualenv: source /srv/venv/bin/activate"
-   echo "To create a user run: cd /srv/flowspy; ./manage.py createsuperuser"
-   echo "To start flowspy server: cd /srv/flowspy; ./manage.py runserver 0.0.0.0:8000"
-   echo "To start celeryd: cd /srv/flowspy; ./manage.py celeryd"
-
+     echo "To set environment to English, run: export LC_ALL=en_US"
+     echo "To activate virualenv: source /srv/venv/bin/activate"
+     echo "To create a user run: cd /srv/flowspy; ./manage.py createsuperuser"
+     echo "To start flowspy server: cd /srv/flowspy; ./manage.py runserver 0.0.0.0:8000"
+     echo "To start celeryd: cd /srv/flowspy; ./manage.py celeryd"
    SHELL
 end

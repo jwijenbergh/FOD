@@ -1,15 +1,5 @@
 FROM centos:latest
 
-#RUN apt-get -yqq update
-#RUN apt-get -yqq install virtualenv python python-dev vim git gcc libevent-dev libxml2-dev libxslt-dev patch beanstalkd mariadb-server libmariadb-dev libmariadbclient-dev-compat sqlite3
-#RUN apt-get -yqq install procps
-
-# TODO: maybe libmariadb and libmariadbclient might be missing ?
-RUN yum -y install python python-virtualenv vim git gcc libevent libevent-devel libxml2 libxml2-devel libxslt libxslt-devel patch mariadb-server mariadb-devel sqlite 
-
-# TODO: ugly:
-RUN yum -y install http://cbs.centos.org/kojifiles/packages/beanstalkd/1.9/3.el7/x86_64/beanstalkd-1.9-3.el7.x86_64.rpm
-
 RUN yum -y install procps
 
 # RUN echo "create database fod;" | mysql -u root
@@ -17,16 +7,7 @@ RUN yum -y install procps
 RUN mkdir -p /var/log/fod /srv
 COPY . /srv/flowspy
 
-RUN (cd /srv/flowspy/flowspy && cp -f settings.py.dist settings.py && patch settings.py < settings.py.patch && touch settings_local.py;)
-
-# seems that pip will be available in virtualenv:
-RUN (virtualenv /srv/venv && . /srv/venv/bin/activate; cd /srv/flowspy/; pip install -r requirements.txt;)
-     
-RUN (cd /srv/flowspy/; ./patch-dependencies.sh;)
-
-RUN (cd /srv/flowspy/; . /srv/venv/bin/activate && \
-      ./manage.py syncdb --noinput && \
-      ./manage.py migrate; ./manage.py loaddata initial_data;)
+RUN (cd /srv/flowspy; ./install-centos.sh;)
 
 #  echo "To set environment to English, run: export LC_ALL=en_US"
 #  echo "To activate virualenv: source /srv/venv/bin/activate"
