@@ -16,15 +16,18 @@ fi
 
 cd "$(dirname "$0")"
 
-if [ ! -x ./fodcli_db_is_mysql ] || ./fodcli_db_is_mysql; then
-  echo "Starting DB services FoD might be depending on (depending on its config): mysql" 1>&2
-  systemctl start mysql.service
-fi
+#if [ ! -x ./fodcli_db_is_mysql ] || ./fodcli_db_is_mysql; then
+#  echo "Starting DB services FoD might be depending on (depending on its config): mysql" 1>&2
+#  systemctl start mysql.service
+#fi
 
 # hook to initiallize (without any user interaction admin user and its peer data)
 [ -x ./fodcli_insert_basic_data.sh ] && ./fodcli_insert_basic_data.sh
 
 mkdir -p /var/run/fod
+
+echo "starting redis" 1>&2
+/usr/bin/redis-server &
 
 echo "Starting FoD celeryd in background" 1>&2
 celery worker -A flowspy --concurrency=2 --detach -l debug -f celery.log

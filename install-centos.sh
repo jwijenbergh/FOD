@@ -25,7 +25,22 @@ virtualenv-3 /srv/venv
 (
 	source /srv/venv/bin/activate
 	mkdir -p /srv/flowspy/
-	cp -r "`dirname $0`"/* /srv/flowspy/
+
+	# Select source dir and copy FoD into /srv/flowspy/
+	if [ "`basename "$0"`" = install-centos.sh ]; then
+		# this script is in the source directory
+		cp -r "`dirname $0`"/* /srv/flowspy/
+	elif [ -e /vagrant ]; then
+		# vagrant's copy in /vagrant/
+		cp -r /vagrant/* /srv/flowspy/
+	elif [ -e ./install-centos.sh ]; then
+		# current directory is with the sourcecode
+		cp -r ./* /srv/flowspy/
+	else
+		echo "Could not find FoD src directory tried `dirname $0`, /vagrant/, ./"
+		exit 1
+	fi
+	
 	cd /srv/flowspy/
 	(
 		cd flowspy
