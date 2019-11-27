@@ -3,16 +3,25 @@
 
 export LC_ALL="C"
 
-#apt-get -y install apache2 
-#apt-get -y install libapache2-mod-shib2
-#apt-get -y install perl libcgi-pm-perl
-
 [ -z "$NOAPT" ] && apt-get -y install apache2 libapache2-mod-shib2 perl libcgi-pm-perl
 
 [ -z "$NOMOD" ] && a2enmod proxy
 [ -z "$NOMOD" ] && a2enmod proxy_http
 [ -z "$NOMOD" ] && a2enmod cgi
 
+if grep -q '^CentOS' /etc/redhat-release 2> /dev/null; then
+cat > /etc/yum.repos.d/shibboleth.repo <<END
+[shibboleth]
+name=Shibboleth (CentOS_7)
+# Please report any problems to https://issues.shibboleth.net
+type=rpm-md
+mirrorlist=https://shibboleth.net/cgi-bin/mirrorlist.cgi/CentOS_7
+gpgcheck=1
+gpgkey=https://shibboleth.net/downloads/service-provider/RPMS/repomd.xml.key
+enabled=1
+END
+yum -y -q install httpd shibboleth perl perl-CGI
+fi
 # 
 
 basedir="/srv/flowspy"
@@ -36,8 +45,7 @@ echo 1>&2
 ##
 
 echo 1>&2
-#cp shibboleth_inst/inst/srv/flowspy/flowspy/settings.py flowspy/settings.py
-cp -fv "$basedir2/files.inst/srv/flowspy/flowspy/settings.py" flowspy/settings.py
+(cd flowspy; patch settings.py < 02-settings.py-shibboleth.patch;)
 
 echo 1>&2
 (cd /etc/shibboleth/ && ./keygen.sh)
