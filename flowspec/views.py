@@ -937,11 +937,11 @@ def setup(request):
 
                 with open("flowspy/settings_local.py", "a") as f:
                     f.write("NETCONF_DEVICE = \"%s\"\n" % form.cleaned_data["netconf_device"])
-                    f.write("NETCONF_USER = \"%s\"\n"   % form.cleaned_data["netconf_port"])
-                    f.write("NETCONF_PASS = \"%s\"\n"   % form.cleaned_data["netconf_user"])
-                    f.write("NETCONF_PORT = %s\n"       % form.cleaned_data["netconf_pass"])
+                    f.write("NETCONF_USER = \"%s\"\n"   % form.cleaned_data["netconf_user"])
+                    f.write("NETCONF_PASS = \"%s\"\n"   % form.cleaned_data["netconf_pass"])
+                    f.write("NETCONF_PORT = %s\n"       % form.cleaned_data["netconf_port"])
 
-                logger.error('TODO REMOVE: password: %s' % form.cleaned_data["password"])
+                # logger.error('TODO REMOVE: password: %s' % form.cleaned_data["password"])
                 return HttpResponseRedirect(reverse("welcome"))
         else:
             form = SetupForm()
