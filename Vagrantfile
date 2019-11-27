@@ -63,6 +63,10 @@ Vagrant.configure(2) do |config|
 #create database fod;
 #SCRIPT
 
+     echo "Installation of Shibboleth" >&2
+
+     (cd /srv/flowspy/inst/apache_shib/; ./apache_shib_init.sh;)
+
      echo "To set environment to English, run: export LC_ALL=en_US"
      echo "To activate virualenv: source /srv/venv/bin/activate"
      echo "To create a user run: cd /srv/flowspy; ./manage.py createsuperuser"

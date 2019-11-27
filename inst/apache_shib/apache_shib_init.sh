@@ -3,12 +3,6 @@
 
 export LC_ALL="C"
 
-[ -z "$NOAPT" ] && apt-get -y install apache2 libapache2-mod-shib2 perl libcgi-pm-perl
-
-[ -z "$NOMOD" ] && a2enmod proxy
-[ -z "$NOMOD" ] && a2enmod proxy_http
-[ -z "$NOMOD" ] && a2enmod cgi
-
 if grep -q '^CentOS' /etc/redhat-release 2> /dev/null; then
 cat > /etc/yum.repos.d/shibboleth.repo <<END
 [shibboleth]
@@ -21,6 +15,13 @@ gpgkey=https://shibboleth.net/downloads/service-provider/RPMS/repomd.xml.key
 enabled=1
 END
 yum -y -q install httpd shibboleth perl perl-CGI
+DISTRO=centos
+else
+[ -z "$NOAPT" ] && apt-get -y install apache2 libapache2-mod-shib2 perl libcgi-pm-perl
+
+[ -z "$NOMOD" ] && a2enmod proxy
+[ -z "$NOMOD" ] && a2enmod proxy_http
+[ -z "$NOMOD" ] && a2enmod cgi
 fi
 # 
 
@@ -36,7 +37,14 @@ echo 1>&2
 #cp -uva shibboleth_inst/inst/etc/apache2/ /etc/
 #cd ./shibboleth_inst/inst/etc/apache2/ && cp -uva --parents -t /etc/apache2/ .
 #cd "$basedir/shibboleth_inst/inst/etc/apache2/" && cp -uva --parents -t /etc/apache2/ $(cat "$basedir/shibboleth_inst/etc-apache-diff.list.filtered2")
-(cd "$basedir2/files.inst/etc/apache2/" && cp -fva --parents -t /etc/apache2/ $(cat "$basedir2/files.inst/etc-apache-diff.list.filtered2"))
+
+if [ "$DISTRO" = centos ]; then
+	dsthttpd=/etc/httpd/
+else
+	dsthttpd=/etc/apache2/
+fi
+
+(cd "$basedir2/files.inst/etc/apache2/" && cp -fva --parents -t "$dsthttpd" $(cat "$basedir2/files.inst/etc-apache-diff.list.filtered2"))
 
 echo 1>&2
 #cp -uva shibboleth_inst/inst/etc/shibboleth/ /etc/
@@ -52,7 +60,7 @@ echo 1>&2
 
 echo 1>&2
 # -subj "/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/"
-(cd /etc/apache2/ && openssl req -x509 -batch -nodes -days 365 -newkey rsa:2048 -keyout mysitename.key -out mysitename.crt)
+(cd "$dsthttpd" && openssl req -x509 -batch -nodes -days 365 -newkey rsa:2048 -keyout mysitename.key -out mysitename.crt)
 
 ##
 
@@ -61,10 +69,11 @@ hostname test-fod.geant.net
 
 ##
 
-/etc/init.d/shibd restart
-
-/etc/init.d/apache2 restart
-
-
-
+if [ "$DISTRO" = centos ]; then
+	service httpd restart
+	service shibd restart
+else
+	/etc/init.d/apache2 restart
+	/etc/init.d/shibd restart
+fi
 
