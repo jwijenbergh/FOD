@@ -40,7 +40,7 @@ echo 1>&2
 
 if [ "$DISTRO" = centos ]; then
 	dsthttpd=/etc/httpd/
-        cp "$basedir/files.inst/centos/httpd-fod.conf" "$dsthttpd/conf.d/"
+        cp "$basedir2/files.inst/centos/httpd-fod.conf" "$dsthttpd/conf.d/"
 else
 	dsthttpd=/etc/apache2/
 	(cd "$basedir2/files.inst/etc/apache2/" && cp -fva --parents -t "$dsthttpd" $(cat "$basedir2/files.inst/etc-apache-diff.list.filtered2"))
