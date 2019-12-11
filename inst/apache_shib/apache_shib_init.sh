@@ -14,7 +14,7 @@ gpgcheck=1
 gpgkey=https://shibboleth.net/downloads/service-provider/RPMS/repomd.xml.key
 enabled=1
 END
-yum -y -q install httpd shibboleth perl perl-CGI
+yum -y -q install httpd shibboleth perl perl-CGI mod_ssl
 DISTRO=centos
 else
 [ -z "$NOAPT" ] && apt-get -y install apache2 libapache2-mod-shib2 perl libcgi-pm-perl
@@ -40,11 +40,12 @@ echo 1>&2
 
 if [ "$DISTRO" = centos ]; then
 	dsthttpd=/etc/httpd/
+        cp "$basedir/files.inst/centos/httpd-fod.conf" "$dsthttpd/conf.d/"
 else
 	dsthttpd=/etc/apache2/
+	(cd "$basedir2/files.inst/etc/apache2/" && cp -fva --parents -t "$dsthttpd" $(cat "$basedir2/files.inst/etc-apache-diff.list.filtered2"))
 fi
 
-(cd "$basedir2/files.inst/etc/apache2/" && cp -fva --parents -t "$dsthttpd" $(cat "$basedir2/files.inst/etc-apache-diff.list.filtered2"))
 
 echo 1>&2
 #cp -uva shibboleth_inst/inst/etc/shibboleth/ /etc/
