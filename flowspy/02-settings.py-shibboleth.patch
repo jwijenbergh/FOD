@@ -1,0 +1,34 @@
+--- settings.py.orig	2019-12-11 08:36:31.984997552 +0000
++++ settings.py	2019-11-28 09:37:38.073012758 +0000
+@@ -297,7 +297,6 @@
+ POLL_SESSION_UPDATE = 60.0
+ 
+ # Shibboleth
+-SHIB_AUTH_ENTITLEMENT = 'urn:mace:example.com:pki:user'
+ SHIB_ADMIN_DOMAIN = 'example.com'
+ SHIB_LOGOUT_URL = 'https://example.com/Shibboleth.sso/Logout'
+ 
+@@ -329,15 +328,15 @@
+ 
+ # (";"-separated) part of value of attribute with key SHIB_ENTITLEMENT needed in order to be considered a valid user:
+ # if SHIB_AUTH_ENTITLEMENT is empty no constraint on SHIB_ENTITLEMENT attribute value is enforced (can even be missing)
+-SHIB_AUTH_ENTITLEMENT = 'urn:mace:example.com:pki:user'
+-#SHIB_AUTH_ENTITLEMENT = '' # is also in settings_local.py so override it there
++#SHIB_AUTH_ENTITLEMENT = 'urn:mace:example.com:pki:user'
++SHIB_AUTH_ENTITLEMENT = '' # is also in settings_local.py so override it there
+ 
+-SHIB_USERNAME = ['HTTP_EPPN'] # in settings.py.dist # originally used for SHIB_USERNAME
+-SHIB_USERNAME_DISPLAY_NAME = "eduPersonPrincipalName"
+-SHIB_USERNAME_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:eduPersonPrincipalName or urn:oid:1.3.6.1.4.1.5923.1.1.1.6"
+-#SHIB_USERNAME = ['HTTP_PERSISTENT_ID']
+-#SHIB_USERNAME_DISPLAY_NAME = "PERSISTENT_ID"
+-#SHIB_USERNAME_DISPLAY_ADDINFO = "urn:oid:1.3.6.1.4.1.5923.1.1.1.10"
++#SHIB_USERNAME = ['HTTP_EPPN'] # in settings.py.dist # originally used for SHIB_USERNAME
++#SHIB_USERNAME_DISPLAY_NAME = "eduPersonPrincipalName"
++#SHIB_USERNAME_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:eduPersonPrincipalName or urn:oid:1.3.6.1.4.1.5923.1.1.1.6"
++SHIB_USERNAME = ['HTTP_PERSISTENT_ID']
++SHIB_USERNAME_DISPLAY_NAME = "PERSISTENT_ID"
++SHIB_USERNAME_DISPLAY_ADDINFO = "urn:oid:1.3.6.1.4.1.5923.1.1.1.10"
+ 
+ SHIB_SLUGIFY_USERNAME = False # value in settings.py.dist
+ #SHIB_SLUGIFY_USERNAME = True

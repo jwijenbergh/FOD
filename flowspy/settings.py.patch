@@ -20,7 +20,7 @@
          'USER': '',
          'PASSWORD': '',
          'HOST': '',                      # Set to empty string for localhost.
-@@ -159,7 +159,7 @@
+@@ -160,7 +160,7 @@
  WSGI_APPLICATION = 'flowspy.wsgi.application'
  
  AUTHENTICATION_BACKENDS = (
@@ -29,7 +29,7 @@
      'django.contrib.auth.backends.ModelBackend',
  )
  
-@@ -195,25 +195,20 @@
+@@ -196,25 +196,20 @@
  LOGGING = {
      'version': 1,
      'disable_existing_loggers': False,
