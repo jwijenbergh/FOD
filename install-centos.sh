@@ -11,7 +11,7 @@ echo "Installing remi repo"
 yum -q -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 
 echo "Installing base dependencies"
-yum -q -y install python36 python36-setuptools python36-virtualenv vim git gcc libevent-devel libxml2-devel libxslt-devel mariadb-server mysql-devel patch yum-utils
+yum -q -y install python36 python3-setuptools python3-virtualenv vim git gcc libevent-devel libxml2-devel libxslt-devel mariadb-server mysql-devel patch yum-utils
 
 
 echo "Installing redis"
