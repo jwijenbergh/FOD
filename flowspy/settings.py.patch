@@ -1,5 +1,5 @@
---- settings.py.dist	2019-11-26 11:34:40.235339350 +0000
-+++ settings.py	2019-11-26 11:34:40.549342382 +0000
+--- flowspy/settings.py.dist	2019-11-26 22:41:57.825374283 +0000
++++ flowspy/settings.py	2019-11-26 22:41:14.605534002 +0000
 @@ -30,7 +30,7 @@
  import os
  from celery.schedules import crontab

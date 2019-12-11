@@ -1,8 +1,8 @@
 FROM centos:latest
 
-RUN yum -y install procps
+ENV LC_ALL C.utf8
 
-# RUN echo "create database fod;" | mysql -u root
+RUN yum -y install procps
 
 RUN mkdir -p /var/log/fod /srv
 COPY . /srv/flowspy
