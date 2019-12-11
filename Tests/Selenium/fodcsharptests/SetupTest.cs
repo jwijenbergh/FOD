@@ -163,15 +163,15 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).Click();
             driver.FindElement(By.Id("id_password")).SendKeys("Gf1!grGR00");
             driver.FindElement(By.Id("id_netconf_device")).Click();
-            driver.FindElement(By.Id("id_netconf_device")).SendKeys("22");
+            driver.FindElement(By.Id("id_netconf_device")).SendKeys("1.0.0.0/8");
             driver.FindElement(By.Id("id_netconf_port")).Click();
-            driver.FindElement(By.Id("id_netconf_port")).SendKeys("22");
+            driver.FindElement(By.Id("id_netconf_port")).SendKeys("1.0.0.0/8");
             driver.FindElement(By.Id("id_netconf_user")).Click();
             driver.FindElement(By.Id("id_netconf_user")).SendKeys("user");
             driver.FindElement(By.Id("id_netconf_pass")).Click();
             driver.FindElement(By.Id("id_netconf_pass")).SendKeys("Gf12!grGR00");
             driver.FindElement(By.Id("id_test_peer_addr")).Click();
-            driver.FindElement(By.Id("id_test_peer_addr")).SendKeys("0.0.0.0/30");
+            driver.FindElement(By.Id("id_test_peer_addr")).SendKeys("1.0.0.0/8");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
             wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("."));
         }
@@ -215,7 +215,7 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_test_peer_addr")).Click();
             driver.FindElement(By.Id("id_test_peer_addr")).SendKeys("");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("Invalid IP format"));
+            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("All fields must be required."));
         }
 
         [TearDown]
