@@ -1,6 +1,6 @@
-FROM centos:latest
+FROM centos:7
 
-ENV LC_ALL C.utf8
+ENV LC_ALL en_US.utf8
 
 RUN yum -y install procps
 
