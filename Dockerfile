@@ -15,6 +15,7 @@ RUN mkdir -p /var/log/fod /srv
 COPY . /srv/flowspy
 
 RUN (cd /srv/flowspy/flowspy && cp -f settings.py.dist settings.py && patch settings.py < settings.py.patch && touch settings_local.py;)
+RUN echo "ENABLE_SETUP_VIEW = True" >> /srv/flowspy/flowspy/settings.py
 
 RUN (virtualenv /srv/venv && . /srv/venv/bin/activate; cd /srv/flowspy/; pip install -r requirements.txt;)
      
