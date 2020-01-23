@@ -18,6 +18,18 @@ from flowspec.serializers import (
 from flowspec.validators import check_if_rule_exists
 from rest_framework.response import Response
 
+import os
+import logging
+FORMAT = '%(asctime)s %(levelname)s: %(message)s'
+logging.basicConfig(format=FORMAT)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'mylog.log')
+handler = logging.FileHandler(LOG_FILENAME)
+formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
 
 class RouteViewSet(viewsets.ModelViewSet):
     queryset = Route.objects.all()
@@ -25,17 +37,17 @@ class RouteViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if settings.DEBUG:
-            if self.request.user.is_anonymous():
+            if self.request.user.is_anonymous:
                 return Route.objects.all()
-            elif self.request.user.is_authenticated():
+            elif self.request.user.is_authenticated:
                 return Route.objects.filter(applier=self.request.user)
             else:
                 raise PermissionDenied('User is not Authenticated')
 
         if self.request.user.is_superuser:
             return Route.objects.all()
-        elif (self.request.user.is_authenticated() and not
-              self.request.user.is_anonymous()):
+        elif (self.request.user.is_authenticated and not
+              self.request.user.is_anonymous):
             return Route.objects.filter(applier=self.request.user)
 
     def list(self, request):
@@ -44,8 +56,10 @@ class RouteViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request):
+        logger.info("info"+str(request.data))
         serializer = RouteSerializer(
-            context={'request': request}, data=request.DATA, partial=True)
+            #context={'request': request}, data=request.DATA, partial=True)
+            context={'request': request}, data=request.data, partial=True)
         if serializer.is_valid():
             (exists, message) = check_if_rule_exists(
                 {'source': serializer.object.source,
@@ -128,7 +142,8 @@ class RouteViewSet(viewsets.ModelViewSet):
 
         serializer = RouteSerializer(
             obj, context={'request': request},
-            data=request.DATA, partial=partial)
+            #data=request.DATA, partial=partial)
+            data=request.data, partial=partial)
 
         if serializer.is_valid():
             new_status = serializer.object.status
