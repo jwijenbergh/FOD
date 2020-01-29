@@ -272,10 +272,10 @@ def get_matchingprotocol_route_pks(protocolist, routes):
     return route_pk_list
 
 class SetupForm(forms.Form):
-    password = forms.CharField(widget=forms.PasswordInput(), label="Password", required=True)
-    netconf_device = forms.CharField(label="Router host (NETCONF)", required=True,help_text='1.0.0.0')
-    netconf_port = forms.IntegerField(label="Router port (NETCONF)", min_value=0, max_value=65535, required=True,help_text='65535')
-    netconf_user = forms.CharField(label="Router user (NETCONF)", required=True)
-    netconf_pass = forms.CharField(widget=forms.PasswordInput(), label="Router password (NETCONF)", required=True)
-    test_peer_addr = forms.CharField(label="Test peer IP subnet", required=True,help_text='1.0.0.0/8')
+    password = forms.CharField(widget=forms.PasswordInput(), label="Password")
+    netconf_device = forms.CharField(label="Router host (NETCONF)")
+    netconf_port = forms.IntegerField(label="Router port (NETCONF)", min_value=0, max_value=6553)
+    netconf_user = forms.CharField(label="Router user (NETCONF)")
+    netconf_pass = forms.CharField(widget=forms.PasswordInput(), label="Router password (NETCONF)")
+    test_peer_addr = forms.CharField(label="Test peer IP subnet")
 
