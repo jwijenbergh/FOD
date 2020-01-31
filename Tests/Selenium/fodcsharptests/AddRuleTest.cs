@@ -58,36 +58,36 @@ namespace fodcsharptests
             //What should happen? 
         }
 
-        [Test]
-        public void AddWrongName()
-        {
-            driver.Url = "http://localhost:8085/altlogin";
+        //[Test]
+        //public void AddWrongName()
+        //{
+        //    driver.Url = "http://localhost:8085/altlogin";
 
-            driver.FindElement(By.Id("id_username")).Click();
-            driver.FindElement(By.Id("id_username")).SendKeys("admin");
-            driver.FindElement(By.Id("id_password")).Click();
-            #region MyPasswordIsHere
-            driver.FindElement(By.Id("id_password")).SendKeys("1");
-            #endregion
-            driver.FindElement(By.Id("applybutton")).Click();
-            driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
+        //    driver.FindElement(By.Id("id_username")).Click();
+        //    driver.FindElement(By.Id("id_username")).SendKeys("admin");
+        //    driver.FindElement(By.Id("id_password")).Click();
+        //    #region MyPasswordIsHere
+        //    driver.FindElement(By.Id("id_password")).SendKeys("1");
+        //    #endregion
+        //    driver.FindElement(By.Id("applybutton")).Click();
+        //    driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
 
-            driver.FindElement(By.Id("routebutton")).Click();
-            driver.FindElement(By.XPath("//*[contains(text(), 'Apply for a new rule')]"));
+        //    driver.FindElement(By.Id("routebutton")).Click();
+        //    driver.FindElement(By.XPath("//*[contains(text(), 'Apply for a new rule')]"));
 
-            driver.FindElement(By.Id("id_name")).Click();
-            driver.FindElement(By.Id("id_name")).SendKeys("1' or '1' = '1 /*");
+        //    driver.FindElement(By.Id("id_name")).Click();
+        //    driver.FindElement(By.Id("id_name")).SendKeys("1' or '1' = '1 /*");
 
-            driver.FindElement(By.Id("id_source")).Click();
-            driver.FindElement(By.Id("id_source")).SendKeys("0.0.0.0/0");
+        //    driver.FindElement(By.Id("id_source")).Click();
+        //    driver.FindElement(By.Id("id_source")).SendKeys("0.0.0.0/0");
 
-            driver.FindElement(By.Id("id_destination")).Click();
-            driver.FindElement(By.Id("id_destination")).SendKeys("0.0.0.0/29");
+        //    driver.FindElement(By.Id("id_destination")).Click();
+        //    driver.FindElement(By.Id("id_destination")).SendKeys("0.0.0.0/29");
 
-            driver.FindElement(By.Id("applybutton")).Click();
+        //    driver.FindElement(By.Id("applybutton")).Click();
 
-            driver.FindElement(By.XPath("//*[contains(text(), 'Enter a valid \'slug\' consisting of letters, numbers, underscores or hyphens.')]"));
-        }
+        //    driver.FindElement(By.XPath("//*[contains(text(), 'Enter a valid \'slug\' consisting of letters, numbers, underscores or hyphens.')]"));
+        //}
 
         [Test]
         public void AddWrongSourceAddress()
