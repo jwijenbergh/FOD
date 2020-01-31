@@ -26,14 +26,14 @@ namespace fodcsharptests
         [Test]
         public void SuccessLogin()
         {
-            driver.Url = "https://test-fod.geant.net/altlogin";
+            driver.Url = "http://localhost:8085/altlogin";
 
 
             driver.FindElement(By.Id("id_username")).Click();
-            driver.FindElement(By.Id("id_username")).SendKeys("ecaterina.wp8t3");
+            driver.FindElement(By.Id("id_username")).SendKeys("admin");
             driver.FindElement(By.Id("id_password")).Click();
             #region MyPasswordIsHere
-            driver.FindElement(By.Id("id_password")).SendKeys("Password");
+            driver.FindElement(By.Id("id_password")).SendKeys("1");
             #endregion
             driver.FindElement(By.Id("applybutton")).Click();
             driver.FindElement(By.XPath("//*[contains(text(), 'My rules')]"));
@@ -42,7 +42,7 @@ namespace fodcsharptests
         [Test]
         public void LoginWithoutLogin()
         {
-            driver.Url = "https://test-fod.geant.net/altlogin";
+            driver.Url = "http://localhost:8085/altlogin";
 
 
             driver.FindElement(By.Id("id_username")).Click();
@@ -61,7 +61,7 @@ namespace fodcsharptests
         [Test]
         public void LoginWithoutPassword()
         {
-            driver.Url = "https://test-fod.geant.net/altlogin";
+            driver.Url = "http://localhost:8085/altlogin";
 
 
             driver.FindElement(By.Id("id_username")).Click();
@@ -78,7 +78,7 @@ namespace fodcsharptests
         [Test]
         public void LoginWithoutData()
         {
-            driver.Url = "https://test-fod.geant.net/altlogin";
+            driver.Url = "http://localhost:8085/altlogin";
 
 
             driver.FindElement(By.Id("id_username")).Click();
@@ -93,7 +93,7 @@ namespace fodcsharptests
         [Test]
         public void LoginWithWrongData()
         {
-            driver.Url = "https://test-fod.geant.net/altlogin";
+            driver.Url = "http://localhost:8085/altlogin";
 
 
             driver.FindElement(By.Id("id_username")).Click();
