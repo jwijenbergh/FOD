@@ -4,7 +4,7 @@ cl
 celery
 django-admin
 django-picklefield
-django-registration
+django-registration==3.0.1
 djangorestframework
 django-tinymce
 django-form-utils
