@@ -15,6 +15,7 @@ from flowspec.viewsets import (
     MatchProtocolViewSet,
     MatchDscpViewSet,
 )
+from django_registration import views as registration_views
 
 admin.autodiscover()
 
@@ -46,7 +47,9 @@ urlpatterns = [
     path('/', include('django.conf.urls.i18n')),
     url(r'^selectinst/?$', flowspec_views.selectinst, name="selectinst"),
     url(r'^profile/token/$', accounts_views.generate_token, name="user-profile-token"),
-    url(r'^accounts/activate/(?P<activation_key>\w+)/$', accounts_views.activate, name='activate_account'),
+
+    path('accounts/', include('django_registration.backends.activation.urls')),
+
     url(r'^load_js/(?P<file>[\w\s\d_-]+)/$', flowspec_views.load_jscript, name="load-js"),
     url(r'^activate/complete/$', TemplateView.as_view(template_name='templates/registration/activation_complete.html'), name='registration_activation_complete'),
     path('altlogin/', LoginView.as_view(template_name='overview/login.html'), name="altlogin"),

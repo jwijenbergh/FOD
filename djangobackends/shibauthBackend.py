@@ -18,15 +18,18 @@
 #
 
 from django.contrib.auth.models import User
+import logging
+
+formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+handler = logging.FileHandler("debug.log")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
 
 
 class shibauthBackend:
-    def authenticate(self, **kwargs):
-        username = kwargs.get('username')
-        firstname = kwargs.get('firstname')
-        lastname = kwargs.get('lastname')
-        mail = kwargs.get('mail')
-        authsource = kwargs.get('authsource')
+    def authenticate(self, request, username=None, password=None, token=None, mail=None, firstname=None, lastname=None, authsource=None):
         if authsource != 'shibboleth':
             return None
         try:

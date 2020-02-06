@@ -18,13 +18,15 @@
 #
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractBaseUser, User, BaseUserManager
 from peers.models import Peer
 
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     peers = models.ManyToManyField(Peer, related_name='user_profile')
+    objects = BaseUserManager()
+    USERNAME_FIELD = 'username'
 
     class Meta:
         permissions = (

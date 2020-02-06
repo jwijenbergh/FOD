@@ -41,8 +41,7 @@ from flowspec.forms import *
 from flowspec.models import *
 from peers.models import *
 
-#TODO re-enable
-#from django_registration.models import RegistrationProfile
+from django_registration.backends.activation.views import RegistrationView
 
 from copy import deepcopy
 
@@ -609,6 +608,7 @@ def user_login(request):
         except:
             user_exists = False
         user = authenticate(username=username, firstname=firstname, lastname=lastname, mail=mail, authsource='shibboleth')
+        logger.debug('Authentication of %s' % user)
 
         if user is not None:
             try:
@@ -617,9 +617,9 @@ def user_login(request):
                 form = UserProfileForm()
                 form.fields['user'] = forms.ModelChoiceField(queryset=User.objects.filter(pk=user.pk), empty_label=None)
                 form.fields['peer'] = forms.ModelChoiceField(queryset=Peer.objects.all(), empty_label=None)
-                return render(request, 'registration/select_institution.html', {'form': form})
+                return render(request, 'django_registration/select_institution.html', {'form': form})
             if not user_exists:
-                user_activation_notify(user)
+                user_activation_notify(request, user)
             if user.is_active:
                 login(request, user)
                 return HttpResponseRedirect(reverse("dashboard"))
@@ -651,34 +651,35 @@ def user_login(request):
         )
 
 
-def user_activation_notify(user):
+def user_activation_notify(request, user):
     if not settings.DISABLE_EMAIL_NOTIFICATION:
         current_site = Site.objects.get_current()
         peers = user.userprofile.peers.all()
+        reg_view = RegistrationView()
+        reg_view.request = request
+        reg_view.email_body_template = 'django_registration/activation_email.txt'
+        reg_view.email_subject_template = 'django_registration/activation_email_subject.txt'
 
         # Email subject *must not* contain newlines
         # TechCs will be notified about new users.
         # Platform admins will activate the users.
+
         subject = render_to_string(
-            'registration/activation_email_subject.txt',
+            'django_registration/activation_email_subject.txt',
             {
                 'site': current_site
             }
         )
         subject = ''.join(subject.splitlines())
-        #TODO registration_profile = RegistrationProfile.objects.create_profile(user)
-        registration_profile="TODO - key"
-        message = render_to_string(
-            'registration/activation_email.txt',
-            {
-                'activation_key': registration_profile, #TODO registration_profile.activation_key,
-                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
-                'site': current_site,
-                'user': user
-            }
-        )
+        
         if settings.NOTIFY_ADMIN_MAILS:
             admin_mails = settings.NOTIFY_ADMIN_MAILS
+            message = render_to_string(
+                template_name = reg_view.email_body_template,
+                context=reg_view.get_email_context(reg_view.get_activation_key(user)),
+                request=request
+            )
+
             send_new_mail(
                 settings.EMAIL_SUBJECT_PREFIX + subject,
                 message,
@@ -694,7 +695,7 @@ def user_activation_notify(user):
                 peer_notification.save()
                 # Mail to domain techCs plus platform admins (no activation hash sent)
                 subject = render_to_string(
-                    'registration/activation_email_peer_notify_subject.txt',
+                    'django_registration/activation_email_peer_notify_subject.txt',
                     {
                         'site': current_site,
                         'peer': peer
@@ -702,7 +703,7 @@ def user_activation_notify(user):
                 )
                 subject = ''.join(subject.splitlines())
                 message = render_to_string(
-                    'registration/activation_email_peer_notify.txt',
+                    'django_registration/activation_email_peer_notify.txt',
                     {
                         'user': user,
                         'peer': peer
@@ -805,7 +806,7 @@ def selectinst(request):
         form = UserProfileForm(request_data)
         if form.is_valid():
             userprofile = form.save()
-            user_activation_notify(userprofile.user)
+            user_activation_notify(request, userprofile.user)
             error = _("User account <strong>%s</strong> is pending activation. Administrators have been notified and will activate this account within the next days. <br>If this account has remained inactive for a long time contact your technical coordinator or GEANT Helpdesk") %userprofile.user.username
             return render(
                 request,
@@ -818,7 +819,7 @@ def selectinst(request):
         else:
             return render(
                 request,
-                'registration/select_institution.html',
+                'django_registration/select_institution.html',
                 {
                     'form': form
                 }
@@ -865,6 +866,7 @@ def load_jscript(request, file):
 
 
 def lookupShibAttr(attrmap, requestMeta):
+    logger.debug("lookupShibAttr: requestMeta=%s" % str(requestMeta))
     for attr in attrmap:
         if (attr in requestMeta.keys()):
             if len(requestMeta[attr]) > 0:

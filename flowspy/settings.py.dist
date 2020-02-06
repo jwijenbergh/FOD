@@ -176,7 +176,7 @@ INSTALLED_APPS = (
     'poller',
     'django.contrib.admin',
     'peers',
-    #'registration',
+    'django_registration',
     'accounts',
     'tinymce',
     'widget_tweaks',
