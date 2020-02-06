@@ -106,10 +106,11 @@ def edit(routepk, callback=None):
         route.response = "Task timeout"
         route.save()
         announce("[%s] Rule edit: %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
-    except Exception:
+    except Exception as e:
         route.status = "ERROR"
         route.response = "Error"
         route.save()
+        logger.error(str(e))
         announce("[%s] Rule edit: %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
 
 

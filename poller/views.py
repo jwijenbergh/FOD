@@ -127,15 +127,16 @@ class Msgs(object):
     def message_updates(self, request, peer_id):
         if request.is_ajax():
             cursor = {}
-            logger.info("Polling update")
+            logger.debug("Polling update")
             try:
                 user = Peer.objects.get(pk=peer_id).peer_tag
+                logger.debug("Polling by user %s", str(user))
             except:
                 user = None
                 return False
             r = redis.StrictRedis()
             key = "msg_%s" % request.user.username
-            logger.info(str((key, user)))
+            logger.debug(str((key, user)))
             size = r.llen(key)
             msgs = []
             now = datetime.datetime.now()
@@ -144,7 +145,7 @@ class Msgs(object):
                 if m:
                     msgs.append(create_message(m.decode("utf-8"), request.user.username, now.strftime("%Y-%m-%d %H:%M:%S")))
             #msgs = r.lrange(key, 0, size)
-            logger.info(str(msgs))
+            logger.debug(str(msgs))
             if not msgs:
                 return HttpResponse(content='', content_type=None, status=400)
             return json_response({'messages': msgs})
