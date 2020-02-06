@@ -491,3 +491,4 @@ SETTINGS_EXPORT = [
     'LANGUAGE_CODE',
 ]
 
+from flowspy.settings_local import *

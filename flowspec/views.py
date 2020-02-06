@@ -892,7 +892,7 @@ def routedetails(request, route_slug):
 @login_required
 def routestats(request, route_slug):
     route = get_object_or_404(Route, name=route_slug)
-    import junos
+    import flowspec.junos
     import time
     res = {}
     try:
