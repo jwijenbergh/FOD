@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 
 from rest_framework import viewsets
@@ -202,3 +203,16 @@ class MatchProtocolViewSet(viewsets.ModelViewSet):
 class MatchDscpViewSet(viewsets.ModelViewSet):
     queryset = MatchDscp.objects.all()
     serializer_class = MatchDscpSerializer
+
+class StatsRoutesViewSet(viewsets.ViewSet):
+    """
+    A simple Vieset for retrieving statistics of the route by
+    an authenticated user.
+    """
+    permission_classes = (IsAuthenticated,)
+    def retrieve(self, request, pk=None):
+        queryset = Route.objects.all()
+        from flowspec.views import routestats
+        route = get_object_or_404(queryset, name=pk)
+        return routestats(request, route.name)
+

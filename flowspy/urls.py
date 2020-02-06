@@ -14,6 +14,7 @@ from flowspec.viewsets import (
     FragmentTypeViewSet,
     MatchProtocolViewSet,
     MatchDscpViewSet,
+    StatsRoutesViewSet,
 )
 from django_registration import views as registration_views
 
@@ -27,6 +28,7 @@ router.register(r'thenactions', ThenActionViewSet)
 router.register(r'fragmentypes', FragmentTypeViewSet)
 router.register(r'matchprotocol', MatchProtocolViewSet)
 router.register(r'matchdscp', MatchDscpViewSet)
+router.register(r'stats/routes', StatsRoutesViewSet, basename='statsroute')
 
 
 urlpatterns = [
