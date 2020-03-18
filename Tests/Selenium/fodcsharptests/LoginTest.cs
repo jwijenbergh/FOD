@@ -26,7 +26,7 @@ namespace fodcsharptests
         [Test]
         public void SuccessLogin()
         {
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
 
             driver.FindElement(By.Id("id_username")).Click();
@@ -42,7 +42,7 @@ namespace fodcsharptests
         [Test]
         public void LoginWithoutLogin()
         {
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
 
             driver.FindElement(By.Id("id_username")).Click();
@@ -61,7 +61,7 @@ namespace fodcsharptests
         [Test]
         public void LoginWithoutPassword()
         {
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
 
             driver.FindElement(By.Id("id_username")).Click();
@@ -78,7 +78,7 @@ namespace fodcsharptests
         [Test]
         public void LoginWithoutData()
         {
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
 
             driver.FindElement(By.Id("id_username")).Click();
@@ -93,7 +93,7 @@ namespace fodcsharptests
         [Test]
         public void LoginWithWrongData()
         {
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
 
             driver.FindElement(By.Id("id_username")).Click();

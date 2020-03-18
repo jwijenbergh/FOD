@@ -27,7 +27,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyPassword()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_password")).Click();
             driver.FindElement(By.Id("id_password")).SendKeys("Gf1!grGR00");
@@ -44,7 +44,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyNotSavePassword()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_password")).Click();
             driver.FindElement(By.Id("id_password")).SendKeys("1");
@@ -60,7 +60,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyRouterHost()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_netconf_device")).Click();
             driver.FindElement(By.Id("id_netconf_device")).SendKeys("22");
@@ -76,7 +76,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyWrongRouterHost()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_netconf_device")).Click();
             driver.FindElement(By.Id("id_netconf_device")).SendKeys("<>");
@@ -92,7 +92,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyRouterPort()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_netconf_port")).Click();
             driver.FindElement(By.Id("id_netconf_port")).SendKeys("22");
@@ -108,7 +108,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyWrongRouterPort()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_netconf_port")).Click();
             driver.FindElement(By.Id("id_netconf_port")).SendKeys("<>");
@@ -124,7 +124,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyRouterUser()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_netconf_user")).Click();
             driver.FindElement(By.Id("id_netconf_user")).SendKeys("user");
@@ -140,7 +140,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyWrongRouterUser()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_netconf_user")).Click();
             driver.FindElement(By.Id("id_netconf_user")).SendKeys("<>");
@@ -156,7 +156,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyRouterPassword()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_netconf_pass")).Click();
             driver.FindElement(By.Id("id_netconf_pass")).SendKeys("Gf1!grGR00");
@@ -172,7 +172,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyNotSaveRouterPassword()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_netconf_pass")).Click();
             driver.FindElement(By.Id("id_netconf_pass")).SendKeys("1");
@@ -188,7 +188,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyTestIP()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_test_peer_addr")).Click();
             driver.FindElement(By.Id("id_test_peer_addr")).SendKeys("0.0.0.0/30");
@@ -204,7 +204,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyWrongTestIP()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_test_peer_addr")).Click();
             driver.FindElement(By.Id("id_test_peer_addr")).SendKeys("<>");
@@ -220,10 +220,10 @@ namespace fodcsharptests
         //[Test]
         //public void GoodData()
         //{
-        //    driver.Url = "http://localhost:8087/setup";
+        //    driver.Url = "http://localhost:8081/setup";
 
         //    driver.FindElement(By.Id("id_password")).Click();
-        //    driver.FindElement(By.Id("id_password")).SendKeys("Gf1!grGR00");
+        //    driver.FindElement(By.Id("id_password")).SendKeys("1");
         //    driver.FindElement(By.Id("id_netconf_device")).Click();
         //    driver.FindElement(By.Id("id_netconf_device")).SendKeys("1.0.0.0/8");
         //    driver.FindElement(By.Id("id_netconf_port")).Click();
@@ -246,7 +246,7 @@ namespace fodcsharptests
         [Test]
         public void WrongData()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_password")).Click();
             driver.FindElement(By.Id("id_password")).SendKeys("*/,");
@@ -272,7 +272,7 @@ namespace fodcsharptests
         [Test]
         public void EmptyFeilds()
         {
-            driver.Url = "http://localhost:8087/setup";
+            driver.Url = "http://localhost:8081/setup";
 
             driver.FindElement(By.Id("id_password")).Click();
             driver.FindElement(By.Id("id_password")).SendKeys("");

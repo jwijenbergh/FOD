@@ -30,7 +30,7 @@ namespace fodcsharptests
         {
 
             // use 1.0.0.0/8 
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
             driver.FindElement(By.Id("id_username")).Click();
             driver.FindElement(By.Id("id_username")).SendKeys("admin");
@@ -61,7 +61,7 @@ namespace fodcsharptests
         //[Test]
         //public void AddWrongName()
         //{
-        //    driver.Url = "http://localhost:8085/altlogin";
+        //    driver.Url = "http://localhost:8081/altlogin";
 
         //    driver.FindElement(By.Id("id_username")).Click();
         //    driver.FindElement(By.Id("id_username")).SendKeys("admin");
@@ -92,7 +92,7 @@ namespace fodcsharptests
         [Test]
         public void AddWrongSourceAddress()
         {
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
             driver.FindElement(By.Id("id_username")).Click();
             driver.FindElement(By.Id("id_username")).SendKeys("admin");
@@ -123,7 +123,7 @@ namespace fodcsharptests
         [Test]
         public void AddWrongDestinationAddress()
         {
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
             driver.FindElement(By.Id("id_username")).Click();
             driver.FindElement(By.Id("id_username")).SendKeys("admin");
@@ -154,7 +154,7 @@ namespace fodcsharptests
         [Test]
         public void AddWithOutExpires()
         {
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
             driver.FindElement(By.Id("id_username")).Click();
             driver.FindElement(By.Id("id_username")).SendKeys("admin");
@@ -188,7 +188,7 @@ namespace fodcsharptests
         [Test]
         public void AddWrongSrcPort()
         {
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
             driver.FindElement(By.Id("id_username")).Click();
             driver.FindElement(By.Id("id_username")).SendKeys("admin");
@@ -222,7 +222,7 @@ namespace fodcsharptests
         [Test]
         public void AddWrongDestPort()
         {
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
             driver.FindElement(By.Id("id_username")).Click();
             driver.FindElement(By.Id("id_username")).SendKeys("admin");
@@ -256,7 +256,7 @@ namespace fodcsharptests
         [Test]
         public void AddWrongPort()
         {
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
             driver.FindElement(By.Id("id_username")).Click();
             driver.FindElement(By.Id("id_username")).SendKeys("admin");

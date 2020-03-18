@@ -26,7 +26,7 @@ namespace fodcsharptests
         [Test]
         public void SuccessLogin()
         {
-            driver.Url = "http://localhost:8085/altlogin";
+            driver.Url = "http://localhost:8081/altlogin";
 
             driver.FindElement(By.Id("id_username")).Click();
             driver.FindElement(By.Id("id_username")).SendKeys("admin");
