@@ -419,19 +419,17 @@ if __name__ == "__main__":
 
     if argv.__len__() >= 2 and argv[1] == "--get1":
       fod_rule_api__get_routes1(fod_con1, argv[2])
-    else:
-      fod_rule_api__get_routes1(fod_con1)
-
-    print
-
-    if argv.__len__() >= 2 and argv[1] == "--crea":
+    elif argv.__len__() >= 2 and argv[1] == "--crea":
+      print("crea")
       fod_rule_api__create_route_old15(fod_con1, name=argv[2], source=argv[3])
-
     elif argv.__len__() >= 2 and argv[1] == "--chg":
       fod_rule_api__change_route(fod_con1, argv[2], argv[3], argv[4])
 
     elif argv.__len__() >= 2 and argv[1] == "--del":
       fod_rule_api__delete_route(fod_con1, argv[2])
+    else:
+      fod_rule_api__get_routes1(fod_con1)
+
 
 ##############################################################################
 ##############################################################################
