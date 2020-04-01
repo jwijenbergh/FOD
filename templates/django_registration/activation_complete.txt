@@ -3,3 +3,10 @@ Your account with username {{ user.username }} has been activated.
 You may login to FoD using the following URL:
 
 http://{{ site.domain }}{% url 'login' %}
+
+
+
+Please follow instructions on the following link for the usage:
+
+https://wiki.geant.org/display/gn42jra2/Firewall-On-Demand+%28FoD%29+User+Documentation
+

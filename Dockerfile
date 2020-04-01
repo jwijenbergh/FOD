@@ -15,5 +15,7 @@ RUN (cd /srv/flowspy; bash ./install-debian.sh;)
 
 EXPOSE 8000
 
+WORKDIR /srv/flowspy
+
 CMD [ "/srv/flowspy/runfod.sh" ]
 

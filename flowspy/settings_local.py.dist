@@ -101,6 +101,7 @@ ACCOUNT_ACTIVATION_DAYS = 7
 # Define subnets that should not have any rules applied whatsoever
 #PROTECTED_SUBNETS = ['10.10.0.0/16']
 PROTECTED_SUBNETS = []
+# max number of days into the future that is allowed to pick in rule expiration datepicker
 #MAX_RULE_EXPIRE_DAYS = 10
 MAX_RULE_EXPIRE_DAYS = 30
 
@@ -144,17 +145,24 @@ SNMP_RULESFILTER = ["__flowspec_default_inet__", "__flowspec_IAS_inet__"]
 SNMP_POLL_INTERVAL = 8 #seconds
 # cache file for data
 SNMP_TEMP_FILE = "/tmp/snmp_temp_data"
+SNMP_POLL_LOCK = "/var/run/fod/snmppoll.lock"
 
 # Number of historical values to store for a route.
 # Polling interval must be set for "snmp-stats-poll" celery task in CELERYBEAT_SCHEDULE.
 # By default, it is 5 min interval, so SNMP_MAX_SAMPLECOUNT=12 means we have about
 # one hour history.
-SNMP_MAX_SAMPLECOUNT = 12
+#SNMP_MAX_SAMPLECOUNT = 12
+SNMP_MAX_SAMPLECOUNT = 2016
 
 # Age of inactive routes that can be already removed (in seconds)
-SNMP_REMOVE_RULES_AFTER = 3600
+#SNMP_REMOVE_RULES_AFTER = 3600
+SNMP_REMOVE_RULES_AFTER = 604800
 
+#
 
+DISABLE_RULE_OVERLAP_CHECK = True
+
+ENABLE_SETUP_VIEW = False
 
 ##############################################################################
 ##############################################################################

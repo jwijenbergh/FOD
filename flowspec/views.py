@@ -919,7 +919,7 @@ def routestats(request, route_slug):
         return HttpResponse(json.dumps({"error": "No data available. %s" % e}), content_type="application/json", status=404)
 
 def setup(request):
-    if User.objects.count() == 0:
+    if settings.ENABLE_SETUP_VIEW and User.objects.count() == 0:
         if request.method == "POST":
             form = SetupForm(request.POST)
             if form.is_valid():

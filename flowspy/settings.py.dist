@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*- vim:fileencoding=utf-8:
 # vim: tabstop=4:shiftwidth=4:softtabstop=4:expandtab
 # Django settings for flowspy project.
-# Copyright Â© 2011-2015 Greek Research and Technology Network (GRNET S.A.)
-# Copyright Â© 2011-2014 Leonidas Poulopoulos (@leopoul)
-# Copyright Â© 2014-2015 Stavros Kroustouris (@kroustou)
+# Copyright © 2011-2015 Greek Research and Technology Network (GRNET S.A.)
+# Copyright © 2011-2014 Leonidas Poulopoulos (@leopoul)
+# Copyright © 2014-2015 Stavros Kroustouris (@kroustou)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -492,3 +492,4 @@ SETTINGS_EXPORT = [
 ]
 
 from flowspy.settings_local import *
+
