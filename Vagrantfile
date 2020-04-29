@@ -23,6 +23,7 @@ Vagrant.configure(2) do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   config.vm.network "forwarded_port", guest: 8000, host: 8000, host_ip: "0.0.0.0"
+  config.vm.network "forwarded_port", guest: 443, host: 8443, host_ip: "0.0.0.0"
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -64,6 +65,9 @@ Vagrant.configure(2) do |config|
 #SCRIPT
 
      echo "Installation of Shibboleth" >&2
+
+     echo "TODO fix SELinux"
+     setenforce permissive
 
      (cd /srv/flowspy/inst/apache_shib/; ./apache_shib_init.sh;)
 

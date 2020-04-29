@@ -71,6 +71,9 @@ hostname test-fod.geant.net
 ##
 
 if [ "$DISTRO" = centos ]; then
+	chown -R apache: /etc/shibboleth/
+	systemctl enable httpd
+	systemctl enable shibd
 	service httpd restart
 	service shibd restart
 else
