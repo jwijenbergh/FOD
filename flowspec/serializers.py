@@ -26,6 +26,11 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
     """
     applier = serializers.CharField(source='applier_username', read_only=True)
 
+    def validate_applier(self, attrs, source):
+        user = self.context.get('request').user
+        logger.info("validate_applier source="+str(source))
+        return source
+
     #def validate_source(self, attrs, source):
     def validate_source(self, source):
         user = self.context.get('request').user

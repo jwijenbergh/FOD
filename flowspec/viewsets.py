@@ -65,11 +65,17 @@ class RouteViewSet(viewsets.ModelViewSet):
         logger.info("before serializer.valid test")
         try:
             logger.info("before serializer.valid test2")
+            #raise test from None 
             if serializer.is_valid():
                 logger.info("after serializer.valid")
+                logger.info("dir="+str(dir(serializer)))
+                #logger.info("data="+str(serializer.data))
                 (exists, message) = check_if_rule_exists(
-                    {'source': serializer.object.source,
-                     'destination': serializer.object.destination},
+                    {
+                     #'source': serializer.object.source,
+                     'source': request.data["source"],
+                     #'destination': serializer.object.destination,
+                     'destination': request.data["destination"]},
                     self.get_queryset())
                 logger.info("xexists="+str(exists))
                 if exists:
@@ -77,10 +83,13 @@ class RouteViewSet(viewsets.ModelViewSet):
                 else:
                     return super(RouteViewSet, self).create(request)
             else:
+                logger.info("before serializer.errors")
                 return Response(serializer.errors, status=400)
-        except:
+        #except:
+        except BaseException as e:
             #logger.info("exception1 got="+str(e))
-            logger.info("debug viewsets: got exception")
+            #logger.info("debug viewsets: got exception"+str(e))
+            logger.error("debug viewsets: got exception", exc_info=True)
 
     def retrieve(self, request, pk=None):
         route = get_object_or_404(self.get_queryset(), pk=pk)

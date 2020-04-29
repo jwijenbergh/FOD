@@ -7,6 +7,17 @@ from peers.models import PeerRange, Peer
 from flowspec.models import Route
 from django.urls import reverse
 
+import os
+import logging
+FORMAT = '%(asctime)s %(levelname)s: %(message)s'
+logging.basicConfig(format=FORMAT)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'mylog.log')
+handler = logging.FileHandler(LOG_FILENAME)
+formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 def get_network(ip):
     try:
@@ -185,23 +196,28 @@ def check_if_rule_exists(fields, queryset):
     :rtype: tuple(bool, str)
     """
 
+    log.info("check_if_rule_exists: test1")
     routes = queryset.filter(
         source=fields.get('source'),
         destination=ip_network(fields.get('destination')).compressed,
     )
+    log.info("check_if_rule_exists: test2")
     if routes:
         ids = [str(item[0]) for item in routes.values_list('pk')]
         return (
             True, _('Rule(s) regarding those addresses already exist '
                     'with id(s) {}. Please edit those instead'.format(', '.join(ids))))
 
+    log.info("check_if_rule_exists: test3")
     routes = Route.objects.filter(
         source=fields.get('source'),
         destination=ip_network(fields.get('destination')).compressed,
     )
+    log.info("check_if_rule_exists: test4")
     for route in routes:
         return (
             True, _('Rule(s) regarding those addresses already exist '
                     'but you cannot edit them. Please refer to the '
                     'application\'s administrators for further clarification'))
+    log.info("check_if_rule_exists: test5")
     return (False, None)
