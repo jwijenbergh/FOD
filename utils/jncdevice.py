@@ -549,8 +549,10 @@ class Parser(object):
     def parseString(self):
         '''Normally this would be an rpc_reply in case of netconf invoking or
         a configuration element in case of normal parsing'''
-        from StringIO import StringIO
-        doc = self.parsexml_(StringIO(self.confile))
+        #from StringIO import StringIO
+        from io import StringIO
+        from io import BytesIO
+        doc = self.parsexml_(BytesIO(self.confile.encode()))
         rootNode = doc.getroot()
         rootNodeTag = Tag_pattern_.match(rootNode.tag).groups()[-1]
         if rootNodeTag == 'rpc-reply':
