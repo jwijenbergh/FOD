@@ -24,17 +24,22 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
     """
     A serializer for `Route` objects
     """
-    applier = serializers.CharField(source='applier_username', read_only=True)
+    applier = serializers.CharField(source='applier.username', read_only=True)
+
+    def create(self, validated_data):
+        if "applier" not in validated_data:
+            u = self.context.get('request').user
+            logger.info("Adding applier according to authentized user %s" % u.username)
+            validated_data["applier"] = u
+        return super().create(validated_data)
 
     def validate_applier(self, attrs, source):
         user = self.context.get('request').user
-        logger.info("validate_applier source="+str(source))
         return source
 
     #def validate_source(self, attrs, source):
     def validate_source(self, source):
         user = self.context.get('request').user
-        #logger.info("attrs="+str(attrs))
         source_ip = source #attrs.get('source')
         res = clean_source(user, source_ip)
         if res != source_ip:
