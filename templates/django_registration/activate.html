@@ -30,9 +30,12 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                        						<div class="alert {% if account %}alert-success{% else %}alert-info{% endif %}">
+                            {% if error and account %}<div class="alert alert-info">{{error}}</div>{% endif %}
+                            <div class="alert {% if account %}alert-success{% else %}alert-info{% endif %}">
                       					{% if account %}
                       					    {{account}} {% trans "succesfully activated" %}
+                      					{% elif error %}
+                                            {{error}}
                       					{% else %}
                       					    {% trans "The user has probably been already activated." %}
                       					{% endif %}
