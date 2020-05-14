@@ -33,6 +33,7 @@ logger.addHandler(handler)
 
 
 class RouteViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
     queryset = Route.objects.all()
     serializer_class = RouteSerializer
 
