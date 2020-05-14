@@ -154,7 +154,8 @@ class RouteViewSet(viewsets.ModelViewSet):
             data=request.data, partial=partial)
 
         if serializer.is_valid():
-            new_status = serializer.object.status
+            #new_status = serializer.object.status
+            new_status = serializer.data["status"]
             super(RouteViewSet, self).update(request, pk, partial=partial)
             if old_status == 'ACTIVE':
                 work_on_active_object(obj, new_status)
