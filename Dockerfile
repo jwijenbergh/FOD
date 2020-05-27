@@ -11,6 +11,7 @@ RUN apt-get -qqy install locales
 RUN mkdir -p /var/log/fod /srv
 COPY . /srv/flowspy
 
+RUN apt-get -qqy install patch
 RUN (cd /srv/flowspy/flowspy && cp -f settings.py.dist settings.py && patch settings.py < settings.py.patch && touch settings_local.py;)
 
 RUN (cd /srv/flowspy; bash ./install-debian.sh;)
