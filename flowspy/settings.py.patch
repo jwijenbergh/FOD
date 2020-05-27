@@ -1,5 +1,5 @@
---- flowspy/settings.py.dist	2019-11-26 22:41:57.825374283 +0000
-+++ flowspy/settings.py	2019-11-26 22:41:14.605534002 +0000
+--- settings.py.dist	2020-05-27 16:04:09.459076296 +0200
++++ settings.py	2020-05-27 16:06:59.378164956 +0200
 @@ -30,7 +30,7 @@
  import os
  from celery.schedules import crontab
@@ -64,3 +64,12 @@
  SERVER_EMAIL = "Example FoD Service <noreply@example.com>"
  EMAIL_SUBJECT_PREFIX = "[FoD] "
  EXPIRATION_NOTIFY_DAYS = 4
+@@ -491,7 +486,7 @@
+     'LANGUAGE_CODE',
+ ]
+ 
+-ENABLE_SETUP_VIEW = False
++ENABLE_SETUP_VIEW = True
+ 
+ from flowspy.settings_local import *
+ 

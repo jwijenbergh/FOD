@@ -491,5 +491,7 @@ SETTINGS_EXPORT = [
     'LANGUAGE_CODE',
 ]
 
+ENABLE_SETUP_VIEW = False
+
 from flowspy.settings_local import *
 
