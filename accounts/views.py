@@ -19,6 +19,7 @@
 from django import forms
 from django.conf import settings
 from django.core.mail import send_mail
+from smtplib import SMTPRecipientsRefused
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.shortcuts import render, HttpResponse
@@ -30,8 +31,18 @@ from rest_framework.authtoken.models import Token
 from accounts.models import UserProfile
 from peers.models import Peer
 from flowspec.forms import UserProfileForm
-# TODO from registration.models import RegistrationProfile
+from django_registration.backends.activation.views import ActivationView
+from django_registration.exceptions import ActivationError
 
+
+import os, logging
+LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'flowspec_accounts_view.log')
+formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(LOG_FILENAME)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 def generate_token(request):
     user = request.user
@@ -45,99 +56,115 @@ def generate_token(request):
 @never_cache
 def activate(request, activation_key):
     account = None
-    # TODO
-    #if request.method == "GET":
-    #    activation_key = activation_key.lower()  # Normalize before trying anything with it.
-    #    try:
-    #        rp = RegistrationProfile.objects.get(activation_key=activation_key)
+    actview = ActivationView()
+    if request.method == "GET":
+        try:
+            username = actview.validate_key(activation_key=activation_key)
 
-    #    except RegistrationProfile.DoesNotExist:
-    #        return render(
-    #            request,
-    #            'registration/activate.html',
-    #            {
-    #                'account': account,
-    #                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS
-    #            }
-    #        )
-    #    try:
-    #        userProfile = rp.user.get_profile()
-    #    except UserProfile.DoesNotExist:
-    #        return render(
-    #            request,
-    #            'registration/activate.html',
-    #            {
-    #                'account': account,
-    #                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS
-    #            }
-    #        )
+        except ActivationError as e:
+            return render(
+                request,
+                'django_registration/activate.html',
+                {
+                    'account': account,
+                    'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+                    'error': str(e.message)
+                }
+            )
+        try:
+            userProfile = User.objects.get(username=username).userprofile
+        except User.DoesNotExist:
+            return render(
+                request,
+                'django_registration/activate.html',
+                {
+                    'account': account,
+                    'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+                    'error': "Activation failed"
+                }
+            )
 
-    #    form = UserProfileForm(instance=userProfile)
+        form = UserProfileForm(instance=userProfile)
 
-    #    return render(
-    #        request,
-    #        'registration/activate_edit.html',
-    #        {
-    #            'account': account,
-    #            'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
-    #            'form': form
-    #        },
-    #    )
+        return render(
+            request,
+            'django_registration/activate_edit.html',
+            {
+                'account': account,
+                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+                'form': form
+            },
+        )
 
-    #if request.method == "POST":
-    #    request_data = request.POST.copy()
-    #    try:
-    #        user = User.objects.get(pk=request_data['user'])
-    #        up = user.get_profile()
+    if request.method == "POST":
+        request_data = request.POST.copy()
+        try:
+            user = User.objects.get(pk=request_data['user'])
+            up = user.userprofile
 
-    #        # use getlist to get the list of peers (might be multiple)
-    #        profile_peers = request.POST.getlist('peers')
+            # use getlist to get the list of peers (might be multiple)
+            profile_peers = request.POST.getlist('peers')
 
-    #        # remove already assigned peers, as these are selected by
-    #        # the user, no admin has yet verified those. They will be
-    #        # replaced by the admin's selection.
-    #        up.peers.clear()
+            # remove already assigned peers, as these are selected by
+            # the user, no admin has yet verified those. They will be
+            # replaced by the admin's selection.
+            up.peers.clear()
 
-    #        for peer in profile_peers:
-    #            up.peers.add(Peer.objects.get(pk=peer))
-    #        up.save()
+            for peer in profile_peers:
+                up.peers.add(Peer.objects.get(pk=peer))
+            up.save()
 
-    #    except:
-    #        return render(
-    #            request,
-    #            'registration/activate_edit.html',
-    #            {
-    #                'account': account,
-    #                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS
-    #            },
-    #        )
-    #    activation_key = activation_key.lower()  # Normalize before trying anything with it.
-    #    try:
-    #        rp = RegistrationProfile.objects.get(activation_key=activation_key)
-    #        account = RegistrationProfile.objects.activate_user(activation_key)
-    #    except Exception:
-    #        pass
+        except:
+            return render(
+                request,
+                'django_registration/activate_edit.html',
+                {
+                    'account': account,
+                    'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+                },
+            )
 
-    #    if account:
-    #        # A user has been activated
-    #        email = render_to_string(
-    #            'registration/activation_complete.txt',
-    #            {
-    #                'site': Site.objects.get_current(),
-    #                'user': account
-    #            }
-    #        )
-    #        send_mail(
-    #            _("%sUser account activated") % settings.EMAIL_SUBJECT_PREFIX,
-    #            email,
-    #            settings.SERVER_EMAIL,
-    #            [account.email]
-    #        )
-    #    return render(
-    #        request,
-    #        'registration/activate.html',
-    #        {
-    #            'account': account,
-    #            'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS
-    #        },
-    #    )
+        try:
+            account = actview.activate(activation_key=activation_key)
+        except ActivationError as e:
+            return render(
+                request,
+                'django_registration/activate.html',
+                {
+                    'account': account,
+                    'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+                    'error': str(e.message)
+                }
+            )
+
+        if account:
+            # A user has been activated
+            email = render_to_string(
+                'django_registration/activation_complete.txt',
+                {
+                    'site': Site.objects.get_current(),
+                    'user': account
+                }
+            )
+            error = None
+            try:
+                send_mail(
+                    _("%sUser account activated") % settings.EMAIL_SUBJECT_PREFIX,
+                    email,
+                    settings.SERVER_EMAIL,
+                    [account.email]
+                )
+            except SMTPRecipientsRefused as e:
+                logger.error("Failed to send a notification e-mail to the user: %s" % e)
+                error = e
+                
+        logger.info('Activated account %s' % account)
+        return render(
+            request,
+            'django_registration/activate.html',
+            {
+                'account': account,
+                'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+                'error': "Failed to send a notification e-mail to the user"
+            },
+        )

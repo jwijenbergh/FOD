@@ -33,6 +33,7 @@ logger.addHandler(handler)
 
 
 class RouteViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
     queryset = Route.objects.all()
     serializer_class = RouteSerializer
 
@@ -57,19 +58,12 @@ class RouteViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request):
-        logger.info("debug viewsets: create: request.data="+str(request.data))
+        logger.debug("debug viewsets: create: request.data="+str(request.data))
         serializer = RouteSerializer(
-            #context={'request': request}, data=request.DATA, partial=True) # does not work any more
             context={'request': request}, data=request.data, partial=True) # is this correct ???
-        logger.info("debug viewsets: create: serializer="+str(serializer))
-        logger.info("before serializer.valid test")
         try:
-            logger.info("before serializer.valid test2")
             #raise test from None 
             if serializer.is_valid():
-                logger.info("after serializer.valid")
-                logger.info("dir="+str(dir(serializer)))
-                #logger.info("data="+str(serializer.data))
                 (exists, message) = check_if_rule_exists(
                     {
                      #'source': serializer.object.source,
@@ -77,18 +71,13 @@ class RouteViewSet(viewsets.ModelViewSet):
                      #'destination': serializer.object.destination,
                      'destination': request.data["destination"]},
                     self.get_queryset())
-                logger.info("xexists="+str(exists))
                 if exists:
                     return Response({"non_field_errors": [message]}, status=400)
                 else:
                     return super(RouteViewSet, self).create(request)
             else:
-                logger.info("before serializer.errors")
                 return Response(serializer.errors, status=400)
-        #except:
         except BaseException as e:
-            #logger.info("exception1 got="+str(e))
-            #logger.info("debug viewsets: got exception"+str(e))
             logger.error("debug viewsets: got exception", exc_info=True)
 
     def retrieve(self, request, pk=None):
@@ -165,7 +154,8 @@ class RouteViewSet(viewsets.ModelViewSet):
             data=request.data, partial=partial)
 
         if serializer.is_valid():
-            new_status = serializer.object.status
+            #new_status = serializer.object.status
+            new_status = serializer.data["status"]
             super(RouteViewSet, self).update(request, pk, partial=partial)
             if old_status == 'ACTIVE':
                 work_on_active_object(obj, new_status)
