@@ -1,24 +1,21 @@
-FROM debian:buster
+FROM centos:7
 
 ENV LC_ALL en_US.utf8
 
-RUN apt-get update
-RUN echo "Set up container's locales"
-RUN echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US"\n' > /etc/default/locale
-RUN echo "en_US.utf8 UTF-8" >> /etc/locale.gen
-RUN apt-get -qqy install locales
+RUN yum -y install procps
 
 RUN mkdir -p /var/log/fod /srv
 COPY . /srv/flowspy
 
-RUN apt-get -qqy install patch
-RUN (cd /srv/flowspy/flowspy && cp -f settings.py.dist settings.py && patch settings.py < settings.py.patch && touch settings_local.py;)
+RUN (cd /srv/flowspy; ./install-centos.sh;)
 
-RUN (cd /srv/flowspy; bash ./install-debian.sh;)
+#  echo "To set environment to English, run: export LC_ALL=en_US"
+#  echo "To activate virualenv: source /srv/venv/bin/activate"
+#  echo "To create a user run: cd /srv/flowspy; ./manage.py createsuperuser"
+#  echo "To start flowspy server: cd /srv/flowspy; ./manage.py runserver 0.0.0.0:8000"
+#  echo "To start celeryd: cd /srv/flowspy; ./manage.py celeryd"
 
 EXPOSE 8000
-
-WORKDIR /srv/flowspy
 
 CMD [ "/srv/flowspy/runfod.sh" ]
 
