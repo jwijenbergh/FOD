@@ -4,27 +4,65 @@
 # with Celery, Redis, and sqlite.
 #
 
-set -e
+install_basesw=1
+install_fodproper=1
+if [ $# -ge 1 -a "$1" = "--both" ]; then
+  shift 1
+  install_basesw=1
+  install_fodproper=1
+elif [ $# -ge 1 -a "$1" = "--basesw" ]; then 
+  shift 1
+  install_basesw=1
+  install_fodproper=0
+elif [ $# -ge 1 -a "$1" = "--fodproper" ]; then
+  shift 1
+  install_basesw=0
+  install_fodproper=1
+fi
 
-echo "Installing epel repo"
-rpm -Uh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+##
 
-echo "Installing remi repo"
-yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+if [ "$install_basesw" = 1 ]; then
 
-echo "Installing base dependencies"
-yum -y install python36 python3-setuptools python36-virtualenv vim git gcc libevent-devel libxml2-devel libxslt-devel mariadb-server mysql-devel patch yum-utils
+  set -e
+
+  echo "Installing epel repo"
+  rpm -Uh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+  echo "Installing remi repo"
+  yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+
+  echo "Installing base dependencies"
+  yum -y install python36 python3-setuptools python36-virtualenv vim git gcc libevent-devel libxml2-devel libxslt-devel mariadb-server mysql-devel patch yum-utils
 
 
-echo "Installing redis"
-# Installation of redis from remi RPM repository
-yum-config-manager --enable remi
-yum -q -y install redis
+  echo "Installing redis"
+  # Installation of redis from remi RPM repository
+  yum-config-manager --enable remi
+  yum -q -y install redis
 
-echo "Setup python environment for FoD"
-mkdir -p /var/log/fod /srv
-virtualenv-3 /srv/venv
-(
+  set +e
+
+fi
+
+##
+
+if [ "$install_fodproper" = 0 ]; then
+
+  echo "Setup partial python environment for FoD"
+  virtualenv-3 /srv/venv
+  source /srv/venv/bin/activate
+  pip install -r requirements.txt
+
+else
+
+  set -e
+
+  echo "Setup python environment for FoD"
+  mkdir -p /var/log/fod /srv
+  virtualenv-3 /srv/venv
+
+  (
         set +e
 	source /srv/venv/bin/activate
 	mkdir -p /srv/flowspy/
@@ -59,5 +97,9 @@ virtualenv-3 /srv/venv
 	#./manage.py syncdb --noinput
 	./manage.py migrate
 	./manage.py loaddata initial_data
-)
+  )
+
+  set +e
+
+fi
 
