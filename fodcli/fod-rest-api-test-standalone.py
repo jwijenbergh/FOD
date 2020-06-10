@@ -191,7 +191,7 @@ def fod_rule_api__create_rule(fod_con, name="Example1", then=[], routes=[], comm
       #then = ["https://fod.example.com/api/thenactions/3/"], 
       then = then, 
       routes = routes,
-      expires = "2020-05-09",
+      expires = "2020-06-09",
       editing=True
     )
 
@@ -224,7 +224,7 @@ def fod_rule_api__create_route_old15(fod_con, name="Example1", source="9.9.9.2",
       destinationport = destinationport, 
       protocol = protocol_list,
       then = ["https://fod.example.com/api/thenactions/3/"], 
-      expires = "2020-05-28",
+      expires = "2020-06-20",
       dscp = None
     )
 
@@ -301,7 +301,7 @@ def fod_rule_api__change_rule__partial(fod_con, id, status="INACTIVE",  editing=
   response = requests.patch(url__api_rules+str(id)+'/', headers=fod_api_headers, data=data, verify=ssl_verify)
   return handle_json_answer(response)
 
-def fod_rule_api__change_route(fod_con, id, name="Example1", source="9.9.9.2"):
+def fod_rule_api__change_route(fod_con, id, name="Example1", source="9.9.9.2", status="INACTIVE"):
 
   fod_api_headers=fod_con["fod_api_headers"]
   url__api_routes=fod_con["url__api_base"]+url__api_routes__rel
@@ -311,12 +311,13 @@ def fod_rule_api__change_route(fod_con, id, name="Example1", source="9.9.9.2"):
       id = id,
       name = name, 
       comments = "Description", 
-      status = "INACTIVE", 
+      #status = "INACTIVE", 
+      status = status, 
       source = source, 
       sourceport = "30", 
       destination = "10.0.0.57", 
       destinationport = "1020,80-90,101", 
-      #then = ["https://fod.example.com/api/thenactions/3/"], 
+      then = ["https://fod.example.com/api/thenactions/3/"], 
       #expires = "2018-03-20"    
     )
 
@@ -434,17 +435,30 @@ if __name__ == "__main__":
 
     if argv.__len__() >= 2 and argv[1] == "--get1":
       fod_rule_api__get_routes1(fod_con1, argv[2])
-    elif argv.__len__() >= 2 and argv[1] == "--crea":
+    if argv.__len__() >= 1 and argv[1] == "--list":
+      fod_rule_api__get_routes1(fod_con1)
+
+    elif argv.__len__() >= 2 and argv[1] == "--crea": # e.g --crea test1 1.1.1.1
       print("crea", file=sys.stderr)
       json_parsed, status_code = fod_rule_api__create_route_old15(fod_con1, name=argv[2], source=argv[3])
       print ("status_code=", status_code, file=sys.stderr)
       print ("json_parsed=", json_parsed, file=sys.stderr)
-    elif argv.__len__() >= 2 and argv[1] == "--chg":
-      fod_rule_api__change_route(fod_con1, argv[2], argv[3], argv[4])
 
-    elif argv.__len__() >= 2 and argv[1] == "--del":
-      fod_rule_api__delete_route(fod_con1, argv[2])
+    elif argv.__len__() >= 5 and argv[1] == "--chg": # e.g --chg 79 test2 2.1.1.1 INACTIVE
+
+      print("chg", file=sys.stderr)
+      json_parsed, status_code = fod_rule_api__change_route(fod_con1, argv[2], argv[3], argv[4], argv[5])
+      print ("status_code=", status_code, file=sys.stderr)
+      print ("json_parsed=", json_parsed, file=sys.stderr)
+
+    elif argv.__len__() >= 2 and argv[1] == "--del": # e.g. --del 79
+      print("del", file=sys.stderr)
+      json_parsed, status_code = fod_rule_api__delete_route(fod_con1, argv[2])
+      print ("status_code=", status_code, file=sys.stderr)
+      print ("json_parsed=", json_parsed, file=sys.stderr)
+
     else:
+
       fod_rule_api__get_routes1(fod_con1)
 
 
