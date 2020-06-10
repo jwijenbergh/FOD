@@ -324,7 +324,7 @@ def poll_snmp_statistics():
       logger.info("poll_snmp_statistics(): in child process (pid="+str(pid)+", npid="+str(npid)+")")
       try:
         snmpstats.poll_snmp_statistics()        
-      except e:
+      except Exception as e:
         logger.error("poll_snmp_statistics(): exception occured in snmp poll (pid="+str(pid)+", npid="+str(npid)+"): "+str(e))
       snmp_lock_remove()
       #exit_process()
