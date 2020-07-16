@@ -188,18 +188,22 @@ def batch_delete(routes, **kwargs):
 def announce(messg, user, route):
     peers = user.userprofile.peers.all()
     username = user.username
+    tgt_net = ip_network(route.destination)
     for peer in peers:
-        if username:
-            break
         for network in peer.networks.all():
             net = ip_network(network)
-            if ip_network(route.destination) in net:
+            logger.info("ANNOUNCE check ip " + str(ip_network(route.destination)) + str(type(ip_network(route.destination))) + " in net " + str(net) + str(type(net)))
+            # check if the target is a subnet of peer range (python3.6 doesn't have subnet_of())
+            if tgt_net.network_address >= net.network_address and tgt_net.broadcast_address <= net.broadcast_address:
                 username = peer.peer_tag
+                logger.info("ANNOUNCE found peer " + str(username))
                 break
+
     messg = str(messg)
-    logger.info("announce " + messg)
+    logger.info("ANNOUNCE " + messg)
     r = redis.StrictRedis()
     key = "msg_%s" % username
+    logger.info("ANNOUNCE key " + key)
     r.rpush(key, messg)
     r.expire(key, 1800)
 

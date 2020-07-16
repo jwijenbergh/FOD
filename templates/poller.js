@@ -50,7 +50,7 @@ jQuery.fn.enable = function(opt_enable) {
 };
 
 var updater = {
-    errorSleepTime: 500,
+    errorSleepTime: 5000,
     cursor: null,
     start: function() {
     	    var date = new Date();
@@ -63,9 +63,9 @@ var updater = {
         },
     poll: function() {
     	{% if user.is_authenticated %}
-    	if (updater.errorSleepTime > 128000){
-    		oTable.fnReloadAjax(refreshUrl);
-    	}
+    	//if (updater.errorSleepTime > 128000){
+    	//	oTable.fnReloadAjax(refreshUrl);
+    	//}
     	timeout = {{timeout}};
     	    var date = new Date();
 			var timestamp = date.getTime();
@@ -84,8 +84,8 @@ var updater = {
 	    updater.onError();
 	    return;
 	}
-	updater.errorSleepTime = 500;
-	window.setTimeout(updater.poll, 0);
+	//updater.errorSleepTime = 500;
+	window.setTimeout(updater.poll, updater.errorSleepTime);
     },
 
     onFetchExisting: function(response) {
@@ -102,7 +102,7 @@ var updater = {
         	if (text == 'timeout'){
         		oTable.fnReloadAjax(refreshUrl);
         	}
-        	updater.errorSleepTime *= 2;
+        	//updater.errorSleepTime *= 2;
 			console.log("Poll error; sleeping for", updater.errorSleepTime, "ms");
 			window.setTimeout(updater.poll, updater.errorSleepTime);
 
