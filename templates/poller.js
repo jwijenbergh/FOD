@@ -63,12 +63,12 @@ var updater = {
         },
     poll: function() {
     	{% if user.is_authenticated %}
-    	//if (updater.errorSleepTime > 128000){
-    	//	oTable.fnReloadAjax(refreshUrl);
-    	//}
+    	if (oTable) {
+    		oTable.fnReloadAjax(refreshUrl);
+	}
     	timeout = {{timeout}};
-    	    var date = new Date();
-			var timestamp = date.getTime();
+	var date = new Date();
+	var timestamp = date.getTime();
         {% for peer in user.userprofile.peers.all %}
         $.ajax({url: "{% url 'fetch-updates'  peer.pk %}?="+timestamp, type: "POST", dataType: "json", cache:false,
     		success: updater.onSuccess,
@@ -100,7 +100,9 @@ var updater = {
 
     onError: function(response, text) {
         	if (text == 'timeout'){
-        		oTable.fnReloadAjax(refreshUrl);
+			if (oTable) {
+				oTable.fnReloadAjax(refreshUrl);
+			}
         	}
         	//updater.errorSleepTime *= 2;
 			console.log("Poll error; sleeping for", updater.errorSleepTime, "ms");
@@ -122,7 +124,9 @@ var updater = {
 	    updater.showMessage(messages[i]);
 	}
 	$("#hid_mid").val('UPDATED');
-	oTable.fnReloadAjax(refreshUrl);
+	if (oTable) {
+		oTable.fnReloadAjax(refreshUrl);
+	}
     },
 
     existingMessages: function(response) {
