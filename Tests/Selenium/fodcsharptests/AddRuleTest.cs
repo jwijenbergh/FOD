@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using System.Configuration;
 
 namespace fodcsharptests
 {
@@ -30,7 +32,8 @@ namespace fodcsharptests
         {
 
             // use 1.0.0.0/8 
-            driver.Url = "http://localhost:8081/altlogin";
+            driver.Url = ConfigurationSettings.AppSettings.Get("Url"); ;
+         
 
             driver.FindElement(By.Id("id_username")).Click();
             driver.FindElement(By.Id("id_username")).SendKeys("admin");
