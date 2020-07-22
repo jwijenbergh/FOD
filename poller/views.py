@@ -28,6 +28,7 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from peers.models import Peer
+from gevent.event import Event
 import redis
 
 import logging
@@ -135,7 +136,7 @@ class Msgs(object):
                 user = None
                 return False
             r = redis.StrictRedis()
-            key = "msg_%s" % request.user.username
+            key = "msg_%s" % user
             logger.debug(str((key, user)))
             size = r.llen(key)
             msgs = []

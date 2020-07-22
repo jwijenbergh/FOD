@@ -50,7 +50,7 @@ jQuery.fn.enable = function(opt_enable) {
 };
 
 var updater = {
-    errorSleepTime: 500,
+    errorSleepTime: 5000,
     cursor: null,
     start: function() {
     	    var date = new Date();
@@ -63,12 +63,12 @@ var updater = {
         },
     poll: function() {
     	{% if user.is_authenticated %}
-    	if (updater.errorSleepTime > 128000){
+    	if (oTable) {
     		oTable.fnReloadAjax(refreshUrl);
-    	}
+	}
     	timeout = {{timeout}};
-    	    var date = new Date();
-			var timestamp = date.getTime();
+	var date = new Date();
+	var timestamp = date.getTime();
         {% for peer in user.userprofile.peers.all %}
         $.ajax({url: "{% url 'fetch-updates'  peer.pk %}?="+timestamp, type: "POST", dataType: "json", cache:false,
     		success: updater.onSuccess,
@@ -84,8 +84,8 @@ var updater = {
 	    updater.onError();
 	    return;
 	}
-	updater.errorSleepTime = 500;
-	window.setTimeout(updater.poll, 0);
+	//updater.errorSleepTime = 500;
+	window.setTimeout(updater.poll, updater.errorSleepTime);
     },
 
     onFetchExisting: function(response) {
@@ -100,9 +100,11 @@ var updater = {
 
     onError: function(response, text) {
         	if (text == 'timeout'){
-        		oTable.fnReloadAjax(refreshUrl);
+			if (oTable) {
+				oTable.fnReloadAjax(refreshUrl);
+			}
         	}
-        	updater.errorSleepTime *= 2;
+        	//updater.errorSleepTime *= 2;
 			console.log("Poll error; sleeping for", updater.errorSleepTime, "ms");
 			window.setTimeout(updater.poll, updater.errorSleepTime);
 
@@ -122,7 +124,9 @@ var updater = {
 	    updater.showMessage(messages[i]);
 	}
 	$("#hid_mid").val('UPDATED');
-	oTable.fnReloadAjax(refreshUrl);
+	if (oTable) {
+		oTable.fnReloadAjax(refreshUrl);
+	}
     },
 
     existingMessages: function(response) {
