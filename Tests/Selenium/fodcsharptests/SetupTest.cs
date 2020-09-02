@@ -34,11 +34,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).Click();
             driver.FindElement(By.Id("id_password")).SendKeys("Gf1!grGR00");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Name("netconf_device"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean) js.ExecuteScript("return arguments[0].required;", inputElement);
+            if(!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
 
         }
@@ -51,11 +52,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_password")).Click();
             driver.FindElement(By.Id("id_password")).SendKeys("1");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Name("netconf_device"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
@@ -67,11 +69,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_netconf_device")).Click();
             driver.FindElement(By.Id("id_netconf_device")).SendKeys("22");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Id("id_password"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
@@ -83,11 +86,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_netconf_device")).Click();
             driver.FindElement(By.Id("id_netconf_device")).SendKeys("<>");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Id("id_password"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
@@ -99,11 +103,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_netconf_port")).Click();
             driver.FindElement(By.Id("id_netconf_port")).SendKeys("22");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Id("id_password"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
@@ -115,11 +120,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_netconf_port")).Click();
             driver.FindElement(By.Id("id_netconf_port")).SendKeys("<>");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Id("id_password"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
@@ -131,11 +137,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_netconf_user")).Click();
             driver.FindElement(By.Id("id_netconf_user")).SendKeys("user");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Id("id_password"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
@@ -147,11 +154,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_netconf_user")).Click();
             driver.FindElement(By.Id("id_netconf_user")).SendKeys("<>");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Id("id_password"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
@@ -163,11 +171,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_netconf_pass")).Click();
             driver.FindElement(By.Id("id_netconf_pass")).SendKeys("Gf1!grGR00");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Id("id_password"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
@@ -179,11 +188,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_netconf_pass")).Click();
             driver.FindElement(By.Id("id_netconf_pass")).SendKeys("1");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Id("id_password"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
@@ -195,11 +205,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_test_peer_addr")).Click();
             driver.FindElement(By.Id("id_test_peer_addr")).SendKeys("0.0.0.0/30");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Id("id_password"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
@@ -211,11 +222,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_test_peer_addr")).Click();
             driver.FindElement(By.Id("id_test_peer_addr")).SendKeys("<>");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Id("id_password"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
@@ -263,11 +275,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_test_peer_addr")).Click();
             driver.FindElement(By.Id("id_test_peer_addr")).SendKeys("*/");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Id("id_password"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
@@ -289,11 +302,12 @@ namespace fodcsharptests
             driver.FindElement(By.Id("id_test_peer_addr")).Click();
             driver.FindElement(By.Id("id_test_peer_addr")).SendKeys("");
             driver.FindElement(By.XPath("//input[@type='submit']")).Click();
-            IAlert alert = wait.Until(ExpectedConditions.AlertIsPresent());
-            string text = alert.Text;
-            if (text == "Fields must be filled out!")
+            IWebElement inputElement = driver.FindElement(By.Id("id_password"));
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            bool isRequired = (Boolean)js.ExecuteScript("return arguments[0].required;", inputElement);
+            if (!isRequired)
             {
-                alert.Accept();
+                Assert.Fail();
             }
         }
 
