@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support.UI;
 using Assert = NUnit.Framework.Assert;
 
@@ -27,7 +29,7 @@ namespace fodcsharptests
         [Test]
         public void OnlyPassword()
         {
-            driver.Url = "http://localhost:8081/setup";
+            driver.Url = "http://localhost:8084/setup/";
 
             driver.FindElement(By.Id("id_password")).Click();
             driver.FindElement(By.Id("id_password")).SendKeys("Gf1!grGR00");
