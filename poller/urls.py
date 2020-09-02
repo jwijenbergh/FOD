@@ -22,6 +22,8 @@ from poller import views
 urlpatterns = [
     #'poller.views',
     url('^$', views.main),
+    # 1st call to get all existing messages
     url('^message/existing/(?P<peer_id>[\w\-]+)/$', views.message_existing, name='fetch-existing'),
-    url('^message/updates/(?P<peer_id>[\w\-]+)/$', views.message_updates, name='fetch-updates')
+    # update - get new messages
+    url('^message/updates/(?P<peer_id>[\w\-]+)/(?P<last_id>[\w\-]+)$', views.message_updates, name='fetch-updates')
 ]

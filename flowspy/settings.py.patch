@@ -71,5 +71,5 @@
 -ENABLE_SETUP_VIEW = False
 +ENABLE_SETUP_VIEW = True
  
- from flowspy.settings_local import *
- 
+ # Maximum size of stream of notification messages per each peer tag
+ NOTIF_STREAM_MAXSIZE = 50

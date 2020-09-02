@@ -34,6 +34,13 @@ import redis
 import logging
 import os
 
+# This component is used to retrieve stream of notifications from server into browser;
+# the notifications are "announced" by flowspec/tasks.py announce() method;
+# all notifications are passed via redis, the key is created as notifstream_%s, where %s is a peertag.
+# The key is used to store stream of objects: {"m": "%s", "time": "timestamp"},
+# where %s is a notification message, and timestamp is in "%Y-%m-%d %H:%M:%S"
+# format.
+
 LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'poller.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -43,8 +50,16 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-def create_message(message, user, time):
-    data = {'id': str(uuid.uuid4()), 'body': message, 'user':user, 'time':time}
+def create_message(message, user, msgid, time):
+    """Create new message that will be sent in a response to client with text "message".
+    Params:
+        message: str text of the notification
+        user: str username of logged in user
+        str: str message id from redis
+    Returns:
+        dict with the following keys: id, body, user, time
+    """
+    data = {'id': msgid, 'body': message, 'user':user, 'time':time}
     data['html'] = render_to_string('poll_message.html', {'message': data})
     return data
 
@@ -81,54 +96,16 @@ class Msgs(object):
 
     def message_existing(self, request, peer_id):
         if request.is_ajax():
-            try:
-                user = Peer.objects.get(pk=peer_id).peer_tag
-            except:
-                user = None
-                return False
-            try:
-                assert(self.new_message_user_event[user])
-            except:
-                self.new_message_user_event[user] = Event()
-            try:
-                if self.user_cache[user]:
-                    self.user_cursor[user] = self.user_cache[user][-1]['id']
-            except:
-                self.user_cache[user] = []
-                self.user_cursor[user] = ''
-            return json_response({'messages': self.user_cache[user]})
+            logger.debug("Polling all existing notifications")
+            return self.message_updates(request, peer_id, "")
         return HttpResponseRedirect(reverse('group-routes'))
 
-    def message_new(self, mesg=None):
-        if mesg:
-            message = mesg['message']
-            user = mesg['username']
-            logger.info("from %s" %user)
-            now = datetime.datetime.now()
-            msg = create_message(message, user, now.strftime("%Y-%m-%d %H:%M:%S"))
-        try:
-            isinstance(self.user_cache[user], list)
-        except:
-            self.user_cache[user] = []
-        self.user_cache[user].append(msg)
-        if self.user_cache[user][-1] == self.user_cache[user][0]:
-            self.user_cursor[user] = self.user_cache[user][-1]['id']
-        else:
-            self.user_cursor[user] = self.user_cache[user][-2]['id']
-        if len(self.user_cache[user]) > self.cache_size:
-            self.user_cache[user] = self.user_cache[user][-self.cache_size:]
-        try:
-            assert(self.new_message_user_event[user])
-        except:
-            self.new_message_user_event[user] = Event()
-        self.new_message_user_event[user].set()
-        self.new_message_user_event[user].clear()
-        return json_response(msg)
-
-    def message_updates(self, request, peer_id):
+    def message_updates(self, request, peer_id, last_id=""):
         if request.is_ajax():
-            cursor = {}
-            logger.debug("Polling update")
+            if last_id:
+                logger.debug("Polling updates of notifications since " + last_id)
+            last_id = bytes(last_id, "utf-8")
+
             try:
                 user = Peer.objects.get(pk=peer_id).peer_tag
                 logger.debug("Polling by user %s", str(user))
@@ -136,20 +113,21 @@ class Msgs(object):
                 user = None
                 return False
             r = redis.StrictRedis()
-            key = "msg_%s" % user
+            key = "notifstream_%s" % user
             logger.debug(str((key, user)))
-            size = r.llen(key)
-            msgs = []
-            now = datetime.datetime.now()
-            for i in range(size):
-                m = r.lpop(key)
-                if m:
-                    msgs.append(create_message(m.decode("utf-8"), request.user.username, now.strftime("%Y-%m-%d %H:%M:%S")))
-            #msgs = r.lrange(key, 0, size)
+            if last_id and last_id != b"null":
+                logger.debug("Polling from last_id %s", last_id)
+                msgs = r.xrange(key, min=last_id)
+            else:
+                msgs = r.xrange(key)
+            msglist = []
+            for i, msg in msgs:
+                if last_id != i:
+                    msglist.append(create_message(msg[b"m"].decode("utf-8"), request.user.username, i.decode("utf-8"), msg[b"time"].decode("utf-8")))
             logger.debug(str(msgs))
             if not msgs:
-                return HttpResponse(content='', content_type=None, status=400)
-            return json_response({'messages': msgs})
+                return HttpResponse(content='', content_type=None, status=204)
+            return json_response({'messages': msglist})
 
         return HttpResponseRedirect(reverse('group-routes'))
 
