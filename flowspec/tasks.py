@@ -202,10 +202,12 @@ def announce(messg, user, route):
     messg = str(messg)
     logger.info("ANNOUNCE " + messg)
     r = redis.StrictRedis()
-    key = "msg_%s" % username
-    logger.info("ANNOUNCE key " + key)
-    r.rpush(key, messg)
-    r.expire(key, 1800)
+    key = "notifstream_%s" % username
+    obj = {"m": messg, "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+    logger.info("ANNOUNCE " + str(obj))
+    lastid = r.xadd(key, obj, maxlen=settings.NOTIF_STREAM_MAXSIZE, approximate=False)
+    logger.info("ANNOUNCE key " + key + " with lastid " + lastid.decode("utf-8"))
+    r.expire(key, settings.NOTIF_STREAM_MAXLIFE)
 
 @shared_task
 def check_sync(route_name=None, selected_routes=[]):

@@ -493,5 +493,9 @@ SETTINGS_EXPORT = [
 
 ENABLE_SETUP_VIEW = False
 
-from flowspy.settings_local import *
+# Maximum size of stream of notification messages per each peer tag
+NOTIF_STREAM_MAXSIZE = 50
+# Maximum time that notifications persist on the server in seconds
+NOTIF_STREAM_MAXLIFE = 1800
 
+from flowspy.settings_local import *

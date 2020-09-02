@@ -49,28 +49,27 @@ jQuery.fn.enable = function(opt_enable) {
     return this;
 };
 
+var loads = 0;
 var updater = {
     errorSleepTime: 5000,
-    cursor: null,
+    last_id: null,
     start: function() {
-    	    var date = new Date();
-			var timestamp = date.getTime();
-        {% for peer in user.userprofile.peers.all %}
-        $.ajax({url: "{% url 'fetch-existing'  peer.pk %}?="+timestamp, type: "POST", dataType: "json", cache:false,
-    		success: updater.onFetchExisting,
-    		error: updater.onError});
-        {% endfor %}
-        },
+	    console.log("Initial fetching of all notifications.");
+	    {% for peer in user.userprofile.peers.all %}
+	    $.ajax({url: "{% url 'fetch-existing'  peer.pk %}", type: "POST", dataType: "json", cache:false,
+			    success: updater.onFetchExisting,
+			    error: updater.onError});
+	    {% endfor %}
+    },
     poll: function() {
     	{% if user.is_authenticated %}
+	console.log("Polling new notifications from", updater.last_id);
     	if (oTable) {
     		oTable.fnReloadAjax(refreshUrl);
 	}
     	timeout = {{timeout}};
-	var date = new Date();
-	var timestamp = date.getTime();
         {% for peer in user.userprofile.peers.all %}
-        $.ajax({url: "{% url 'fetch-updates'  peer.pk %}?="+timestamp, type: "POST", dataType: "json", cache:false,
+        $.ajax({url: "{% url 'fetch-updates'  peer.pk 'PLACEHOLDER' %}".replace("PLACEHOLDER", updater.last_id), type: "POST", dataType: "json", cache:false,
     		success: updater.onSuccess,
     		timeout: timeout,
     		error: updater.onError});
@@ -84,7 +83,6 @@ var updater = {
 	    updater.onError();
 	    return;
 	}
-	//updater.errorSleepTime = 500;
 	window.setTimeout(updater.poll, updater.errorSleepTime);
     },
 
@@ -99,15 +97,18 @@ var updater = {
         },
 
     onError: function(response, text) {
-        	if (text == 'timeout'){
-			if (oTable) {
-				oTable.fnReloadAjax(refreshUrl);
-			}
-        	}
-        	//updater.errorSleepTime *= 2;
-			console.log("Poll error; sleeping for", updater.errorSleepTime, "ms");
-			window.setTimeout(updater.poll, updater.errorSleepTime);
-
+	     if (text == 'timeout'){
+		     if (oTable) {
+			     oTable.fnReloadAjax(refreshUrl);
+		     }
+	     }
+	     //updater.errorSleepTime *= 2;
+	     console.log("Poll error; sleeping for", updater.errorSleepTime, "ms");
+	     if (updater.last_id == null) {
+		     window.setTimeout(updater.start, updater.errorSleepTime);
+	     } else {
+		     window.setTimeout(updater.poll, updater.errorSleepTime);
+	     }
     },
 
     newMessages: function(response) {
@@ -115,10 +116,9 @@ var updater = {
 	if (response.messages.length == 0){
 		return true;
 	}
-	updater.cursor = response.cursor;
 	var messages = response.messages;
-	updater.cursor = messages[messages.length - 1].id;
-	console.log(messages.length, "new messages, cursor:", updater.cursor);
+	updater.last_id = messages[messages.length - 1]["id"];
+	console.log(messages.length, "new messages, last_id:", updater.last_id);
 
 	for (var i = 0; i < messages.length; i++) {
 	    updater.showMessage(messages[i]);
@@ -134,10 +134,10 @@ var updater = {
     	if (response.messages.length == 0){
     		return true;
     	}
-    	updater.cursor = response.cursor;
+	$("#inbox").empty();
     	var messages = response.messages;
-    	updater.cursor = messages[messages.length - 1].id;
-    	var i = messages.length
+	updater.last_id = messages[messages.length - 1]["id"];
+	console.log("get ", i, " messages with last_id ", updater.last_id);
     	for (var i = 0; i < messages.length; i++) {
     	    updater.showMessage(messages[i]);
     	}
