@@ -52,10 +52,12 @@ jQuery.fn.enable = function(opt_enable) {
 var loads = 0;
 var updater = {
     errorSleepTime: 5000,
-    last_id: null,
+    started: false,
+    last_ids: new Object(),
     start: function() {
 	    console.log("Initial fetching of all notifications.");
 	    {% for peer in user.userprofile.peers.all %}
+	    updater.last_ids["{{ peer.pk }}"] = null;
 	    $.ajax({url: "{% url 'fetch-existing'  peer.pk %}", type: "POST", dataType: "json", cache:false,
 			    success: updater.onFetchExisting,
 			    error: updater.onError});
@@ -63,13 +65,13 @@ var updater = {
     },
     poll: function() {
     	{% if user.is_authenticated %}
-	console.log("Polling new notifications from", updater.last_id);
     	if (oTable) {
     		oTable.fnReloadAjax(refreshUrl);
 	}
     	timeout = {{timeout}};
         {% for peer in user.userprofile.peers.all %}
-        $.ajax({url: "{% url 'fetch-updates'  peer.pk 'PLACEHOLDER' %}".replace("PLACEHOLDER", updater.last_id), type: "POST", dataType: "json", cache:false,
+        console.log("Polling new notifications from", updater.last_ids["{{ peer.pk }}"], "peerid {{ peer.pk }}");
+        $.ajax({url: "{% url 'fetch-updates'  peer.pk 'PLACEHOLDER' %}".replace("PLACEHOLDER", updater.last_ids["{{ peer.pk }}"]), type: "POST", dataType: "json", cache:false,
     		success: updater.onSuccess,
     		timeout: timeout,
     		error: updater.onError});
@@ -89,7 +91,7 @@ var updater = {
     onFetchExisting: function(response) {
     	try {
     	    updater.existingMessages(response);
-
+    	    updater.started = true;
     	} catch (e) {
     	    updater.onError();
     	    return;
@@ -102,9 +104,7 @@ var updater = {
 			     oTable.fnReloadAjax(refreshUrl);
 		     }
 	     }
-	     //updater.errorSleepTime *= 2;
-	     console.log("Poll error; sleeping for", updater.errorSleepTime, "ms");
-	     if (updater.last_id == null) {
+	     if (updater.started == false) {
 		     window.setTimeout(updater.start, updater.errorSleepTime);
 	     } else {
 		     window.setTimeout(updater.poll, updater.errorSleepTime);
@@ -117,8 +117,10 @@ var updater = {
 		return true;
 	}
 	var messages = response.messages;
-	updater.last_id = messages[messages.length - 1]["id"];
-	console.log(messages.length, "new messages, last_id:", updater.last_id);
+	var peerid = messages[messages.length - 1]["peerid"];
+	var msgid = messages[messages.length - 1]["id"];
+	updater.last_ids[peerid] = msgid;
+	console.log(messages.length, "new messages, last_id:", msgid, "peerid", peerid);
 
 	for (var i = 0; i < messages.length; i++) {
 	    updater.showMessage(messages[i]);
@@ -136,8 +138,10 @@ var updater = {
     	}
 	$("#inbox").empty();
     	var messages = response.messages;
-	updater.last_id = messages[messages.length - 1]["id"];
-	console.log("get ", i, " messages with last_id ", updater.last_id);
+	var peerid = messages[messages.length - 1]["peerid"];
+	var msgid = messages[messages.length - 1]["id"];
+	updater.last_ids[peerid] = msgid
+	console.log("got", messages.length, "messages with last_id", msgid);
     	for (var i = 0; i < messages.length; i++) {
     	    updater.showMessage(messages[i]);
     	}
