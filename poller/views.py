@@ -50,7 +50,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-def create_message(message, user, msgid, time):
+def create_message(message, user, msgid, time, peer_id):
     """Create new message that will be sent in a response to client with text "message".
     Params:
         message: str text of the notification
@@ -59,7 +59,7 @@ def create_message(message, user, msgid, time):
     Returns:
         dict with the following keys: id, body, user, time
     """
-    data = {'id': msgid, 'body': message, 'user':user, 'time':time}
+    data = {'id': msgid, 'body': message, 'user':user, 'time':time, 'peerid': peer_id}
     data['html'] = render_to_string('poll_message.html', {'message': data})
     return data
 
@@ -123,7 +123,7 @@ class Msgs(object):
             msglist = []
             for i, msg in msgs:
                 if last_id != i:
-                    msglist.append(create_message(msg[b"m"].decode("utf-8"), request.user.username, i.decode("utf-8"), msg[b"time"].decode("utf-8")))
+                    msglist.append(create_message(msg[b"m"].decode("utf-8"), request.user.username, i.decode("utf-8"), msg[b"time"].decode("utf-8"), peer_id))
             logger.debug(str(msgs))
             if not msgs:
                 return HttpResponse(content='', content_type=None, status=204)
