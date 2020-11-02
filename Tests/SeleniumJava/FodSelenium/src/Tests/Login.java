@@ -30,9 +30,6 @@ public class Login {
 			    // Cxception handling
 			}
 		}
-		finally {
-			driver.close();
-		}
 	}
 	@Test
 	public static void LoginWithoutLogin(WebDriver driver, String url) {
@@ -43,7 +40,7 @@ public class Login {
 			driver.findElement(By.id("id_password")).click();
 			driver.findElement(By.id("id_password")).sendKeys("Password");
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Please enter a correct username and password. Note that both fields are case-sensitive.')]"));
+			driver.findElement(By.xpath("//*[contains(text(), 'This field is required.')]"));
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
@@ -52,9 +49,6 @@ public class Login {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
-		}
-		finally {
-			driver.close();
 		}
 	}
 	@Test
@@ -66,7 +60,7 @@ public class Login {
 			driver.findElement(By.id("id_password")).click();
 			driver.findElement(By.id("id_password")).sendKeys("");
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Please enter a correct username and password. Note that both fields are case-sensitive.')]"));
+			driver.findElement(By.xpath("//*[contains(text(), 'This field is required.')]"));
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
@@ -75,9 +69,6 @@ public class Login {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
-		}
-		finally {
-			driver.close();
 		}
 	}
 	@Test
@@ -89,7 +80,7 @@ public class Login {
 			driver.findElement(By.id("id_password")).click();
 			driver.findElement(By.id("id_password")).sendKeys("");
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Please enter a correct username and password. Note that both fields are case-sensitive.')]"));
+			driver.findElement(By.xpath("//*[contains(text(), 'This field is required.')]"));
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
@@ -98,9 +89,6 @@ public class Login {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
-		}
-		finally {
-			driver.close();
 		}
 	}
 	@Test
@@ -121,9 +109,6 @@ public class Login {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
-		}
-		finally {
-			driver.close();
 		}
 	}
 
