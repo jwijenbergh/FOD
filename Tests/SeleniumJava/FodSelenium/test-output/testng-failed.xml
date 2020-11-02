@@ -6,10 +6,6 @@
       <class name="Tests.Login">
         <methods>
           <include name="LoginWithoutLogin"/>
-          <include name="LoginWithoutPassword"/>
-          <include name="LoginWithWrongData"/>
-          <include name="LoginWithoutData"/>
-          <include name="SuccessLogin"/>
         </methods>
       </class> <!-- Tests.Login -->
     </classes>

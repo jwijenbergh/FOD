@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.annotations.Test;
 
 
@@ -117,8 +118,13 @@ public class Login {
 		//setting the driver executable
 		System.setProperty("webdriver.chrome.driver", ".\\driver\\chromedriver.exe");
 		
+		
+		ChromeOptions chromeOptions = new ChromeOptions();
+		//chromeOptions.addArguments("headless");
 		//Initiating your chromedriver
-		WebDriver driver=new ChromeDriver();
+		WebDriver driver=new ChromeDriver(chromeOptions);
+		
+		
 		
 		//Applied wait time
 		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
