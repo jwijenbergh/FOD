@@ -7,10 +7,11 @@ import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.Test;
 
 
 public class Login {
-	
+	@Test
 	public static void SuccessLogin(WebDriver driver, String url) {
 		try {
 		driver.get(url);
@@ -33,7 +34,7 @@ public class Login {
 			driver.close();
 		}
 	}
-	
+	@Test
 	public static void LoginWithoutLogin(WebDriver driver, String url) {
 		try {
 			driver.get(url);
@@ -56,7 +57,7 @@ public class Login {
 			driver.close();
 		}
 	}
-	
+	@Test
 	public static void LoginWithoutData(WebDriver driver, String url) {
 		try {
 			driver.get(url);
@@ -79,7 +80,7 @@ public class Login {
 			driver.close();
 		}
 	}
-	
+	@Test
 	public static void LoginWithoutPassword(WebDriver driver, String url) {
 		try {
 			driver.get(url);
@@ -102,7 +103,7 @@ public class Login {
 			driver.close();
 		}
 	}
-	
+	@Test
 	public static void LoginWithWrongData(WebDriver driver, String url) {
 		try {
 			driver.get(url);
