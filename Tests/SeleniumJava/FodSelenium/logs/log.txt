@@ -1,0 +1,9 @@
+no such element: Unable to locate element: {"method":"xpath","selector":"//*[contains(text(), 'My rules')]"}
+  (Session info: chrome=86.0.4240.111)
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:25:48'
+System info: host: 'DESKTOP-CA0DK73', ip: '172.27.160.1', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '15.0.1'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 86.0.4240.111, chrome: {chromedriverVersion: 86.0.4240.22 (398b0743353ff..., userDataDir: C:\Users\ECATER~1\AppData\L...}, goog:chromeOptions: {debuggerAddress: localhost:50541}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:virtualAuthenticators: true}
+Session ID: 6e1579b4bdef9c7e4dac60f3e743f267
+*** Element info: {Using=xpath, value=//*[contains(text(), 'My rules')]}
