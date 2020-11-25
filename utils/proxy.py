@@ -25,6 +25,7 @@ from django.conf import settings
 import logging
 from django.core.cache import cache
 import os
+import redis
 from celery.exceptions import TimeLimitExceeded, SoftTimeLimitExceeded
 from .portrange import parse_portrange
 import traceback
@@ -242,6 +243,9 @@ class Applier(object):
         edit_is_successful = False
         commit_confirmed_is_successful = False
         commit_is_successful = False
+        r = redis.StrictRedis()
+        lock = r.lock("netconf_lock")
+        lock.acquire(blocking=True)
         try:
           if configuration:
             with manager.connect(host=self.device, port=self.port, username=self.username, password=self.password, hostkey_verify=False) as m:
@@ -339,6 +343,9 @@ class Applier(object):
                             logger.error(cause)
                             cause_user="NETCONF connection failed"
                             return False, cause_user
+        finally:
+            lock.release()
+
 
 def is_successful(response):
     if response.ok:
