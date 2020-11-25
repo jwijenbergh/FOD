@@ -95,6 +95,7 @@ else
 	touch flowspy/settings_local.py
 
 	#./manage.py syncdb --noinput
+	./manage.py collectstatic
 	./manage.py migrate
 	./manage.py loaddata initial_data
   )

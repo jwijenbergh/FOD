@@ -26,7 +26,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.context import RequestContext
-from django.template.loader import render_to_string
+from django.template.loader import render_to_string, get_template
 from django.utils.translation import ugettext as _
 from django.urls import reverse
 from django.contrib import messages
@@ -862,8 +862,10 @@ def user_logout(request):
 @never_cache
 def load_jscript(request, file):
     long_polling_timeout = int(settings.POLL_SESSION_UPDATE) * 1000 + 10000
-    return render(request, '%s.js' % file, {'timeout': long_polling_timeout}, content_type="text/javascript")
-
+    template = get_template('%s.js' % file)
+    return HttpResponse(template.render(request=request,
+                        context={'timeout': long_polling_timeout}),
+                        content_type="text/javascript")
 
 def lookupShibAttr(attrmap, requestMeta):
     logger.debug("lookupShibAttr: requestMeta=%s" % str(requestMeta))
