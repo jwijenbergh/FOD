@@ -10,7 +10,7 @@ Then, the next step is to install specific python packages for fod. These packag
 
 
 
-	pip install Django==1.4.5 MySQL-python==1.2.3 PyYAML==3.10 South==0.7.5 amqplib==1.0.2 anyjson==0.3.1 argparse==1.2.1 celery==2.5.3 cl==0.0.3 django-celery==2.5.5 django-picklefield==0.2.1 django-registration==0.8 django-tinymce==1.5 gevent==0.13.6 greenlet==0.3.1 gunicorn==0.14.5 ipaddr==2.1.10 kombu==2.1.8 lxml==3.4.2 mailer==0.7 ncclient==0.4.3 paramiko==1.7.7.1 pycrypto==2.6 pyparsing==1.5.6 python-dateutil==1.5 python-memcached==1.48 wsgiref==0.1.2
+	pip install -r requirements.txt
 
 
 `Important!`

@@ -1,11 +1,10 @@
-amqplib
 argparse
 cl
-celery
+celery==4.4.0
 django-admin
 django-picklefield==2.0
 django-registration==3.0.1
-djangorestframework
+djangorestframework==3.11.2
 django-tinymce
 django-form-utils
 django-settings-export
