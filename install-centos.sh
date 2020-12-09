@@ -95,8 +95,8 @@ else
 	touch flowspy/settings_local.py
 
 	#./manage.py syncdb --noinput
-	mkdir -p static
-	echo yes | ./manage.py collectstatic
+	mkdir -p /srv/flowspy/static/
+	./manage.py collectstatic --noinput
 	./manage.py migrate
 	./manage.py loaddata initial_data
   )
