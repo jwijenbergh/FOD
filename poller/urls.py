@@ -25,5 +25,6 @@ urlpatterns = [
     # 1st call to get all existing messages
     url('^message/existing/(?P<peer_id>[\w\-]+)/$', views.message_existing, name='fetch-existing'),
     # update - get new messages
+    url('^message/updates/(?P<peer_id>[\w\-]+)/$', views.message_updates, name='fetch-updates'),
     url('^message/updates/(?P<peer_id>[\w\-]+)/(?P<last_id>[\w\-]+)$', views.message_updates, name='fetch-updates')
 ]
