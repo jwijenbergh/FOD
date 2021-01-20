@@ -1,4 +1,4 @@
-{% load i18n %}
+﻿{% load i18n %}
 {% load static %}
 
 <!DOCTYPE html>
@@ -60,7 +60,7 @@
 				 {% if user.is_authenticated %}
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                        <i class="fa fa-user fa-fw" id="user_icon_id"></i>  <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user" role="menu" >
                     	<li role="presentation" class="dropdown-header">{{user}}</li>
@@ -76,7 +76,7 @@
                         </li>
 						{% endif %}
                         <li class="divider"></li>
-                        <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i> {% trans "Logout" %}</a>
+                        <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw" id="log_out_id"></i> {% trans "Logout" %}</a>
                         </li>
 
                     </ul>
