@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+//import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.annotations.Test;
@@ -118,6 +119,9 @@ public class Login {
 		//setting the driver executable
 		System.setProperty("webdriver.chrome.driver", ".\\driver\\chromedriver.exe");
 		
+		// declaration and instantiation of objects/variables
+    	//System.setProperty("webdriver.gecko.driver",".\\driver\\geckodriver.exe");
+		//WebDriver driver = new FirefoxDriver();
 		
 		ChromeOptions chromeOptions = new ChromeOptions();
 		//chromeOptions.addArguments("headless");
