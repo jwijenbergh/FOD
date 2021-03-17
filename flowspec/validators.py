@@ -196,6 +196,8 @@ def check_if_rule_exists(fields, queryset):
     :rtype: tuple(bool, str)
     """
 
+    if hasattr(settings, "ROUTES_DUPLICATES_CHECKING") and settings.ROUTES_DUPLICATES_CHECKING == False:
+        return (False, None)
     routes = queryset.filter(
         source=fields.get('source'),
         destination=ip_network(fields.get('destination')).compressed,
