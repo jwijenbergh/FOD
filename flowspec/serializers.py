@@ -27,13 +27,16 @@ class ThenActionSerializer(serializers.Serializer):
         return obj.action
 
     def to_internal_value(self, data):
+        action_desc = str(data).split(":")
+        action = action_desc[0]
+        action_value = action_desc[1] if len(action_desc) > 1 else "" 
         try:
-            action_desc = data.split(":")
-            action = action_desc[0]
-            action_value = action_desc[1] if len(action_desc) > 1 else "" 
             return ThenAction.objects.get(action=action, action_value=action_value)
         except ThenAction.DoesNotExist:
-            raise serializers.ValidationError('ThenAction does not exist.')
+            try:
+                return ThenAction.objects.get(id=int(action))
+            except ThenAction.DoesNotExist:
+                raise serializers.ValidationError('ThenAction does not exist.')
 
 class MatchProtocolSerializer(serializers.Serializer):
     def to_representation(self, obj):
@@ -44,7 +47,10 @@ class MatchProtocolSerializer(serializers.Serializer):
             protocol = data
             return MatchProtocol.objects.get(protocol=protocol)
         except MatchProtocol.DoesNotExist:
-            raise serializers.ValidationError('MatchProtocol does not exist.')
+            try:
+                return MatchProtocol.objects.get(id=data)
+            except MatchProtocol.DoesNotExist:
+                raise serializers.ValidationError('MatchProtocol does not exist.')
 
 class RouteSerializer(serializers.HyperlinkedModelSerializer):
     """
