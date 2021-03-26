@@ -18,7 +18,7 @@
 #
 
 from utils import proxy as PR
-from celery import shared_task
+from celery import shared_task, subtask
 import logging
 import json
 from django.conf import settings
