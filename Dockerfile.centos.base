@@ -23,5 +23,5 @@ RUN (cd /srv/flowspy; ./install-centos.sh --basesw;)
 #EXPOSE 8000
 
 #CMD [ "/srv/flowspy/runfod.sh" ]
-CMD [ "/bin/sh" ]
+CMD [ "sleep" "10000000" ]
 
