@@ -21,6 +21,11 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 class ThenActionSerializer(serializers.Serializer):
+    class Meta:
+        model = Route
+        fields = ('id', 'action', 'action_value')
+        read_only_fields = ('id')
+
     def to_representation(self, obj):
         if obj.action_value:
             return f"{obj.action}:{obj.action_value}"

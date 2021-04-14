@@ -4,13 +4,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 
 from rest_framework import viewsets
-from flowspec.models import (
-    Route, MatchPort, ThenAction, FragmentType, MatchProtocol,
-    MatchDscp)
+from flowspec.models import Route, ThenAction, FragmentType, MatchProtocol, MatchDscp
 
 from flowspec.serializers import (
     RouteSerializer,
-    PortSerializer,
     ThenActionSerializer,
     FragmentTypeSerializer,
     MatchProtocolSerializer,
@@ -186,11 +183,6 @@ class RouteViewSet(viewsets.ModelViewSet):
 
     def pre_delete(self, obj):
         obj.commit_delete()
-
-
-class PortViewSet(viewsets.ModelViewSet):
-    queryset = MatchPort.objects.all()
-    serializer_class = PortSerializer
 
 
 class ThenActionViewSet(viewsets.ModelViewSet):
