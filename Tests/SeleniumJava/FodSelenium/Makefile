@@ -71,11 +71,20 @@ package1: ensuremaven
 CLASS1:=Login
 
 chg_src_login_url1:
-	#echo "$(LOGIN_URL1)" > "src/Tests/Login.url.$$"
 	echo "$(LOGIN_URL1)" > "src/Tests/$(CLASS1).url.$$"
 	if ! diff "src/Tests/$(CLASS1).url.$$" "src/Tests/$(CLASS1).url"; then \
 	  mv -f "src/Tests/$(CLASS1).url.$$" "src/Tests/$(CLASS1).url"; \
 	  sed -i  -r 's/^(\s*String url =).*/\1 "$(LOGIN_URL1)\/altlogin";/' src/Tests/$(CLASS1).java; \
+	fi
+	echo "$(LOGIN_USER1)" > "src/Tests/$(CLASS1).pwd.$$"
+	if ! diff "src/Tests/$(CLASS1).user.$$" "src/Tests/$(CLASS1).user"; then \
+	  mv -f "src/Tests/$(CLASS1).user.$$" "src/Tests/$(CLASS1).user"; \
+	  sed -i  -r 's/"id_username".*sendKeys.*$$/"id_username"\)\).sendKeys\("'"$(LOGIN_USER1)"'"\)\;/' src/Tests/$(CLASS1).java; \
+	fi
+	echo "$(LOGIN_PWD1)" > "src/Tests/$(CLASS1).pwd.$$"
+	if ! diff "src/Tests/$(CLASS1).pwd.$$" "src/Tests/$(CLASS1).pwd"; then \
+	  mv -f "src/Tests/$(CLASS1).pwd.$$" "src/Tests/$(CLASS1).pwd"; \
+	  sed -i  -r 's/"id_password".*sendKeys.*$$/"id_password"\)\).sendKeys\("'"$(LOGIN_PWD1)"'"\)\;/' src/Tests/$(CLASS1).java; \
 	fi
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
@@ -89,7 +98,7 @@ url_file_list=$(wildcard src/Tests/*.url)
 run1: ensurechromedriver
 	#sed -i  -r 's/^(\s*String url =).*/\1 "http:\/\/172.17.0.2:8000\/altlogin";/' src/Tests/Login.java
 	#make package1
-	make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' CLASS1="$(CLASS1)"
+	make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='admin2' LOGIN_PWD1='adminpwd1' CLASS1="$(CLASS1)"
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 	ln -sf /usr/local/bin/chromedriver .\\driver\\chromedriver.exe
 	echo "X server (e.g. vnc) should be running on :0 and be accessible for test 1 user" 1>&2
