@@ -64,6 +64,7 @@ installchromedriver:
 clean: ensuremaven
 	if [ "$$(id -u)" = 0 ]; then \
 	  echo using sudo user; \
+	  chown -R test1 .; \
 	  sudo -u test1 env DISPLAY=:0 mvn clean; \
 	else \
 	  echo user; \
@@ -75,6 +76,7 @@ clean: ensuremaven
 package1: ensuremaven
 	if [ "$$(id -u)" = 0 ]; then \
 	  echo using sudo user; \
+	  chown -R test1 .; \
 	  sudo -u test1 env DISPLAY=:0 mvn -Dmaven.test.skip=true compile package assembly:single; \
 	else \
 	  echo "user $$(id -un)"; \
@@ -84,6 +86,7 @@ package1: ensuremaven
 mvntest1: ensuremaven
 	if [ "$$(id -u)" = 0 ]; then \
 	  echo using sudo user; \
+	  chown -R test1 .; \
 	  sudo -u test1 env DISPLAY=:0 mvn test; \
 	else \
 	  echo "user $$(id -un)"; \
@@ -123,10 +126,11 @@ url_file_list=$(wildcard src/Tests/*.url)
 ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar: $(java_file_list)
 	make package1
 
-run1: ensurechromedriver
+run1: ensurechromedriver ensuretestuser1
 	#sed -i  -r 's/^(\s*String url =).*/\1 "http:\/\/172.17.0.2:8000\/altlogin";/' src/Tests/Login.java
 	#make package1
 	make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='admin2' LOGIN_PWD1='adminpwd1' CLASS1="$(CLASS1)"
+	chown -R test1 .
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 	ln -sf /usr/local/bin/chromedriver .\\driver\\chromedriver.exe
 	echo "X server (e.g. vnc) should be running on :0 and be accessible for test 1 user" 1>&2
@@ -137,8 +141,9 @@ run1: ensurechromedriver
 	sudo -u test1 env DISPLAY=:0 java -cp ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar "Tests.$(CLASS1)"
 
 # use mvn for running all tests
-runtest1:
+runtest1: ensurechromedriver ensuretestuser1
 	make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='admin2' LOGIN_PWD1='adminpwd1' CLASS1="$(CLASS1)"
+	chown -R test1 .
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 	ln -sf /usr/local/bin/chromedriver .\\driver\\chromedriver.exe
 	echo "X server (e.g. vnc) should be running on :0 and be accessible for test 1 user" 1>&2
