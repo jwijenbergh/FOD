@@ -62,29 +62,57 @@ installchromedriver:
 ##
 
 clean: ensuremaven
-	mvn clean
+	if [ "$$(id -u)" = 0 ]; then \
+	  echo using sudo user; \
+	  sudo -u test1 env DISPLAY=:0 mvn clean; \
+	else \
+	  echo user; \
+	  mvn clean; \
+	fi
 
+# -Dmaven.test.skip=true -D
+#mvn clean compile package assembly:single
 package1: ensuremaven
-	#mvn clean compile package assembly:single
-	mvn compile package assembly:single
+	if [ "$$(id -u)" = 0 ]; then \
+	  echo using sudo user; \
+	  sudo -u test1 env DISPLAY=:0 mvn -Dmaven.test.skip=true compile package assembly:single; \
+	else \
+	  echo "user $$(id -un)"; \
+	  mvn -Dmaven.test.skip=true compile package assembly:single; \
+	fi
 
-CLASS1:=Login
+mvntest1: ensuremaven
+	if [ "$$(id -u)" = 0 ]; then \
+	  echo using sudo user; \
+	  sudo -u test1 env DISPLAY=:0 mvn test; \
+	else \
+	  echo "user $$(id -un)"; \
+	  mvn test; \
+	fi
+
+###
+
+#CLASS1:=Login
+CLASS1:=LoginTest
+
+#TEST_DIR:=src/Tests
+TEST_DIR:=src/test/java/Tests
 
 chg_src_login_url1:
-	echo "$(LOGIN_URL1)" > "src/Tests/$(CLASS1).url.$$"
-	if ! diff "src/Tests/$(CLASS1).url.$$" "src/Tests/$(CLASS1).url"; then \
-	  mv -f "src/Tests/$(CLASS1).url.$$" "src/Tests/$(CLASS1).url"; \
-	  sed -i  -r 's/^(\s*String url =).*/\1 "$(LOGIN_URL1)\/altlogin";/' src/Tests/$(CLASS1).java; \
+	echo "$(LOGIN_URL1)" > "$(TEST_DIR)/$(CLASS1).url.$$"
+	if ! diff "$(TEST_DIR)/$(CLASS1).url.$$" "$(TEST_DIR)/$(CLASS1).url"; then \
+	  mv -f "$(TEST_DIR)/$(CLASS1).url.$$" "$(TEST_DIR)/$(CLASS1).url"; \
+	  sed -i  -r 's/( url =).*/\1 "$(LOGIN_URL1)\/altlogin";/' $(TEST_DIR)/$(CLASS1).java; \
 	fi
-	echo "$(LOGIN_USER1)" > "src/Tests/$(CLASS1).pwd.$$"
-	if ! diff "src/Tests/$(CLASS1).user.$$" "src/Tests/$(CLASS1).user"; then \
-	  mv -f "src/Tests/$(CLASS1).user.$$" "src/Tests/$(CLASS1).user"; \
-	  sed -i  -r 's/"id_username".*sendKeys.*$$/"id_username"\)\).sendKeys\("'"$(LOGIN_USER1)"'"\)\;/' src/Tests/$(CLASS1).java; \
+	echo "$(LOGIN_USER1)" > "$(TEST_DIR)/$(CLASS1).user.$$"
+	if ! diff "$(TEST_DIR)/$(CLASS1).user.$$" "$(TEST_DIR)/$(CLASS1).user"; then \
+	  mv -f "$(TEST_DIR)/$(CLASS1).user.$$" "$(TEST_DIR)/$(CLASS1).user"; \
+	  sed -i  -r 's/"id_username".*sendKeys.*$$/"id_username"\)\).sendKeys\("'"$(LOGIN_USER1)"'"\)\;/' $(TEST_DIR)/$(CLASS1).java; \
 	fi
-	echo "$(LOGIN_PWD1)" > "src/Tests/$(CLASS1).pwd.$$"
-	if ! diff "src/Tests/$(CLASS1).pwd.$$" "src/Tests/$(CLASS1).pwd"; then \
-	  mv -f "src/Tests/$(CLASS1).pwd.$$" "src/Tests/$(CLASS1).pwd"; \
-	  sed -i  -r 's/"id_password".*sendKeys.*$$/"id_password"\)\).sendKeys\("'"$(LOGIN_PWD1)"'"\)\;/' src/Tests/$(CLASS1).java; \
+	echo "$(LOGIN_PWD1)" > "$(TEST_DIR)/$(CLASS1).pwd.$$"
+	if ! diff "$(TEST_DIR)/$(CLASS1).pwd.$$" "$(TEST_DIR)/$(CLASS1).pwd"; then \
+	  mv -f "$(TEST_DIR)/$(CLASS1).pwd.$$" "$(TEST_DIR)/$(CLASS1).pwd"; \
+	  sed -i  -r 's/"id_password".*sendKeys.*$$/"id_password"\)\).sendKeys\("'"$(LOGIN_PWD1)"'"\)\;/' $(TEST_DIR)/$(CLASS1).java; \
 	fi
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
@@ -107,6 +135,19 @@ run1: ensurechromedriver
 	#DISPLAY=:0 java -cp ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar Tests.Login
 	#sudo -u test1 env DISPLAY=:0 java -cp ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar Tests.Login
 	sudo -u test1 env DISPLAY=:0 java -cp ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar "Tests.$(CLASS1)"
+
+# use mvn for running all tests
+runtest1:
+	make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='admin2' LOGIN_PWD1='adminpwd1' CLASS1="$(CLASS1)"
+	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+	ln -sf /usr/local/bin/chromedriver .\\driver\\chromedriver.exe
+	echo "X server (e.g. vnc) should be running on :0 and be accessible for test 1 user" 1>&2
+	#xdpyinfo
+	make ensurevnc0running
+	#DISPLAY=:0 java -cp ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar Tests.Login
+	#sudo -u test1 env DISPLAY=:0 java -cp ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar Tests.Login
+	#sudo -u test1 env DISPLAY=:0 java -cp ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar "Tests.$(CLASS1)"
+	make mvntest1
 
 full1: clean package1 run1
 	@true
