@@ -44,7 +44,7 @@ ensurechromedriver:
 	test -x /usr/local/bin/chromedriver || make installchromedriver
 
 installchromedriver:
-	apt-get install -qqy chromium #firefox-esr 
+	which chromium-browser &>/dev/null || apt-get install -qqy chromium || apt-get install chromium-browser  #firefox-esr 
 	apt-get install -qyy curl unzip openjdk-11-jre-headless xvfb libxi6 libgconf-2-4 gnupg2
 	curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add
 	echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
