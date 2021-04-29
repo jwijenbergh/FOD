@@ -82,6 +82,8 @@ def edit(routepk, callback=None):
     from flowspec.models import Route
     route = Route.objects.get(pk=routepk)
     try:
+        status_pre = route.status
+        logger.info("tasks::edit(): route="+str(route)+", status_pre="+str(status_pre))
         applier = PR.Applier(route_object=route)
         commit, response = applier.apply(operation="replace")
         if commit:
