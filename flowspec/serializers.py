@@ -117,6 +117,18 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
         #return attrs
         return res
 
+    def update(self, instance, validated_data):
+        if 'name' in validated_data:
+            del validated_data["name"]	
+        protocol = validated_data.pop('protocol', None)
+        if protocol:
+            instance.protocol.set(protocol)
+        then = validated_data.pop('then', None)
+        if then:
+            instance.then.set(then)
+        instance =  super().update(instance, validated_data)
+        return instance
+
     then = ThenActionSerializer(many=True)
     protocol = MatchProtocolSerializer(many=True)
     class Meta:
