@@ -41,6 +41,7 @@
 	<th style="text-align: center;">{% trans "Then" %}</th>
 	<th style="text-align: center; ">{% trans "Status" %}</th>
 	<th style="text-align: center;">{% trans "Applier" %}</th>
+	<th style="text-align: center;">{% trans "Updated" %}</th>
 	<th style="text-align: center;">{% trans "Expires" %}</th>
 	<th style="text-align: center;">{% trans "Response" %}</th>
 	<th style="text-align: center;">{% trans "Actions" %}</th>
@@ -291,6 +292,11 @@ $(document).ready( function(){
                      {"mData":"applier", "sClass" : "alignCenter","bSearchable": true,"bSortable": true,
                      "mRender": function (data, type, full) {
                      	return '<small>'+data+' ('+full.peer+')</small>';
+                     }
+                     },
+                     {"mData":"last_updated", "sClass" : "alignCenter","bSearchable": true,"bSortable": true,
+                     "mRender": function (data, type, full) {
+                     	return '<small>'+data+'</small>';
                      }
                      },
                      {"mData":"expires", "sClass" : "alignCenter","bSearchable": true,"bSortable": true,

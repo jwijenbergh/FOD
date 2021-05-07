@@ -257,6 +257,8 @@ def build_routes_json(groutes, is_superuser):
             except UserProfile.DoesNotExist:
                 rd['peer'] = ''
 
+        rd['filed'] = "%s" % r.filed.strftime("%F %T")
+        rd['last_updated'] = "%s" % r.last_updated.strftime("%F %T")
         rd['expires'] = "%s" % r.expires
         rd['response'] = "%s" % r.response
         routes.append(rd)
