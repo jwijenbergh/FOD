@@ -117,8 +117,8 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
         #return attrs
         return res
 
-    then = ThenActionSerializer(many=True, read_only=True)
-    protocol = MatchProtocolSerializer(many=True, read_only=True)
+    then = ThenActionSerializer(many=True)
+    protocol = MatchProtocolSerializer(many=True)
     class Meta:
         model = Route
         fields = (
