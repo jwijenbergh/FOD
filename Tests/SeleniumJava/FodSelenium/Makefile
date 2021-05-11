@@ -106,7 +106,7 @@ chg_src_login_url0:
 	echo "$(LOGIN_URL1)" > "$(TEST_DIR)/$(CLASS1).url.$$"
 	if ! diff "$(TEST_DIR)/$(CLASS1).url.$$" "$(TEST_DIR)/$(CLASS1).url"; then \
 	  mv -f "$(TEST_DIR)/$(CLASS1).url.$$" "$(TEST_DIR)/$(CLASS1).url"; \
-	  sed -i  -r 's/( url =).*/\1 "$(LOGIN_URL1)\/altlogin";/' $(TEST_DIR)/$(CLASS1).java; \
+	  sed -i  -r 's/url *=.*/url = "$(LOGIN_URL1)\/altlogin";/' $(TEST_DIR)/$(CLASS1).java; \
 	fi
 	echo "$(LOGIN_USER1)" > "$(TEST_DIR)/$(CLASS1).user.$$"
 	if ! diff "$(TEST_DIR)/$(CLASS1).user.$$" "$(TEST_DIR)/$(CLASS1).user"; then \
@@ -129,10 +129,16 @@ url_file_list=$(wildcard src/Tests/*.url)
 ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar: $(java_file_list)
 	make package1
 
+FOD_IP = $(shell echo "$${FOD_IP:-172.17.0.2}")
+FOD_PORT = $(shell echo "$${FOD_PORT:-8000}")
+FOD_USER = $(shell echo "$${FOD_USER:-admin}")
+FOD_PWD = $(shell echo "$${FOD_PWD:-adminpwd1}")
+
 run1: ensurechromedriver ensuretestuser1
 	#sed -i  -r 's/^(\s*String url =).*/\1 "http:\/\/172.17.0.2:8000\/altlogin";/' src/Tests/Login.java
 	#make package1
-	make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='admin2' LOGIN_PWD1='adminpwd1' CLASS1="$(CLASS1)"
+	echo "FOD_IP=$(FOD_IP)" 1>&2
+	make chg_src_login_url1 LOGIN_URL1='http:\/\/$(FOD_IP):$(FOD_PORT)' LOGIN_USER1='$(FOD_USER)' LOGIN_PWD1='$(FOD_PWD)' CLASS1="$(CLASS1)"
 	chown -R test1 .
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 	ln -sf /usr/local/bin/chromedriver .\\driver\\chromedriver.exe
@@ -145,20 +151,24 @@ run1: ensurechromedriver ensuretestuser1
 
 
 updateclass-%:
-	make chg_src_login_url0 LOGIN_URL1='http:\/\/172.17.0.3:8001' LOGIN_USER1='admin2' LOGIN_PWD1='adminpwd1' CLASS1="$*"
+	echo "FOD_IP=$(FOD_IP)" 1>&2
+	make chg_src_login_url0 LOGIN_URL1='http:\/\/$(FOD_IP):$(FOD_PORT)' LOGIN_USER1='$(FOD_USER)' LOGIN_PWD1='$(FOD_PWD)' CLASS1="$*"
 
 CLASSES0:=$(wildcard src/Tests/*.java)
 CLASSES_update_list:=$(patsubst src/Tests/%.java,updateclass-%,$(CLASSES0))
 
+
 updateclasses: $(CLASSES_update_list)
-	echo $(CLASSES0)
-	echo $(CLASSES_update_list)
+	echo $(CLASSES0) 1>&2
+	echo $(CLASSES_update_list) 1>&2
+	make $(CLASSES_update_list)
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
 # use mvn for running all tests
 runtest1: ensurechromedriver ensuretestuser1 updateclasses
 	#make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='admin2' LOGIN_PWD1='adminpwd1' CLASS1="$(CLASS1)"
 	#make updateclass-LoginTest
+	echo "FOD_IP=$(FOD_IP)" 1>&2
 	chown -R test1 .
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 	ln -sf /usr/local/bin/chromedriver .\\driver\\chromedriver.exe
