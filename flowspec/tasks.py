@@ -54,6 +54,7 @@ def add(routepk, callback=None):
         commit, response = applier.apply()
         if commit:
             status = "ACTIVE"
+            snmp_add_initial_zero_value.delay(str(route.id), True)
         else:
             status = "ERROR"
         route.status = status
