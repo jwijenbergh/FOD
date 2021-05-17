@@ -911,12 +911,12 @@ def routestats(request, route_slug):
             if routename in res:
               return HttpResponse(json.dumps({"name": routename, "data": res[routename]}), content_type="application/json")
             else:
-              return HttpResponse(json.dumps({"error": "Route '{}' was not found in statistics.".format(routename)}), content_type="application/json", status=404)
+              return HttpResponse(json.dumps({"error": "Route 'match={}' was not found in statistics.".format(routename)}), content_type="application/json", status=404)
         else:
             if route_id in res['_per_rule']:
-              return HttpResponse(json.dumps({"name": routename, "data": res['_per_rule'][route_id]}), content_type="application/json")
+              return HttpResponse(json.dumps({"id" : route_id, "name": routename, "data": res['_per_rule'][route_id]}), content_type="application/json")
             else:
-              return HttpResponse(json.dumps({"error": "Route '{}' was not found in statistics.".format(route_id)}), content_type="application/json", status=404)
+              return HttpResponse(json.dumps({"error": "Route 'id={}' was not found in statistics.".format(route_id)}), content_type="application/json", status=404)
 
     except Exception as e:
         logger.error('routestats failed: %s' % e)
