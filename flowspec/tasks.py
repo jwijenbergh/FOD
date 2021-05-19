@@ -304,13 +304,15 @@ def snmp_lock_remove():
       logger.info("snmp_lock_remove(): failed "+str(e))
 
 def exit_process():
-      logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+")")
-      exit()
-      logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+"), after exit")
-      sys.exit()
-      logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+"), after sys.exit")
-      os._exit()
-      logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+"), after os._exit")
+    import sys
+    pid = os.getpid()
+    logger.info("exit_process(): before exit in child process (pid="+str(pid)+")")
+    exit()
+    logger.info("exit_process(): before exit in child process (pid="+str(pid)+"), after exit")
+    sys.exit()
+    logger.info("exit_process(): before exit in child process (pid="+str(pid)+"), after sys.exit")
+    os._exit()
+    logger.info("exit_process(): before exit in child process (pid="+str(pid)+"), after os._exit")
 
 #@shared_task(ignore_result=True, time_limit=580, soft_time_limit=550)
 @shared_task(ignore_result=True, max_retries=0)
@@ -340,6 +342,7 @@ def poll_snmp_statistics():
       logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+")")
       exit()
       logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+"), after exit")
+      import sys
       sys.exit()
       logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+"), after sys.exit")
       os._exit()
