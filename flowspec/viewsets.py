@@ -55,7 +55,7 @@ class RouteViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request):
-        logger.debug("debug viewsets: create: request.data="+str(request.data))
+        logger.debug("RouteViewSet::create(): request.data="+str(request.data))
         serializer = RouteSerializer(
             context={'request': request}, data=request.data, partial=True) # is this correct ???
         try:
@@ -71,11 +71,27 @@ class RouteViewSet(viewsets.ModelViewSet):
                 if exists:
                     return Response({"non_field_errors": [message]}, status=400)
                 else:
-                    return super(RouteViewSet, self).create(request)
+                    #return super(RouteViewSet, self).create(request)
+                    obj = super(RouteViewSet, self).create(request)
+                    requested_status = request.data["status"]
+                    logger.debug("RouteViewSet::create(): requested_status="+str(requested_status))
+                    logger.info("RouteViewSet::create(): obj.type="+str(type(obj)))
+                    logger.info("RouteViewSet::create(): obj="+str(obj))
+                    logger.info("RouteViewSet::create(): obj.dir="+str(dir(obj)))
+                    logger.info("RouteViewSet::create(): obj.items="+str(obj.items))
+                    logger.info("RouteViewSet::create(): obj.data="+str(obj.data))
+                    logger.info("RouteViewSet::create(): obj.data.id="+str(obj.data["id"]))
+                    route = get_object_or_404(self.get_queryset(), pk=obj.data["id"])
+                    if requested_status == "ACTIVE":
+                      route.status = "PENDING"
+                      route.response = "N/A"
+                      route.save()
+                      route.commit_add()
+                    return obj
             else:
                 return Response(serializer.errors, status=400)
         except BaseException as e:
-            logger.error("debug viewsets: got exception", exc_info=True)
+            logger.error("RouteViewSet::create(): got exception", exc_info=True)
 
     def retrieve(self, request, pk=None):
         route = get_object_or_404(self.get_queryset(), pk=pk)
@@ -141,6 +157,9 @@ class RouteViewSet(viewsets.ModelViewSet):
             if new_status == 'ACTIVE':
                 set_object_pending(obj)
                 obj.commit_add()
+        
+        #if not partial:
+        #   raise PermissionDenied('Permission Denied')
 
         obj = get_object_or_404(self.queryset, pk=pk)
         old_status = obj.status
@@ -158,7 +177,10 @@ class RouteViewSet(viewsets.ModelViewSet):
             #if requested_status == 'INACTIVE':
             new_status = requested_status
             #logger.info("RouteViewSet::update(): data="+str(request.data))
+            logger.info("RouteViewSet::update(): pk="+str(pk))
             logger.info("RouteViewSet::update(): request="+str(requested_status))
+            logger.info("RouteViewSet::update(): obj.type="+str(type(obj)))
+            logger.info("RouteViewSet::update(): obj="+str(obj))
             logger.info("RouteViewSet::update(): old_status="+str(old_status)+", new_status="+str(new_status))
             super(RouteViewSet, self).update(request, pk, partial=partial)
             if old_status == 'ACTIVE':
@@ -189,8 +211,19 @@ class RouteViewSet(viewsets.ModelViewSet):
             obj.commit_add()
 
     def pre_delete(self, obj):
+        log.info("pre delete1")
+        if true or not self.request.user.is_superuser():
+           raise PermissionDenied('Permission Denied')
+        log.info("pre delete")
         obj.commit_delete()
 
+    def delete(self, request, pk=None, partial=False):
+        obj = get_object_or_404(self.queryset, pk=pk)
+        log.info("delete1 pk="+str(pk)+" obj="+str(obj))
+        if true or not self.request.user.is_superuser():
+           raise PermissionDenied('Permission Denied')
+        log.info("pre delete")
+        obj.commit_delete()
 
 class ThenActionViewSet(viewsets.ModelViewSet):
     queryset = ThenAction.objects.all()
