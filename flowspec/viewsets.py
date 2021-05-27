@@ -211,18 +211,26 @@ class RouteViewSet(viewsets.ModelViewSet):
             obj.commit_add()
 
     def pre_delete(self, obj):
-        log.info("pre delete1")
-        if true or not self.request.user.is_superuser():
+        logger.info("pre delete1")
+        if True or not self.request.user.is_superuser():
            raise PermissionDenied('Permission Denied')
-        log.info("pre delete")
+        logger.info("pre delete")
         obj.commit_delete()
 
     def delete(self, request, pk=None, partial=False):
         obj = get_object_or_404(self.queryset, pk=pk)
-        log.info("delete1 pk="+str(pk)+" obj="+str(obj))
-        if true or not self.request.user.is_superuser():
+        logger.info("delete1 pk="+str(pk)+" obj="+str(obj))
+        if True or not self.request.user.is_superuser():
            raise PermissionDenied('Permission Denied')
-        log.info("pre delete")
+        logger.info("pre delete")
+        obj.commit_delete()
+
+    def destroy(self, request, pk=None):
+        obj = get_object_or_404(self.queryset, pk=pk)
+        logger.info("destroy pk="+str(pk)+" obj="+str(obj))
+        if False or not self.request.user.is_superuser():
+           raise PermissionDenied('Permission Denied')
+        logger.info("desroy(): pre delete")
         obj.commit_delete()
 
 class ThenActionViewSet(viewsets.ModelViewSet):
