@@ -211,27 +211,29 @@ class RouteViewSet(viewsets.ModelViewSet):
             obj.commit_add()
 
     def pre_delete(self, obj):
-        logger.info("pre delete1")
-        if True or not self.request.user.is_superuser():
+        logger.info("pre delete(): start")
+        if True or not self.request.user.is_superuser:
            raise PermissionDenied('Permission Denied')
-        logger.info("pre delete")
+        logger.info("pre delete: pre commit_delete")
         obj.commit_delete()
 
     def delete(self, request, pk=None, partial=False):
         obj = get_object_or_404(self.queryset, pk=pk)
-        logger.info("delete1 pk="+str(pk)+" obj="+str(obj))
+        logger.info("delete(): pk="+str(pk)+" obj="+str(obj))
         if True or not self.request.user.is_superuser():
            raise PermissionDenied('Permission Denied')
-        logger.info("pre delete")
+        logger.info("delete(): pre commit_delete")
         obj.commit_delete()
 
     def destroy(self, request, pk=None):
         obj = get_object_or_404(self.queryset, pk=pk)
-        logger.info("destroy pk="+str(pk)+" obj="+str(obj))
-        if False or not self.request.user.is_superuser():
+        logger.info("destroy(): pk="+str(pk)+" obj="+str(obj))
+        if False or not self.request.user.is_superuser:
            raise PermissionDenied('Permission Denied')
-        logger.info("desroy(): pre delete")
+        logger.info("destroy(): pre commit_delete")
         obj.commit_delete()
+        serializer = RouteSerializer(obj, context={'request': request})
+        return Response(serializer.data)
 
 class ThenActionViewSet(viewsets.ModelViewSet):
     queryset = ThenAction.objects.all()
