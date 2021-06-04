@@ -54,7 +54,8 @@ installchromedriver:
 	# TODO: find an suitable version:
 	#RUN wget -N https://chromedriver.storage.googleapis.com/$(google-chrome --version | grep -Eo "[0-9\.]+")/chromedriver_linux64.zip -P /root/
 	#wget -N https://chromedriver.storage.googleapis.com/89.0.4389.23/chromedriver_linux64.zip -P /root
-	wget -N https://chromedriver.storage.googleapis.com/90.0.4430.24/chromedriver_linux64.zip -P /root
+	#wget -N https://chromedriver.storage.googleapis.com/90.0.4430.24/chromedriver_linux64.zip -P /root
+	wget -N https://chromedriver.storage.googleapis.com/91.0.4472.19/chromedriver_linux64.zip -P /root
 	unzip /root/chromedriver_linux64.zip -d /root
 	mv -f /root/chromedriver /usr/local/bin/chromedriver
 	chown root:root /usr/local/bin/chromedriver
