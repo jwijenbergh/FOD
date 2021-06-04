@@ -39,7 +39,9 @@ class RouteViewSet(viewsets.ModelViewSet):
             if self.request.user.is_anonymous:
                 return Route.objects.all()
             elif self.request.user.is_authenticated:
-                return Route.objects.filter(applier=self.request.user)
+                #return Route.objects.filter(applier=self.request.user)
+                return convert_container_to_queryset(self.get_users_routes_all(), Route)
+
             else:
                 raise PermissionDenied('User is not Authenticated')
 
@@ -47,7 +49,19 @@ class RouteViewSet(viewsets.ModelViewSet):
             return Route.objects.all()
         elif (self.request.user.is_authenticated and not
               self.request.user.is_anonymous):
-            return Route.objects.filter(applier=self.request.user)
+            #return Route.objects.filter(applier=self.request.user)
+            return convert_container_to_queryset(self.get_users_routes_all(), Route)
+
+
+    def get_users_routes_all(self):
+        return global__get_users_routes_all(self.request.user)
+
+    def get_users_routes_by_its_peers(self):
+        return global__get_users_routes_by_its_peers(self.request.user)
+
+    def get_users_routes_by_applier_only(self):
+        return global__get_users_routes_by_applier_only(self.request.user)
+
 
     def list(self, request):
         serializer = RouteSerializer(
@@ -228,12 +242,22 @@ class RouteViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         obj = get_object_or_404(self.queryset, pk=pk)
         logger.info("destroy(): pk="+str(pk)+" obj="+str(obj))
-        if False or not self.request.user.is_superuser:
-           raise PermissionDenied('Permission Denied')
         logger.info("destroy(): pre commit_delete")
-        obj.commit_delete()
-        serializer = RouteSerializer(obj, context={'request': request})
-        return Response(serializer.data)
+        if obj.status == 'ACTIVE':
+          obj.status = "PENDING"
+          obj.response = "N/A"
+          obj.save()
+          obj.commit_delete()
+          serializer = RouteSerializer(obj, context={'request': request})
+          return Response(serializer.data)
+        else:
+          try:
+            if not settings.ALLOW_ADMIN__FULL_RULEDEL or not self.request.user.is_superuser:
+              raise PermissionDenied('Permission Denied')
+          except Exception as e:
+              raise PermissionDenied('Permission Denied')
+          # this will delete the rule from DB
+          return super(RouteViewSet, self).destroy(self, request, pk=pk)
 
 class ThenActionViewSet(viewsets.ModelViewSet):
     queryset = ThenAction.objects.all()
@@ -265,4 +289,42 @@ class StatsRoutesViewSet(viewsets.ViewSet):
         from flowspec.views import routestats
         route = get_object_or_404(queryset, name=pk)
         return routestats(request, route.name)
+
+#############################################################################
+#############################################################################
+# global helpers 
+
+# class1's attribute 'id' should be existing and be the primary key, e.g., be a Django model class
+def convert_container_to_queryset(list1, class1):
+         #temp1_ids = [obj.id for obj in list1]
+         temp1_ids = [obj.id for obj in list1 if obj != None]
+         temp2_ids = set(temp1_ids)
+         return class1.objects.filter(id__in=temp2_ids)
+
+#############################################################################
+#############################################################################
+
+def global__get_users_routes_all(user):
+         routes1=global__get_users_routes_by_its_peers(user)
+         routes2=global__get_users_routes_by_applier_only(user)
+         routes_all=list(routes1)+list(routes2)
+         routes_all=list(set(routes_all)) # make uniques list
+         return routes_all
+
+# all these following functions return normal containers, not particular query sets
+# if needed convert them back to query sets by convert_container_to_queryset
+def global__get_users_routes_by_its_peers(user):
+        users_peers_set = set(user.userprofile.peers.all())
+        routes_all = list(Route.objects.filter())
+        #routes_all = list(Route.objects)
+        #temp1 = [obj for obj in routes_all]
+        temp1 = [obj for obj in routes_all if len(set(obj.containing_peers()).intersection(users_peers_set))>0]
+        return temp1
+
+def global__get_users_routes_by_applier_only(user):
+        #return list(Rule.objects.filter(applier=user))
+        return Route.objects.filter(applier=user)
+
+#############################################################################
+#############################################################################
 

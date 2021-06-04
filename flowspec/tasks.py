@@ -121,10 +121,17 @@ def edit(routepk, callback=None):
 def delete(routepk, **kwargs):
     from flowspec.models import Route
     route = Route.objects.get(pk=routepk)
+    initial_status = route.status
     try:
         applier = PR.Applier(route_object=route)
         commit, response = applier.apply(operation="delete")
         reason_text = ''
+        logger.info("tasks::delete(): route="+str(route)+" initial_status="+str(initial_status))
+        if commit and initial_status == "INACTIVE_TODELETE": # special new case for fully deleting a rule via REST API
+           route.delete()
+           msg1 = "[%s] Fully deleted route : %s%s- Result %s" % (route.applier, route.name, reason_text, response)
+           logger.info("tasks::delete(): DELETED msg="+msg1)
+           announce(msg1, route.applier, route)
         if commit:
             status = "INACTIVE"
             if "reason" in kwargs and kwargs['reason'] == 'EXPIRED':
@@ -150,7 +157,8 @@ def delete(routepk, **kwargs):
         route.response = "Task timeout"
         route.save()
         announce("[%s] Suspending rule : %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
-    except Exception:
+    except Exception as e:
+        logger.error("edit(): route="+str(route)+", got unexpected exception="+str(e))
         route.status = "ERROR"
         route.response = "Error"
         route.save()
@@ -222,7 +230,7 @@ def check_sync(route_name=None, selected_routes=[]):
     if route_name:
         routes = routes.filter(name=route_name)
     for route in routes:
-        if route.has_expired() and (route.status != 'EXPIRED' and route.status != 'ADMININACTIVE' and route.status != 'INACTIVE'):
+        if route.has_expired() and (route.status != 'EXPIRED' and route.status != 'ADMININACTIVE' and route.status != 'INACTIVE' and route.status != 'INACTIVE_TODELETE'):
             if route.status != 'ERROR':
                 logger.info('Expiring %s route %s' %(route.status, route.name))
                 subtask(delete).delay(route, reason="EXPIRED")
@@ -238,7 +246,7 @@ def notify_expired():
     logger.info('Initializing expiration notification')
     routes = Route.objects.all()
     for route in routes:
-        if route.status not in ['EXPIRED', 'ADMININACTIVE', 'INACTIVE', 'ERROR']:
+        if route.status not in ['EXPIRED', 'ADMININACTIVE', 'INACTIVE', 'INACTIVE_TODELETE', 'ERROR']:
             expiration_days = (route.expires - datetime.date.today()).days
             if expiration_days < settings.EXPIRATION_NOTIFY_DAYS:
                 try:

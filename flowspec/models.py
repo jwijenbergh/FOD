@@ -28,9 +28,11 @@ from flowspec.tasks import *
 from flowspec.helpers import send_new_mail, get_peer_techc_mails
 from utils import proxy as PR
 from ipaddress import *
+from ipaddress import ip_network
 import datetime
 import logging
 import json
+from peers.models import PeerRange, Peer
 
 from flowspec.junos import create_junos_name
 
@@ -84,6 +86,7 @@ ROUTE_STATES = (
     ("PENDING", "PENDING"),
     ("OUTOFSYNC", "OUTOFSYNC"),
     ("INACTIVE", "INACTIVE"),
+    ("INACTIVE_TODELETE", "INACTIVE_TODELETE"),
     ("ADMININACTIVE", "ADMININACTIVE"),
 )
 
@@ -557,7 +560,7 @@ class Route(models.Model):
                     self.status = "ACTIVE"
                     self.save()
                     found = True
-            if self.status == "ADMININACTIVE" or self.status == "INACTIVE" or self.status == "EXPIRED":
+            if self.status == "ADMININACTIVE" or self.status == "INACTIVE" or self.status == "INACTIVE_TODELETE" or self.status == "EXPIRED":
                 found = True
         return found
 
@@ -627,9 +630,31 @@ class Route(models.Model):
             applier_peers = None
         return applier_peers
 
+    # perf has to be checked:
+    @property 
+    def containing_peer_ranges(self):
+        try:
+            destination_network = ip_network(self.destination)
+            logger.info("containing_peer_ranges(): destination_network="+str(destination_network))
+            #containing_peer_ranges = PeerRange.objects.filter(network__contains(destination_network))
+            containing_peer_ranges = [obj for obj in PeerRange.objects.all() if ip_network(obj.network).__contains__(destination_network)]
+            logger.info("containing_peer_ranges(): containing_peer_ranges="+str(containing_peer_ranges))
+        except Exception as e:
+            logger.info("containing_peer_ranges(): exception occured: "+str(e))
+            #containing_peer_ranges = None
+            containing_peer_ranges = []
+        return containing_peer_ranges
+
+    # perf has to be checked:
+    def containing_peers(self):
+        containing_peer_ranges2 = set(self.containing_peer_ranges)
+        logger.info("containing_peers(): containing_peer_ranges="+str(containing_peer_ranges2))
+        #return [obj.peer for obj in containing_peer_ranges2]
+        return [obj for obj in Peer.objects.all() if len(set(obj.networks.all()).intersection(containing_peer_ranges2))>0]
+
     @property
     def days_to_expire(self):
-        if self.status not in ['EXPIRED', 'ADMININACTIVE', 'ERROR', 'INACTIVE']:
+        if self.status not in ['EXPIRED', 'ADMININACTIVE', 'ERROR', 'INACTIVE', 'INACTIVE_TODELETE']:
             expiration_days = (self.expires - datetime.date.today()).days
             if expiration_days < settings.EXPIRATION_NOTIFY_DAYS:
                 return "%s" %expiration_days
