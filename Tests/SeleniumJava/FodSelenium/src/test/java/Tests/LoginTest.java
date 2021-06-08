@@ -40,6 +40,7 @@ public class LoginTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 	@Test
@@ -62,6 +63,7 @@ public class LoginTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 	@Test
@@ -84,6 +86,7 @@ public class LoginTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 	@Test
@@ -106,6 +109,7 @@ public class LoginTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 	@Test
@@ -128,6 +132,7 @@ public class LoginTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 

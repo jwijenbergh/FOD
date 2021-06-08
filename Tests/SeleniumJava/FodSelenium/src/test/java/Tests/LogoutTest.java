@@ -42,6 +42,7 @@ public class LogoutTest {
 				} catch (IOException ex) {
 				    // Cxception handling
 				}
+                                throw(e);
 			}
 	}
 	
