@@ -5,6 +5,11 @@
 help:
 	@grep -E "^[a-zA_Z_][^ :]+:" Makefile
 
+all:
+	-#echo "vncviewer -via test-fodd-lab-1.geant.net 172.18.0.3:0"
+	echo "vncviewer -via $(FOD_UI_GW:-$(hostname -i)) $(hostname -i):0"
+	echo make FOD_USER="$(FOD_USER)" FOD_PWD="$(FOD_PWD)" runtest1
+
 ##
 
 ensuremaven:
