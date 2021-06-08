@@ -109,19 +109,19 @@ CLASS1:=LoginTest
 TEST_DIR:=src/test/java/Tests
 
 chg_src_login_url0:
-	echo "$(LOGIN_URL1)" > "$(TEST_DIR)/$(CLASS1).url.$$"
-	if ! diff "$(TEST_DIR)/$(CLASS1).url.$$" "$(TEST_DIR)/$(CLASS1).url"; then \
-	  mv -f "$(TEST_DIR)/$(CLASS1).url.$$" "$(TEST_DIR)/$(CLASS1).url"; \
+	echo "$(LOGIN_URL1)" > "$(TEST_DIR)/.$(CLASS1).url.$$"
+	if ! diff "$(TEST_DIR)/.$(CLASS1).url.$$" "$(TEST_DIR)/.$(CLASS1).url"; then \
+	  mv -f "$(TEST_DIR)/.$(CLASS1).url.$$" "$(TEST_DIR)/.$(CLASS1).url"; \
 	  sed -i  -r 's/url *=.*/url = "$(LOGIN_URL1)\/altlogin";/' $(TEST_DIR)/$(CLASS1).java; \
 	fi
-	echo "$(LOGIN_USER1)" > "$(TEST_DIR)/$(CLASS1).user.$$"
-	if ! diff "$(TEST_DIR)/$(CLASS1).user.$$" "$(TEST_DIR)/$(CLASS1).user"; then \
-	  mv -f "$(TEST_DIR)/$(CLASS1).user.$$" "$(TEST_DIR)/$(CLASS1).user"; \
+	echo "$(LOGIN_USER1)" > "$(TEST_DIR)/.$(CLASS1).user.$$"
+	if ! diff "$(TEST_DIR)/.$(CLASS1).user.$$" "$(TEST_DIR)/.$(CLASS1).user"; then \
+	  mv -f "$(TEST_DIR)/.$(CLASS1).user.$$" "$(TEST_DIR)/.$(CLASS1).user"; \
 	  sed -i  -r 's/"id_username".*sendKeys.*$$/"id_username"\)\).sendKeys\("'"$(LOGIN_USER1)"'"\)\;/' $(TEST_DIR)/$(CLASS1).java; \
 	fi
-	echo "$(LOGIN_PWD1)" > "$(TEST_DIR)/$(CLASS1).pwd.$$"
-	if ! diff "$(TEST_DIR)/$(CLASS1).pwd.$$" "$(TEST_DIR)/$(CLASS1).pwd"; then \
-	  mv -f "$(TEST_DIR)/$(CLASS1).pwd.$$" "$(TEST_DIR)/$(CLASS1).pwd"; \
+	echo "$(LOGIN_PWD1)" > "$(TEST_DIR)/.$(CLASS1).pwd.$$"
+	if ! diff "$(TEST_DIR)/.$(CLASS1).pwd.$$" "$(TEST_DIR)/.$(CLASS1).pwd"; then \
+	  mv -f "$(TEST_DIR)/.$(CLASS1).pwd.$$" "$(TEST_DIR)/.$(CLASS1).pwd"; \
 	  sed -i  -r 's/"id_password".*sendKeys.*$$/"id_password"\)\).sendKeys\("'"$(LOGIN_PWD1)"'"\)\;/' $(TEST_DIR)/$(CLASS1).java; \
 	fi
 
