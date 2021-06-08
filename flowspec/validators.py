@@ -52,7 +52,7 @@ def clean_status(status):
     :rtype: str
     """
 
-    allowed_states = ['ACTIVE', 'INACTIVE']
+    allowed_states = ['ACTIVE', 'INACTIVE', 'INACTIVE_TODELETE']
 
     if status not in allowed_states:
         return _('Invalid status value. You are allowed to use "{}".'.format(
@@ -196,6 +196,8 @@ def check_if_rule_exists(fields, queryset):
     :rtype: tuple(bool, str)
     """
 
+    if hasattr(settings, "ROUTES_DUPLICATES_CHECKING") and settings.ROUTES_DUPLICATES_CHECKING == False:
+        return (False, None)
     routes = queryset.filter(
         source=fields.get('source'),
         destination=ip_network(fields.get('destination')).compressed,

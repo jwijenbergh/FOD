@@ -470,6 +470,10 @@ SNMP_REMOVE_RULES_AFTER = 3600
 
 DISABLE_RULE_OVERLAP_CHECK = False
 
+# Perform checking for route duplicates (i.e., forbid creating multiple rules
+# with the same addresses). By default it is enabled (True).
+ROUTES_DUPLICATES_CHECKING = True
+
 ALLOW_DELETE_FULL_FOR_NONADMIN = False
 
 MAIL_NOTIFICATION_TO_ALL_MATCHING_PEERS = True

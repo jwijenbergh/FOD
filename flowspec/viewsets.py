@@ -4,13 +4,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 
 from rest_framework import viewsets
-from flowspec.models import (
-    Route, MatchPort, ThenAction, FragmentType, MatchProtocol,
-    MatchDscp)
+from flowspec.models import Route, ThenAction, FragmentType, MatchProtocol, MatchDscp
 
 from flowspec.serializers import (
     RouteSerializer,
-    PortSerializer,
     ThenActionSerializer,
     FragmentTypeSerializer,
     MatchProtocolSerializer,
@@ -42,7 +39,9 @@ class RouteViewSet(viewsets.ModelViewSet):
             if self.request.user.is_anonymous:
                 return Route.objects.all()
             elif self.request.user.is_authenticated:
-                return Route.objects.filter(applier=self.request.user)
+                #return Route.objects.filter(applier=self.request.user)
+                return convert_container_to_queryset(self.get_users_routes_all(), Route)
+
             else:
                 raise PermissionDenied('User is not Authenticated')
 
@@ -50,7 +49,19 @@ class RouteViewSet(viewsets.ModelViewSet):
             return Route.objects.all()
         elif (self.request.user.is_authenticated and not
               self.request.user.is_anonymous):
-            return Route.objects.filter(applier=self.request.user)
+            #return Route.objects.filter(applier=self.request.user)
+            return convert_container_to_queryset(self.get_users_routes_all(), Route)
+
+
+    def get_users_routes_all(self):
+        return global__get_users_routes_all(self.request.user)
+
+    def get_users_routes_by_its_peers(self):
+        return global__get_users_routes_by_its_peers(self.request.user)
+
+    def get_users_routes_by_applier_only(self):
+        return global__get_users_routes_by_applier_only(self.request.user)
+
 
     def list(self, request):
         serializer = RouteSerializer(
@@ -58,7 +69,7 @@ class RouteViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request):
-        logger.debug("debug viewsets: create: request.data="+str(request.data))
+        logger.debug("RouteViewSet::create(): request.data="+str(request.data))
         serializer = RouteSerializer(
             context={'request': request}, data=request.data, partial=True) # is this correct ???
         try:
@@ -74,11 +85,27 @@ class RouteViewSet(viewsets.ModelViewSet):
                 if exists:
                     return Response({"non_field_errors": [message]}, status=400)
                 else:
-                    return super(RouteViewSet, self).create(request)
+                    #return super(RouteViewSet, self).create(request)
+                    obj = super(RouteViewSet, self).create(request)
+                    requested_status = request.data["status"]
+                    logger.debug("RouteViewSet::create(): requested_status="+str(requested_status))
+                    logger.info("RouteViewSet::create(): obj.type="+str(type(obj)))
+                    logger.info("RouteViewSet::create(): obj="+str(obj))
+                    logger.info("RouteViewSet::create(): obj.dir="+str(dir(obj)))
+                    logger.info("RouteViewSet::create(): obj.items="+str(obj.items))
+                    logger.info("RouteViewSet::create(): obj.data="+str(obj.data))
+                    logger.info("RouteViewSet::create(): obj.data.id="+str(obj.data["id"]))
+                    route = get_object_or_404(self.get_queryset(), pk=obj.data["id"])
+                    if requested_status == "ACTIVE":
+                      route.status = "PENDING"
+                      route.response = "N/A"
+                      route.save()
+                      route.commit_add()
+                    return obj
             else:
                 return Response(serializer.errors, status=400)
         except BaseException as e:
-            logger.error("debug viewsets: got exception", exc_info=True)
+            logger.error("RouteViewSet::create(): got exception", exc_info=True)
 
     def retrieve(self, request, pk=None):
         route = get_object_or_404(self.get_queryset(), pk=pk)
@@ -144,6 +171,9 @@ class RouteViewSet(viewsets.ModelViewSet):
             if new_status == 'ACTIVE':
                 set_object_pending(obj)
                 obj.commit_add()
+        
+        #if not partial:
+        #   raise PermissionDenied('Permission Denied')
 
         obj = get_object_or_404(self.queryset, pk=pk)
         old_status = obj.status
@@ -152,10 +182,20 @@ class RouteViewSet(viewsets.ModelViewSet):
             obj, context={'request': request},
             #data=request.DATA, partial=partial)
             data=request.data, partial=partial)
+        logger.info("RouteViewSet::update(): request.data="+str(request.data))
 
         if serializer.is_valid():
             #new_status = serializer.object.status
             new_status = serializer.data["status"]
+            requested_status = request.data["status"]
+            #if requested_status == 'INACTIVE':
+            new_status = requested_status
+            #logger.info("RouteViewSet::update(): data="+str(request.data))
+            logger.info("RouteViewSet::update(): pk="+str(pk))
+            logger.info("RouteViewSet::update(): request="+str(requested_status))
+            logger.info("RouteViewSet::update(): obj.type="+str(type(obj)))
+            logger.info("RouteViewSet::update(): obj="+str(obj))
+            logger.info("RouteViewSet::update(): old_status="+str(old_status)+", new_status="+str(new_status))
             super(RouteViewSet, self).update(request, pk, partial=partial)
             if old_status == 'ACTIVE':
                 work_on_active_object(obj, new_status)
@@ -185,13 +225,39 @@ class RouteViewSet(viewsets.ModelViewSet):
             obj.commit_add()
 
     def pre_delete(self, obj):
+        logger.info("pre delete(): start")
+        if True or not self.request.user.is_superuser:
+           raise PermissionDenied('Permission Denied')
+        logger.info("pre delete: pre commit_delete")
         obj.commit_delete()
 
+    def delete(self, request, pk=None, partial=False):
+        obj = get_object_or_404(self.queryset, pk=pk)
+        logger.info("delete(): pk="+str(pk)+" obj="+str(obj))
+        if True or not self.request.user.is_superuser():
+           raise PermissionDenied('Permission Denied')
+        logger.info("delete(): pre commit_delete")
+        obj.commit_delete()
 
-class PortViewSet(viewsets.ModelViewSet):
-    queryset = MatchPort.objects.all()
-    serializer_class = PortSerializer
-
+    def destroy(self, request, pk=None):
+        obj = get_object_or_404(self.queryset, pk=pk)
+        logger.info("destroy(): pk="+str(pk)+" obj="+str(obj))
+        logger.info("destroy(): pre commit_delete")
+        if obj.status == 'ACTIVE':
+          obj.status = "PENDING"
+          obj.response = "N/A"
+          obj.save()
+          obj.commit_delete()
+          serializer = RouteSerializer(obj, context={'request': request})
+          return Response(serializer.data)
+        else:
+          try:
+            if not settings.ALLOW_ADMIN__FULL_RULEDEL or not self.request.user.is_superuser:
+              raise PermissionDenied('Permission Denied')
+          except Exception as e:
+              raise PermissionDenied('Permission Denied')
+          # this will delete the rule from DB
+          return super(RouteViewSet, self).destroy(self, request, pk=pk)
 
 class ThenActionViewSet(viewsets.ModelViewSet):
     queryset = ThenAction.objects.all()
@@ -223,4 +289,42 @@ class StatsRoutesViewSet(viewsets.ViewSet):
         from flowspec.views import routestats
         route = get_object_or_404(queryset, name=pk)
         return routestats(request, route.name)
+
+#############################################################################
+#############################################################################
+# global helpers 
+
+# class1's attribute 'id' should be existing and be the primary key, e.g., be a Django model class
+def convert_container_to_queryset(list1, class1):
+         #temp1_ids = [obj.id for obj in list1]
+         temp1_ids = [obj.id for obj in list1 if obj != None]
+         temp2_ids = set(temp1_ids)
+         return class1.objects.filter(id__in=temp2_ids)
+
+#############################################################################
+#############################################################################
+
+def global__get_users_routes_all(user):
+         routes1=global__get_users_routes_by_its_peers(user)
+         routes2=global__get_users_routes_by_applier_only(user)
+         routes_all=list(routes1)+list(routes2)
+         routes_all=list(set(routes_all)) # make uniques list
+         return routes_all
+
+# all these following functions return normal containers, not particular query sets
+# if needed convert them back to query sets by convert_container_to_queryset
+def global__get_users_routes_by_its_peers(user):
+        users_peers_set = set(user.userprofile.peers.all())
+        routes_all = list(Route.objects.filter())
+        #routes_all = list(Route.objects)
+        #temp1 = [obj for obj in routes_all]
+        temp1 = [obj for obj in routes_all if len(set(obj.containing_peers()).intersection(users_peers_set))>0]
+        return temp1
+
+def global__get_users_routes_by_applier_only(user):
+        #return list(Rule.objects.filter(applier=user))
+        return Route.objects.filter(applier=user)
+
+#############################################################################
+#############################################################################
 

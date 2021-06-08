@@ -44,7 +44,7 @@ ensurechromedriver:
 	test -x /usr/local/bin/chromedriver || make installchromedriver
 
 installchromedriver:
-	apt-get install -qqy chromium #firefox-esr 
+	which chromium-browser &>/dev/null || apt-get install -qqy chromium || apt-get install chromium-browser  #firefox-esr 
 	apt-get install -qyy curl unzip openjdk-11-jre-headless xvfb libxi6 libgconf-2-4 gnupg2
 	curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add
 	echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
@@ -53,7 +53,9 @@ installchromedriver:
 
 	# TODO: find an suitable version:
 	#RUN wget -N https://chromedriver.storage.googleapis.com/$(google-chrome --version | grep -Eo "[0-9\.]+")/chromedriver_linux64.zip -P /root/
-	wget -N https://chromedriver.storage.googleapis.com/89.0.4389.23/chromedriver_linux64.zip -P /root
+	#wget -N https://chromedriver.storage.googleapis.com/89.0.4389.23/chromedriver_linux64.zip -P /root
+	#wget -N https://chromedriver.storage.googleapis.com/90.0.4430.24/chromedriver_linux64.zip -P /root
+	wget -N https://chromedriver.storage.googleapis.com/91.0.4472.19/chromedriver_linux64.zip -P /root
 	unzip /root/chromedriver_linux64.zip -d /root
 	mv -f /root/chromedriver /usr/local/bin/chromedriver
 	chown root:root /usr/local/bin/chromedriver
@@ -101,11 +103,11 @@ CLASS1:=LoginTest
 #TEST_DIR:=src/Tests
 TEST_DIR:=src/test/java/Tests
 
-chg_src_login_url1:
+chg_src_login_url0:
 	echo "$(LOGIN_URL1)" > "$(TEST_DIR)/$(CLASS1).url.$$"
 	if ! diff "$(TEST_DIR)/$(CLASS1).url.$$" "$(TEST_DIR)/$(CLASS1).url"; then \
 	  mv -f "$(TEST_DIR)/$(CLASS1).url.$$" "$(TEST_DIR)/$(CLASS1).url"; \
-	  sed -i  -r 's/( url =).*/\1 "$(LOGIN_URL1)\/altlogin";/' $(TEST_DIR)/$(CLASS1).java; \
+	  sed -i  -r 's/url *=.*/url = "$(LOGIN_URL1)\/altlogin";/' $(TEST_DIR)/$(CLASS1).java; \
 	fi
 	echo "$(LOGIN_USER1)" > "$(TEST_DIR)/$(CLASS1).user.$$"
 	if ! diff "$(TEST_DIR)/$(CLASS1).user.$$" "$(TEST_DIR)/$(CLASS1).user"; then \
@@ -117,6 +119,8 @@ chg_src_login_url1:
 	  mv -f "$(TEST_DIR)/$(CLASS1).pwd.$$" "$(TEST_DIR)/$(CLASS1).pwd"; \
 	  sed -i  -r 's/"id_password".*sendKeys.*$$/"id_password"\)\).sendKeys\("'"$(LOGIN_PWD1)"'"\)\;/' $(TEST_DIR)/$(CLASS1).java; \
 	fi
+
+chg_src_login_url1: chg_src_login_url0
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
 java_file_list=$(wildcard src/Tests/*.java)
@@ -126,10 +130,16 @@ url_file_list=$(wildcard src/Tests/*.url)
 ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar: $(java_file_list)
 	make package1
 
+FOD_IP = $(shell echo "$${FOD_IP:-172.17.0.2}")
+FOD_PORT = $(shell echo "$${FOD_PORT:-8000}")
+FOD_USER = $(shell echo "$${FOD_USER:-admin}")
+FOD_PWD = $(shell echo "$${FOD_PWD:-adminpwd1}")
+
 run1: ensurechromedriver ensuretestuser1
 	#sed -i  -r 's/^(\s*String url =).*/\1 "http:\/\/172.17.0.2:8000\/altlogin";/' src/Tests/Login.java
 	#make package1
-	make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='admin2' LOGIN_PWD1='adminpwd1' CLASS1="$(CLASS1)"
+	echo "FOD_IP=$(FOD_IP)" 1>&2
+	make chg_src_login_url1 LOGIN_URL1='http:\/\/$(FOD_IP):$(FOD_PORT)' LOGIN_USER1='$(FOD_USER)' LOGIN_PWD1='$(FOD_PWD)' CLASS1="$(CLASS1)"
 	chown -R test1 .
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 	ln -sf /usr/local/bin/chromedriver .\\driver\\chromedriver.exe
@@ -140,9 +150,26 @@ run1: ensurechromedriver ensuretestuser1
 	#sudo -u test1 env DISPLAY=:0 java -cp ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar Tests.Login
 	sudo -u test1 env DISPLAY=:0 java -cp ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar "Tests.$(CLASS1)"
 
+
+updateclass-%:
+	echo "FOD_IP=$(FOD_IP)" 1>&2
+	make chg_src_login_url0 LOGIN_URL1='http:\/\/$(FOD_IP):$(FOD_PORT)' LOGIN_USER1='$(FOD_USER)' LOGIN_PWD1='$(FOD_PWD)' CLASS1="$*"
+
+CLASSES0:=$(wildcard src/Tests/*.java)
+CLASSES_update_list:=$(patsubst src/Tests/%.java,updateclass-%,$(CLASSES0))
+
+
+updateclasses: $(CLASSES_update_list)
+	echo $(CLASSES0) 1>&2
+	echo $(CLASSES_update_list) 1>&2
+	make $(CLASSES_update_list)
+	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+
 # use mvn for running all tests
-runtest1: ensurechromedriver ensuretestuser1
-	make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='admin2' LOGIN_PWD1='adminpwd1' CLASS1="$(CLASS1)"
+runtest1: ensurechromedriver ensuretestuser1 updateclasses
+	#make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='admin2' LOGIN_PWD1='adminpwd1' CLASS1="$(CLASS1)"
+	#make updateclass-LoginTest
+	echo "FOD_IP=$(FOD_IP)" 1>&2
 	chown -R test1 .
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 	ln -sf /usr/local/bin/chromedriver .\\driver\\chromedriver.exe

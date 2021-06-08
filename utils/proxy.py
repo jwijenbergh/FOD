@@ -208,13 +208,13 @@ class Applier(object):
     def get_existing_config_xml(self):
         retriever0 = Retriever(xml=None)
         config_xml_running = retriever0.fetch_xml()
-        logger.info("proxy::get_existing_config(): config_xml_running="+str(config_xml_running))
+        #logger.info("proxy::get_existing_config(): config_xml_running="+str(config_xml_running))
         return config_xml_running
 
     def get_existing_config(self):
         retriever0 = Retriever(xml=None)
         config_parsed = retriever0.proccess_xml()
-        logger.info("proxy::get_existing_config(): config_parsed="+str(config_parsed))
+        #logger.info("proxy::get_existing_config(): config_parsed="+str(config_parsed))
         return config_parsed
 
     def get_existing_routes(self):

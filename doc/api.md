@@ -1,14 +1,6 @@
 # Description
 
-Since v1.3 FoD officially has a REST API. This allows operations on:
-
-* `ThenAction`
-* `MatchPort`
-* `MatchProtocol`
-* `MatchDscp`
-* `FragmentType`
-* `Route`
-
+Current version of FoD officially has a REST API.
 The API needs authentication. Out of the box the supported authentication
 type is Token Authentication.
 
@@ -27,6 +19,18 @@ in the request:
 parameter
 * Using Postman, under the "Headers" add a header with name
 "Authorization" and value "Token <your-token>".
+
+# Endpoints
+
+REST API provides the following endpoints that will be described in more detail in the next sections:
+
+* `/api/routes/`
+* `/api/thenactions/`
+* `/api/matchprotocol/`
+* `/api/matchdscp/`
+* `/api/fragmenttypes/`
+* `/api/stats/routes/`
+
 
 # Usage Examples
 
@@ -50,84 +54,12 @@ Example:
 curl -X GET https://fod.example.com/api/thenactions/ -H "Authorization: Token <your-token>"
 
 RESPONSE:
-[  
-   {  
-      "id" 1,
-      "action":"discard",
-      "action_value":""
-   },
-   {  
-      "id" 3,
-      "action":"rate-limit",
-      "action_value":"10000k"
-   },
-   ...
+[
+    "discard",
+    "rate-limit:10000k",
+    "rate-limit:1000k",
+    "rate-limit:100k"
 ]
-```
-
-#### A specific item
-
-One can also GET a specific `ThenAction`, by using the `id` in the GET url
-
-URL: `/api/thenactions/<thenaction-id>/`
-
-Example:
-```
-curl -X GET https://fod.example.com/api/thenactions/13/ -H "Authorization: Token <your-token>"
-
-RESPONSE:
-{  
-   "id" 13,
-   "action":"discard",
-   "action_value":""
-},
-```
-
-### POST
-
-Here both `action`, `action_value` fields are required. 
-
-URL: `/api/thenactions/`
-
-Example:
-```
-curl -X POST https://fod.example.com/api/thenactions/ -F "action=rate-limit" -F "action_value=10k" -H "Authorization: Token <your-token>"
-
-RESPONSE:
-{
-    "id": 24,
-    "action": "rate-limit",
-    "action_value": "10k" 
-}
-```
-
-### PUT
-
-Here whichever of the `action`, `action_value` fields can be supplied
-
-URL: `/api/thenactions/<thenaction-id>/`
-
-Example:
-```
-curl -X PUT https://fod.example.com/api/thenactions/24/ -F "action=rate-limit" -F "action_value=10k" -H "Authorization: Token <your-token>"
-
-RESPONSE:
-{
-    "id": 24,
-    "action": "rate-limit",
-    "action_value": "10k" 
-}
-```
-### DELETE
-
-URL: `/api/thenactions/<thenaction-id>/`
-
-Example:
-```
-curl -X DELETE https://fod.example.com/api/thenactions/24/ -H "Authorization: Token <your-token>"
-
-RESPONSE:
-NO CONTENT
 ```
 
 ## Route
@@ -145,29 +77,33 @@ curl -X GET https://fod.example.com/api/routes/ -H "Authorization: Token <your-t
 RESPONSE:
 [
   {
-    "name": "nonadmin_safts_4T0ABD",
-    "id": 1,
-    "comments": "testing rule myman",
-    "applier": "admin",
-    "source": "62.217.45.76/32",
-    "sourceport": [],
-    "destination": "62.217.45.88/32",
-    "destinationport": [],
-    "port": [],
-    "dscp": [],
-    "fragmenttype": [],
-    "icmpcode": "",
-    "packetlength": null,
-    "protocol": [],
-    "tcpflag": "",
-    "then": [],
-    "filed": "2017-03-28T14:51:33Z",
-    "last_updated": "2017-03-28T14:51:33Z",
-    "status": "INACTIVE",
-    "expires": "2017-04-04",
-    "response": "Successfully committed",
-    "requesters_address": "83.212.9.94"
-  },
+        "applier": "admin",
+        "comments": "test comment",
+        "destination": "1.0.0.4/32",
+        "destinationport": "124",
+        "dscp": [],
+        "expires": "2021-04-15",
+        "filed": "2021-03-17T13:39:04.244120Z",
+        "fragmenttype": [],
+        "icmpcode": null,
+        "id": 62,
+        "last_updated": "2021-03-17T13:39:04.244151Z",
+        "name": "test_66ML9G",
+        "packetlength": null,
+        "port": null,
+        "protocol": [
+            "udp"
+        ],
+        "requesters_address": null,
+        "response": null,
+        "source": "0.0.0.0/0",
+        "sourceport": "123",
+        "status": "PENDING",
+        "tcpflag": null,
+        "then": [
+            "discard"
+        ]
+    }
    ...
 ]
 ```
@@ -184,28 +120,32 @@ curl -X GET https://fod.example.com/api/routes/1/ -H "Authorization: Token <your
 
 RESPONSE:
 {
-    "name": "nonadmin_safts_4T0ABD",
-    "id": 1,
-    "comments": "testing rule myman",
     "applier": "admin",
-    "source": "62.217.45.76/32",
-    "sourceport": [],
-    "destination": "62.217.45.88/32",
-    "destinationport": [],
-    "port": [],
+    "comments": "test comment",
+    "destination": "1.0.0.4/32",
+    "destinationport": "124",
     "dscp": [],
+    "expires": "2021-04-15",
+    "filed": "2021-03-17T13:39:04.244120Z",
     "fragmenttype": [],
-    "icmpcode": "",
+    "icmpcode": null,
+    "id": 62,
+    "last_updated": "2021-03-17T13:39:04.244151Z",
+    "name": "test_66ML9G",
     "packetlength": null,
-    "protocol": [],
-    "tcpflag": "",
-    "then": [],
-    "filed": "2017-03-28T14:51:33Z",
-    "last_updated": "2017-03-28T14:51:33Z",
-    "status": "INACTIVE",
-    "expires": "2017-04-04",
-    "response": "Successfully committed",
-    "requesters_address": "83.212.9.94"
+    "port": null,
+    "protocol": [
+        "udp"
+    ],
+    "requesters_address": null,
+    "response": null,
+    "source": "0.0.0.0/0",
+    "sourceport": "123",
+    "status": "PENDING",
+    "tcpflag": null,
+    "then": [
+        "discard"
+    ]
 }
 ```
 
@@ -222,32 +162,52 @@ The response will contain all the additional fields
 
 URL: `/api/routes/`
 
-Example:
+Example input data file `newroute.json`:
+
 ```
-curl -X POST https://fod.example.com/api/routes/ -F "source=62.217.45.75/32" -F "destination=62.217.45.91/32" -F "name=testroute" -F "comments=Route for testing" -H "Authorization: Token <your-token>"
+{
+    "comments": "test comment",
+    "destination": "1.0.0.4/32",
+    "destinationport": "124",
+    "name": "test",
+    "protocol": [
+        "udp"
+    ],
+    "source": "0.0.0.0/0",
+    "sourceport": "123",
+    "then": ["discard"]
+}
+```
+
+```
+curl -X POST --data-binary @newroute.json  -H "Content-Type: application/json" -H "Authorization: Token <your-token>" https://fod.example.com/api/routes/
 
 RESPONSE:
 {
-    "name": "testroute_ODUI3E",
-    "id": 3,
-    "comments": "Route for testing",
+    "name": "test_OLLFTU",
+    "id": 63,
+    "comments": "test comment",
     "applier": "admin",
-    "source": "62.217.45.76/32",
-    "sourceport": [],
-    "destination": "62.217.45.90/32",
-    "destinationport": [],
-    "port": [],
+    "source": "0.0.0.0/0",
+    "sourceport": "123",
+    "destination": "1.0.0.4/32",
+    "destinationport": "124",
+    "port": null,
     "dscp": [],
     "fragmenttype": [],
     "icmpcode": null,
     "packetlength": null,
-    "protocol": [],
+    "protocol": [
+        "udp"
+    ],
     "tcpflag": null,
-    "then": [],
-    "filed": "2017-03-29T13:56:45.860Z",
-    "last_updated": "2017-03-29T13:56:45.860Z",
+    "then": [
+        "discard"
+    ],
+    "filed": "2021-04-14T12:11:58.352094Z",
+    "last_updated": "2021-04-14T12:11:58.352141Z",
     "status": "PENDING",
-    "expires": "2017-04-05",
+    "expires": "2021-05-13",
     "response": null,
     "requesters_address": null
 }

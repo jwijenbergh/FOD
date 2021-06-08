@@ -303,7 +303,8 @@ def poll_snmp_statistics():
           queryset = Route.objects.all()
           for ruleobj in queryset:
             rule_id = str(ruleobj.id)
-            rule_status = str(ruleobj.status)
+            rule_status = str(ruleobj.status).upper()
+            logger.info("snmpstats: STATISTICS_PER_RULE rule_id="+str(rule_id)+" rule_status="+str(rule_status))
             #rule_last_updated = str(ruleobj.last_updated) # e.g. 2018-06-21 08:03:21+00:00
             #rule_last_updated = datetime.strptime(str(ruleobj.last_updated), '%Y-%m-%d %H:%M:%S+00:00') # TODO TZ offset assumed to be 00:00
             rule_last_updated = helper_rule_ts_parse(str(ruleobj.last_updated))
@@ -349,7 +350,7 @@ def poll_snmp_statistics():
                     last_value = rec[0]
                     last_is_null = last_value==None or last_value['value'] == null_measurement
                     if last_value==None:
-                      rule_newer_than_last = true
+                      rule_newer_than_last = True
                     else:
                       last_ts = helper_stats_store_parse_ts(last_value['ts'])
                       rule_newer_than_last = last_ts==None or rule_last_updated > last_ts

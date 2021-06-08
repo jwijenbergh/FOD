@@ -20,6 +20,43 @@ formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+class ThenActionSerializer(serializers.Serializer):
+    class Meta:
+        model = Route
+        fields = ('id', 'action', 'action_value')
+        read_only_fields = ('id')
+
+    def to_representation(self, obj):
+        if obj.action_value:
+            return f"{obj.action}:{obj.action_value}"
+        return obj.action
+
+    def to_internal_value(self, data):
+        action_desc = str(data).split(":")
+        action = action_desc[0]
+        action_value = action_desc[1] if len(action_desc) > 1 else "" 
+        try:
+            return ThenAction.objects.get(action=action, action_value=action_value)
+        except ThenAction.DoesNotExist:
+            try:
+                return ThenAction.objects.get(id=int(action))
+            except ThenAction.DoesNotExist:
+                raise serializers.ValidationError('ThenAction does not exist.')
+
+class MatchProtocolSerializer(serializers.Serializer):
+    def to_representation(self, obj):
+        return obj.protocol
+
+    def to_internal_value(self, data):
+        try:
+            protocol = data
+            return MatchProtocol.objects.get(protocol=protocol)
+        except MatchProtocol.DoesNotExist:
+            try:
+                return MatchProtocol.objects.get(id=data)
+            except MatchProtocol.DoesNotExist:
+                raise serializers.ValidationError('MatchProtocol does not exist.')
+
 class RouteSerializer(serializers.HyperlinkedModelSerializer):
     """
     A serializer for `Route` objects
@@ -31,7 +68,12 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
             u = self.context.get('request').user
             logger.info("Adding applier according to authentized user %s" % u.username)
             validated_data["applier"] = u
-        return super().create(validated_data)
+        protocol = validated_data.pop('protocol')
+        then = validated_data.pop('then')
+        route = Route.objects.create(**validated_data)
+        route.protocol.set(protocol)
+        route.then.set(then)
+        return route
 
     def validate_applier(self, attrs, source):
         user = self.context.get('request').user
@@ -75,6 +117,20 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
         #return attrs
         return res
 
+    def update(self, instance, validated_data):
+        if 'name' in validated_data:
+            del validated_data["name"]	
+        protocol = validated_data.pop('protocol', None)
+        if protocol:
+            instance.protocol.set(protocol)
+        then = validated_data.pop('then', None)
+        if then:
+            instance.then.set(then)
+        instance =  super().update(instance, validated_data)
+        return instance
+
+    then = ThenActionSerializer(many=True)
+    protocol = MatchProtocolSerializer(many=True)
     class Meta:
         model = Route
         fields = (
@@ -93,27 +149,11 @@ class PortSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'port', )
         read_only_fields = ('id', )
 
-
-class ThenActionSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = ThenAction
-        fields = ('id', 'action', 'action_value')
-        read_only_fields = ('id', )
-
-
 class FragmentTypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = FragmentType
         fields = ('id', 'fragmenttype', )
         read_only_fields = ('id', )
-
-
-class MatchProtocolSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = MatchProtocol
-        fields = ('id', 'protocol', )
-        read_only_fields = ('id', )
-
 
 class MatchDscpSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

@@ -165,7 +165,11 @@ def get_range(addr_range):
         if elements == ['0', '0', '0', '0']:
             addr_range = '0'
             if mask is not False:
+                if mask != "0":
+                  addr_range = '0.0.0.0'
                 addr_range += '/%s' % mask
+            else:
+                addr_range = '0'
         elif elements[1:] == ['0', '0', '0']:
             addr_range = '.'.join(elements[:2])
             if mask is not False:

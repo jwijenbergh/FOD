@@ -9,7 +9,6 @@ from flowspec import views as flowspec_views
 from accounts import views as accounts_views
 from flowspec.viewsets import (
     RouteViewSet,
-    PortViewSet,
     ThenActionViewSet,
     FragmentTypeViewSet,
     MatchProtocolViewSet,
@@ -23,9 +22,8 @@ admin.autodiscover()
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'routes', RouteViewSet, basename='route')
-router.register(r'ports', PortViewSet)
 router.register(r'thenactions', ThenActionViewSet)
-router.register(r'fragmentypes', FragmentTypeViewSet)
+router.register(r'fragmenttypes', FragmentTypeViewSet)
 router.register(r'matchprotocol', MatchProtocolViewSet)
 router.register(r'matchdscp', MatchDscpViewSet)
 router.register(r'stats/routes', StatsRoutesViewSet, basename='statsroute')
