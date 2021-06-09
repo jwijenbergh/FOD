@@ -1,7 +1,15 @@
+
 /bin/
 
 *.url
 *.pwd
 *.user
 
+*.url*
+*.pwd*
+*.user*
+
+/target/
+
+.classpath
 
