@@ -160,7 +160,7 @@ updateclass-%:
 	echo "FOD_IP=$(FOD_IP)" 1>&2
 	make chg_src_login_url0 LOGIN_URL1='http:\/\/$(FOD_IP):$(FOD_PORT)' LOGIN_USER1='$(FOD_USER)' LOGIN_PWD1='$(FOD_PWD)' CLASS1="$*"
 
-CLASSES0:=$(wildcard src/Tests/*.java)
+CLASSES0:=$(wildcard $(TEST_DIR)/*.java)
 CLASSES_update_list:=$(patsubst src/Tests/%.java,updateclass-%,$(CLASSES0))
 
 
