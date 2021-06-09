@@ -46,6 +46,7 @@ public class SetupTest {
 				} catch (IOException ex) {
 				    // Cxception handling
 				}
+                                throw(e);
 			}
 	}
 	
@@ -75,6 +76,7 @@ public class SetupTest {
 					} catch (IOException ex) {
 					    // Cxception handling
 					}
+                                        throw(e);
 				}
 		}
 		
@@ -104,6 +106,7 @@ public class SetupTest {
 						} catch (IOException ex) {
 						    // Cxception handling
 						}
+                                                throw(e);
 					}
 			}
 			
@@ -133,6 +136,7 @@ public class SetupTest {
 						} catch (IOException ex) {
 						    // Cxception handling
 						}
+                                                throw(e);
 					}
 			}
 			
@@ -162,6 +166,7 @@ public class SetupTest {
 						} catch (IOException ex) {
 						    // Cxception handling
 						}
+                                                throw(e);
 					}
 			}
 			
@@ -191,6 +196,7 @@ public class SetupTest {
 						} catch (IOException ex) {
 						    // Cxception handling
 						}
+                                                throw(e);
 					}
 			}
 			
@@ -220,6 +226,7 @@ public class SetupTest {
 						} catch (IOException ex) {
 						    // Cxception handling
 						}
+                                                throw(e);
 					}
 			}
 			
@@ -249,6 +256,7 @@ public class SetupTest {
 						} catch (IOException ex) {
 						    // Cxception handling
 						}
+                                                throw(e);
 					}
 			}
 			
@@ -278,6 +286,7 @@ public class SetupTest {
 						} catch (IOException ex) {
 						    // Cxception handling
 						}
+                                                throw(e);
 					}
 			}
 			
@@ -307,6 +316,7 @@ public class SetupTest {
 						} catch (IOException ex) {
 						    // Cxception handling
 						}
+                                                throw(e);
 					}
 			}
 			
@@ -336,6 +346,7 @@ public class SetupTest {
 						} catch (IOException ex) {
 						    // Cxception handling
 						}
+                                                throw(e);
 					}
 			}
 			
@@ -365,6 +376,7 @@ public class SetupTest {
 						} catch (IOException ex) {
 						    // Cxception handling
 						}
+                                                throw(e);
 					}
 			}
 			
@@ -398,6 +410,7 @@ public class SetupTest {
 						} catch (IOException ex) {
 						    // Cxception handling
 						}
+                                                throw(e);
 					}
 			}
 

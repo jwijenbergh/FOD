@@ -48,6 +48,7 @@ public class AddRuleTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 	
@@ -81,6 +82,7 @@ public class AddRuleTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 	
@@ -114,6 +116,7 @@ public class AddRuleTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 	
@@ -147,6 +150,7 @@ public class AddRuleTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 	
@@ -183,6 +187,7 @@ public class AddRuleTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 	
@@ -219,6 +224,7 @@ public class AddRuleTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 	
@@ -255,6 +261,7 @@ public class AddRuleTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 	
@@ -291,6 +298,7 @@ public class AddRuleTest {
 			} catch (IOException ex) {
 			    // Cxception handling
 			}
+                        throw(e);
 		}
 	}
 	
