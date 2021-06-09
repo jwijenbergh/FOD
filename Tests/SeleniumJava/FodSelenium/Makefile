@@ -128,8 +128,8 @@ chg_src_login_url0:
 chg_src_login_url1: chg_src_login_url0
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
-java_file_list=$(wildcard src/Tests/*.java)
-url_file_list=$(wildcard src/Tests/*.url)
+java_file_list=$(wildcard $(TEST_DIR)/*.java)
+url_file_list=$(wildcard $(TEST_DIR)/*.url)
 
 #./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar: src/Tests/Login.url $(url_file_list) $(java_file_list)
 ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar: $(java_file_list)
@@ -161,7 +161,7 @@ updateclass-%:
 	make chg_src_login_url0 LOGIN_URL1='http:\/\/$(FOD_IP):$(FOD_PORT)' LOGIN_USER1='$(FOD_USER)' LOGIN_PWD1='$(FOD_PWD)' CLASS1="$*"
 
 CLASSES0:=$(wildcard $(TEST_DIR)/*.java)
-CLASSES_update_list:=$(patsubst src/Tests/%.java,updateclass-%,$(CLASSES0))
+CLASSES_update_list:=$(patsubst $(TEST_DIR)/%.java,updateclass-%,$(CLASSES0))
 
 
 updateclasses: $(CLASSES_update_list)
@@ -172,7 +172,7 @@ updateclasses: $(CLASSES_update_list)
 
 # use mvn for running all tests
 runtest1: ensurechromedriver ensuretestuser1 updateclasses
-	#make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='admin2' LOGIN_PWD1='adminpwd1' CLASS1="$(CLASS1)"
+	#make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='XXXX' LOGIN_PWD1='YYYYYY' CLASS1="$(CLASS1)"
 	#make updateclass-LoginTest
 	echo "FOD_IP=$(FOD_IP)" 1>&2
 	chown -R test1 .
