@@ -156,17 +156,27 @@ run1: ensurechromedriver ensuretestuser1
 	sudo -u test1 env DISPLAY=:0 java -cp ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar "Tests.$(CLASS1)"
 
 
+updateclasssrc-%:
+	echo "FOD_IP=$(FOD_IP) FOD_PORT=$(FOD_PORT) FOD_USER=$(FOD_USER) FOD_PWD=$(FOD_PWD)" 1>&2
+	make chg_src_login_url0 LOGIN_URL1='http:\/\/$(FOD_IP):$(FOD_PORT)' LOGIN_USER1='$(FOD_USER)' LOGIN_PWD1='$(FOD_PWD)' CLASS1="$*"
+
 updateclass-%:
-	echo "FOD_IP=$(FOD_IP)" 1>&2
+	echo "FOD_IP=$(FOD_IP) FOD_PORT=$(FOD_PORT) FOD_USER=$(FOD_USER) FOD_PWD=$(FOD_PWD)" 1>&2
 	make chg_src_login_url0 LOGIN_URL1='http:\/\/$(FOD_IP):$(FOD_PORT)' LOGIN_USER1='$(FOD_USER)' LOGIN_PWD1='$(FOD_PWD)' CLASS1="$*"
 
 CLASSES0:=$(wildcard $(TEST_DIR)/*.java)
+CLASSES_update_src_list:=$(patsubst $(TEST_DIR)/%.java,updateclasssrc-%,$(CLASSES0))
 CLASSES_update_list:=$(patsubst $(TEST_DIR)/%.java,updateclass-%,$(CLASSES0))
 
+updateclasssrces: $(CLASSES_update_src_list)
+	echo CLASSES0=$(CLASSES0) 1>&2
+	echo CLASSES_update_src_list=$(CLASSES_update_src_list) 1>&2
+	#make $(CLASSES_update_src_list)
+	#make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
 updateclasses: $(CLASSES_update_list)
-	echo $(CLASSES0) 1>&2
-	echo $(CLASSES_update_list) 1>&2
+	echo CLASSES0=$(CLASSES0) 1>&2
+	echo CLASSES_update_list=$(CLASSES_update_list) 1>&2
 	make $(CLASSES_update_list)
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
