@@ -13,3 +13,7 @@
 
 .classpath
 
+.\\driver\\chromedriver.exe
+.\\logs\\log.txt
+.settings/org.eclipse.m2e.core.prefs
+
