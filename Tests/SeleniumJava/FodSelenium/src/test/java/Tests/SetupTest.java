@@ -20,7 +20,7 @@ public class SetupTest {
     
         static String url;
         
-        static ConfigFileReader configFileReader;
+        static ConfigFileReader configFileReader = new ConfigFileReader();
 
 	@Test
 	//public static void OnlyPassword(WebDriver driver, String url) 
@@ -419,7 +419,7 @@ public class SetupTest {
 
 	@BeforeClass	
 	static void testSetUp() {
-		configFileReader= new ConfigFileReader();
+
 		//setting the driver executable
 		System.setProperty("webdriver.chrome.driver", configFileReader.getDriverPath());
 		

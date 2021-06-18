@@ -19,7 +19,7 @@ public class LogoutTest {
    
         static WebDriver driver;
         
-        static ConfigFileReader configFileReader;
+        static ConfigFileReader configFileReader = new ConfigFileReader();
 
 	@Test
 	//public static void SuccessLogout(WebDriver driver, String url) {
@@ -50,7 +50,7 @@ public class LogoutTest {
 	
         @BeforeClass
 	static public void testSetUp() {
-        	configFileReader= new ConfigFileReader();
+        
     		//setting the driver executable
     		System.setProperty("webdriver.chrome.driver", configFileReader.getDriverPath());
 		

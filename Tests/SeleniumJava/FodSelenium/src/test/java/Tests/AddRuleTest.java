@@ -19,7 +19,7 @@ public class AddRuleTest {
 
         static String url;
         
-        static ConfigFileReader configFileReader;
+        static ConfigFileReader configFileReader = new ConfigFileReader();
 
 	@Test
 	//public static void AddName(WebDriver driver, String url) 
@@ -307,7 +307,6 @@ public class AddRuleTest {
         @BeforeClass 
         static void testSetUp() {
 
-        	configFileReader= new ConfigFileReader();
     		//setting the driver executable
     		System.setProperty("webdriver.chrome.driver", configFileReader.getDriverPath());
 		

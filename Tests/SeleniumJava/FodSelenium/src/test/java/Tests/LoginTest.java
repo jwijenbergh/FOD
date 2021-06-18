@@ -22,7 +22,7 @@ public class LoginTest {
   
         static WebDriver driver;
         
-        static ConfigFileReader configFileReader;
+        static ConfigFileReader configFileReader = new ConfigFileReader();
 
 	@Test
 	//public static void SuccessLogin(WebDriver driver, String url) 
@@ -31,9 +31,9 @@ public class LoginTest {
 		try {
 		driver.get(url);
 		driver.findElement(By.id("id_username")).click();
-		driver.findElement(By.id("id_username")).sendKeys("admin2");
+		driver.findElement(By.id("id_username")).sendKeys(configFileReader.getUserLogin());
 		driver.findElement(By.id("id_password")).click();
-		driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+		driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
 		driver.findElement(By.id("applybutton")).click();
 		driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
 		}
@@ -54,9 +54,9 @@ public class LoginTest {
 		try {
 			driver.get(url);
 			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
+			driver.findElement(By.id("id_username")).sendKeys("");
 			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+			driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
 			driver.findElement(By.id("applybutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'This field is required.')]"));
 		}
@@ -77,9 +77,9 @@ public class LoginTest {
 		try {
 			driver.get(url);
 			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
+			driver.findElement(By.id("id_username")).sendKeys("");
 			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+			driver.findElement(By.id("id_password")).sendKeys("");
 			driver.findElement(By.id("applybutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'This field is required.')]"));
 		}
@@ -100,9 +100,9 @@ public class LoginTest {
 		try {
 			driver.get(url);
 			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
+			driver.findElement(By.id("id_username")).sendKeys(configFileReader.getUserLogin());
 			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+			driver.findElement(By.id("id_password")).sendKeys("");
 			driver.findElement(By.id("applybutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'This field is required.')]"));
 		}
@@ -123,9 +123,9 @@ public class LoginTest {
 		try {
 			driver.get(url);
 			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
+			driver.findElement(By.id("id_username")).sendKeys("wronglogin");
 			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+			driver.findElement(By.id("id_password")).sendKeys("wrongpassword");
 			driver.findElement(By.id("applybutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'Please enter a correct username and password. Note that both fields are case-sensitive.')]"));
 		}
@@ -142,7 +142,7 @@ public class LoginTest {
 
         @BeforeClass
 	public static void testSetUp() {
-        	configFileReader= new ConfigFileReader();
+        	
 		//setting the driver executable
 		System.setProperty("webdriver.chrome.driver", configFileReader.getDriverPath());
 		

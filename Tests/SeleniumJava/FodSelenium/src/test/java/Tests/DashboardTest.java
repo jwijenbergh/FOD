@@ -18,13 +18,13 @@ public class DashboardTest {
      
         static String url;	
         
-        static ConfigFileReader configFileReader;
+        static ConfigFileReader configFileReader= new ConfigFileReader();
 	
 	//TODO: test cases
 	
       @BeforeClass
       static void testSetUp() {
-    	  configFileReader= new ConfigFileReader();
+    	  
   		//setting the driver executable
   		System.setProperty("webdriver.chrome.driver", configFileReader.getDriverPath());
 		
