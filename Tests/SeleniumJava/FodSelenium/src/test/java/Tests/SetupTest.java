@@ -441,8 +441,6 @@ public class SetupTest {
 
                 testSetUp();
 
-		
-		//OnlyPassword(driver, url);
 		OnlyPassword();
 	
 			

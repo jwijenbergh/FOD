@@ -328,28 +328,28 @@ public class AddRuleTest {
  
                 testSetUp();
 		
-		//AddName(driver, url);
+
 		AddName();
 
-		//AddWrongName(driver, url);
+
 		AddWrongName();
 
-		//AddWrongSourceAddress(driver, url);
+
 		AddWrongSourceAddress();
 
-		//AddWrongDestinationAddress(driver, url);
+
 		AddWrongDestinationAddress();
 
-		//AddWithOutExpires(driver, url);
+
 		AddWithOutExpires();
 
-		//AddWrongSrcPort(driver, url);
+
 		AddWrongSrcPort();
 
-		//AddWrongDestPort(driver, url);
+
 		AddWrongDestPort();
 
-		//AddWrongPort(driver, url);
+
 		AddWrongPort();
 
 

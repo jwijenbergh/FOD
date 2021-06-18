@@ -162,21 +162,18 @@ public class LoginTest {
     
                 testSetUp();
 		
-		//String url = "http://172.17.0.2:8000/altlogin";
-		
-		//SuccessLogin(driver, url);
 		SuccessLogin();
 		
-		//LoginWithoutLogin(driver, url);
+
 		LoginWithoutLogin();
 		
-		//LoginWithoutData(driver, url);
+
 		LoginWithoutData();
 		
-		//LoginWithoutPassword(driver, url);
+
 		LoginWithoutPassword();
 		
-		//LoginWithWrongData(driver, url);
+
 		LoginWithWrongData();
 
                 testSetDown();
