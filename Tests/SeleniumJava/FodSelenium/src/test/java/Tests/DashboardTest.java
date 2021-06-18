@@ -3,7 +3,7 @@ package test.java.Tests;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-
+import dataProvider.ConfigFileReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -17,13 +17,16 @@ public class DashboardTest {
         static WebDriver driver;
      
         static String url;	
+        
+        static ConfigFileReader configFileReader;
 	
 	//TODO: test cases
 	
       @BeforeClass
       static void testSetUp() {
-		//setting the driver executable
-		System.setProperty("webdriver.chrome.driver", ".\\driver\\chromedriver.exe");
+    	  configFileReader= new ConfigFileReader();
+  		//setting the driver executable
+  		System.setProperty("webdriver.chrome.driver", configFileReader.getDriverPath());
 		
 		
 		ChromeOptions chromeOptions = new ChromeOptions();
@@ -38,7 +41,7 @@ public class DashboardTest {
 		//maximize window
 		driver.manage().window().maximize();
 		
-		url = "http://172.17.0.2:8000/altlogin";
+		url = configFileReader.getApplicationUrl() + "/altlogin";;;
         }
 	
       public static void main(String[] args) {

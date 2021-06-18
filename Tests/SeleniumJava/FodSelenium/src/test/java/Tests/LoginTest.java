@@ -4,6 +4,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import dataProvider.ConfigFileReader;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 //import org.openqa.selenium.firefox.FirefoxDriver;
@@ -19,6 +21,8 @@ public class LoginTest {
         static String url;
   
         static WebDriver driver;
+        
+        static ConfigFileReader configFileReader;
 
 	@Test
 	//public static void SuccessLogin(WebDriver driver, String url) 
@@ -138,8 +142,9 @@ public class LoginTest {
 
         @BeforeClass
 	public static void testSetUp() {
+        	configFileReader= new ConfigFileReader();
 		//setting the driver executable
-		System.setProperty("webdriver.chrome.driver", ".\\driver\\chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", configFileReader.getDriverPath());
 		
 		// declaration and instantiation of objects/variables
     	//System.setProperty("webdriver.gecko.driver",".\\driver\\geckodriver.exe");
@@ -155,7 +160,7 @@ public class LoginTest {
 		//maximize window
 		driver.manage().window().maximize();
 
-                url = "http://172.17.0.2:8000/altlogin";
+                url = configFileReader.getApplicationUrl() + "/altlogin";
          }
 	
           public static void main(String[] args) {
