@@ -145,22 +145,22 @@ def get_snmp_stats():
 
     return results
 
-def lock_history_file(wait=1):
+def lock_history_file(wait=1, reason=""):
     first=1
     success=0
     while first or wait:
       first=0
       try:
           os.mkdir(settings.SNMP_TEMP_FILE+".lock") # TODO use regular file than dir
-          logger.info("lock_history_file(): creating lock dir succeeded")
+          logger.info("lock_history_file(): creating lock dir succeeded (reason="+str(reason)+")")
           success=1
           return success
       except OSError as e:
-          logger.error("lock_history_file(): creating lock dir failed: OSError: "+str(e))
+          logger.error("lock_history_file(): creating lock dir failed (reason="+str(reason)+"): OSError ("+str(wait)+"): "+str(e))
           success=0
       except Exception as e:
           logger.error("lock_history_file(): lock already exists")
-          logger.error("lock_history_file(): creating lock dir failed: "+str(e))
+          logger.error("lock_history_file(): creating lock dir failed (reason="+str(reason)+"): ("+str(wait)+"): "+str(e))
           success=0
       if not success and wait:
         time.sleep(1)
@@ -180,6 +180,7 @@ def load_history():
     try:
         with open(settings.SNMP_TEMP_FILE, "r") as f:
             history = json.load(f)
+            f.close()
     except:
         logger.info("There is no file with SNMP historical data.")
         pass
@@ -190,6 +191,7 @@ def save_history(history, nowstr):
     tf = settings.SNMP_TEMP_FILE + "." + nowstr
     with open(tf, "w") as f:
       json.dump(history, f)
+      f.close()
     os.rename(tf, settings.SNMP_TEMP_FILE)
 
 def helper_stats_store_parse_ts(ts_string):
@@ -233,7 +235,7 @@ def poll_snmp_statistics():
       return False
 
     # lock history file access
-    success = lock_history_file(1)
+    success = lock_history_file(wait=1, reason="poll_snmp_statistics()")
     if not success: 
       logger.error("poll_snmp_statistics(): locking history file failed, aborting");
       return False
@@ -405,7 +407,7 @@ def add_initial_zero_value(rule_id, zero_or_null=True):
     nowstr = now.isoformat()
 
     # lock history file access
-    success = lock_history_file(1)
+    success = lock_history_file(wait=1, reason="add_initial_zero_value("+str(rule_id)+","+str(zero_or_null)+")")
     if not success: 
       logger.error("add_initial_zero_value(): locking history file failed, aborting");
       return False

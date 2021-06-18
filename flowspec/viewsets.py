@@ -35,23 +35,10 @@ class RouteViewSet(viewsets.ModelViewSet):
     serializer_class = RouteSerializer
 
     def get_queryset(self):
-        if settings.DEBUG:
-            if self.request.user.is_anonymous:
-                return Route.objects.all()
-            elif self.request.user.is_authenticated:
-                #return Route.objects.filter(applier=self.request.user)
-                return convert_container_to_queryset(self.get_users_routes_all(), Route)
-
-            else:
-                raise PermissionDenied('User is not Authenticated')
-
         if self.request.user.is_superuser:
             return Route.objects.all()
-        elif (self.request.user.is_authenticated and not
-              self.request.user.is_anonymous):
-            #return Route.objects.filter(applier=self.request.user)
+        else:
             return convert_container_to_queryset(self.get_users_routes_all(), Route)
-
 
     def get_users_routes_all(self):
         return global__get_users_routes_all(self.request.user)
