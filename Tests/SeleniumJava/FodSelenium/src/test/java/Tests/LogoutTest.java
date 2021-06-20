@@ -27,9 +27,9 @@ public class LogoutTest {
 		try {
 			driver.get(url);
 			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
+			driver.findElement(By.id("id_username")).sendKeys(configFileReader.getUserLogin());
 			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+			driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
 			driver.findElement(By.id("applybutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
 			driver.findElement(By.className("user_icon_id")).click();
