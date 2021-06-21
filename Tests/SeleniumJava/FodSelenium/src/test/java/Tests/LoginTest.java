@@ -1,8 +1,10 @@
-package Tests;
+package test.java.Tests;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import dataProvider.ConfigFileReader;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -19,6 +21,8 @@ public class LoginTest {
         static String url;
   
         static WebDriver driver;
+        
+        static ConfigFileReader configFileReader = new ConfigFileReader();
 
 	@Test
 	//public static void SuccessLogin(WebDriver driver, String url) 
@@ -27,9 +31,9 @@ public class LoginTest {
 		try {
 		driver.get(url);
 		driver.findElement(By.id("id_username")).click();
-		driver.findElement(By.id("id_username")).sendKeys("admin2");
+		driver.findElement(By.id("id_username")).sendKeys(configFileReader.getUserLogin());
 		driver.findElement(By.id("id_password")).click();
-		driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+		driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
 		driver.findElement(By.id("applybutton")).click();
 		driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
 		}
@@ -50,9 +54,9 @@ public class LoginTest {
 		try {
 			driver.get(url);
 			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
+			driver.findElement(By.id("id_username")).sendKeys("");
 			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+			driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
 			driver.findElement(By.id("applybutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'This field is required.')]"));
 		}
@@ -73,9 +77,9 @@ public class LoginTest {
 		try {
 			driver.get(url);
 			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
+			driver.findElement(By.id("id_username")).sendKeys("");
 			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+			driver.findElement(By.id("id_password")).sendKeys("");
 			driver.findElement(By.id("applybutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'This field is required.')]"));
 		}
@@ -96,9 +100,9 @@ public class LoginTest {
 		try {
 			driver.get(url);
 			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
+			driver.findElement(By.id("id_username")).sendKeys(configFileReader.getUserLogin());
 			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+			driver.findElement(By.id("id_password")).sendKeys("");
 			driver.findElement(By.id("applybutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'This field is required.')]"));
 		}
@@ -119,9 +123,9 @@ public class LoginTest {
 		try {
 			driver.get(url);
 			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
+			driver.findElement(By.id("id_username")).sendKeys("wronglogin");
 			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+			driver.findElement(By.id("id_password")).sendKeys("wrongpassword");
 			driver.findElement(By.id("applybutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'Please enter a correct username and password. Note that both fields are case-sensitive.')]"));
 		}
@@ -138,8 +142,9 @@ public class LoginTest {
 
         @BeforeClass
 	public static void testSetUp() {
+        	
 		//setting the driver executable
-		System.setProperty("webdriver.chrome.driver", ".\\driver\\chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", configFileReader.getDriverPath());
 		
 		// declaration and instantiation of objects/variables
     	//System.setProperty("webdriver.gecko.driver",".\\driver\\geckodriver.exe");
@@ -155,28 +160,25 @@ public class LoginTest {
 		//maximize window
 		driver.manage().window().maximize();
 
-                url = "http://172.17.0.2:8000/altlogin";
+                url = configFileReader.getApplicationUrl() + "/altlogin";
          }
 	
           public static void main(String[] args) {
     
                 testSetUp();
 		
-		//String url = "http://172.17.0.2:8000/altlogin";
-		
-		//SuccessLogin(driver, url);
 		SuccessLogin();
 		
-		//LoginWithoutLogin(driver, url);
+
 		LoginWithoutLogin();
 		
-		//LoginWithoutData(driver, url);
+
 		LoginWithoutData();
 		
-		//LoginWithoutPassword(driver, url);
+
 		LoginWithoutPassword();
 		
-		//LoginWithWrongData(driver, url);
+
 		LoginWithWrongData();
 
                 testSetDown();

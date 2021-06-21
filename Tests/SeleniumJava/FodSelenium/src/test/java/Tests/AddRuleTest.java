@@ -1,9 +1,9 @@
-package Tests;
+package test.java.Tests;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-
+import dataProvider.ConfigFileReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -18,18 +18,25 @@ public class AddRuleTest {
         static WebDriver driver;
 
         static String url;
+        
+        static ConfigFileReader configFileReader = new ConfigFileReader();
+        
+        public static void Login() 
+        {
+        	driver.get(url);
+			driver.findElement(By.id("id_username")).click();
+			driver.findElement(By.id("id_username")).sendKeys(configFileReader.getUserLogin());
+			driver.findElement(By.id("id_password")).click();
+			driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
+			driver.findElement(By.id("applybutton")).click();
+        }
 
 	@Test
 	//public static void AddName(WebDriver driver, String url) 
 	public static void AddName() 
         {
 		try {
-			driver.get(url);
-			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
-			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
-			driver.findElement(By.id("applybutton")).click();
+			Login();
 			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
 			driver.findElement(By.id("routebutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
@@ -57,12 +64,7 @@ public class AddRuleTest {
 	public static void AddWrongName() 
         {
 		try {
-			driver.get(url);
-			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
-			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
-			driver.findElement(By.id("applybutton")).click();
+			Login();
 			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
 			driver.findElement(By.id("routebutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
@@ -91,12 +93,7 @@ public class AddRuleTest {
 	public static void AddWrongSourceAddress() 
         {
 		try {
-			driver.get(url);
-			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
-			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
-			driver.findElement(By.id("applybutton")).click();
+			Login();
 			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
 			driver.findElement(By.id("routebutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
@@ -125,12 +122,7 @@ public class AddRuleTest {
 	public static void AddWrongDestinationAddress() 
         {
 		try {
-			driver.get(url);
-			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
-			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
-			driver.findElement(By.id("applybutton")).click();
+			Login();
 			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
 			driver.findElement(By.id("routebutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
@@ -159,12 +151,7 @@ public class AddRuleTest {
 	public static void AddWithOutExpires() 
         {
 		try {
-			driver.get(url);
-			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
-			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
-			driver.findElement(By.id("applybutton")).click();
+			Login();
 			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
 			driver.findElement(By.id("routebutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
@@ -196,12 +183,7 @@ public class AddRuleTest {
 	public static void AddWrongSrcPort() 
         {
 		try {
-			driver.get(url);
-			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
-			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
-			driver.findElement(By.id("applybutton")).click();
+			Login();
 			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
 			driver.findElement(By.id("routebutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
@@ -233,12 +215,7 @@ public class AddRuleTest {
 	public static void AddWrongDestPort() 
         {
 		try {
-			driver.get(url);
-			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
-			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
-			driver.findElement(By.id("applybutton")).click();
+			Login();
 			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
 			driver.findElement(By.id("routebutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
@@ -270,12 +247,7 @@ public class AddRuleTest {
 	public static void AddWrongPort() 
         {
 		try {
-			driver.get(url);
-			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys("admin2");
-			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
-			driver.findElement(By.id("applybutton")).click();
+			Login();
 			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
 			driver.findElement(By.id("routebutton")).click();
 			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
@@ -305,8 +277,8 @@ public class AddRuleTest {
         @BeforeClass 
         static void testSetUp() {
 
-		//setting the driver executable
-		System.setProperty("webdriver.chrome.driver", ".\\driver\\chromedriver.exe");
+    		//setting the driver executable
+    		System.setProperty("webdriver.chrome.driver", configFileReader.getDriverPath());
 		
 		
 		ChromeOptions chromeOptions = new ChromeOptions();
@@ -320,7 +292,7 @@ public class AddRuleTest {
 		//maximize window
 		driver.manage().window().maximize();
 		
-		url = "http://172.17.0.2:8000/altlogin";
+		url = configFileReader.getApplicationUrl() + "/altlogin";;
         }
 
 	
@@ -328,28 +300,28 @@ public class AddRuleTest {
  
                 testSetUp();
 		
-		//AddName(driver, url);
+
 		AddName();
 
-		//AddWrongName(driver, url);
+
 		AddWrongName();
 
-		//AddWrongSourceAddress(driver, url);
+
 		AddWrongSourceAddress();
 
-		//AddWrongDestinationAddress(driver, url);
+
 		AddWrongDestinationAddress();
 
-		//AddWithOutExpires(driver, url);
+
 		AddWithOutExpires();
 
-		//AddWrongSrcPort(driver, url);
+
 		AddWrongSrcPort();
 
-		//AddWrongDestPort(driver, url);
+
 		AddWrongDestPort();
 
-		//AddWrongPort(driver, url);
+
 		AddWrongPort();
 
 
