@@ -54,7 +54,7 @@ public class ConfigFileReader {
 		 }
 	 
 	 public String getUserPassword() {
-		 String password = properties.getProperty("login");
+		 String password = properties.getProperty("password");
 		 if(password != null) return password;
 		 else throw new RuntimeException("login not specified in the Configuration.properties file.");
 		 }
