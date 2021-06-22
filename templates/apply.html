@@ -193,7 +193,7 @@
             {% csrf_token %}
             {% load unescape %}
             {% if form.non_field_errors %}
-            <div class="form-group {% if form.non_field_errors %} has-error {% endif %}" style="color: #A94442;">
+            <div class="form-group {% if form.non_field_errors %} has-error {% endif %}" style="color: #A94442;" id="apply_rule_id">
             	{{ form.non_field_errors|unescape}}
             	</div>
             {% endif %}
@@ -203,7 +203,7 @@
         <label for="id_name" class="col-md-2 control-label"><b>{% trans "Name" %}</b></label>
         <div class="col-md-8">
             {% render_field form.name class+="form-control" placeholder="Eg. ntpattack. A unique identifier will be added as a suffix" %}
-            {% if form.name.errors %} <span class="help-block"> {{ form.name.errors|join:", " }} </span>
+            {% if form.name.errors %} <span class="help-block" id="name_error_id"> {{ form.name.errors|join:", " }} </span>
             {% endif %}
         </div>
         </div>
@@ -229,7 +229,7 @@
         		<label for="id_source" class="col-md-2 control-label"><b>{% trans "Source Address" %}</b></label>
 		        <div class="col-md-6">
 		            {% render_field form.source class+="form-control" placeholder=form.source.help_text %}
-		            {% if form.source.errors %} <span class="help-block"> {{ form.source.errors|join:", " }} </span>
+		            {% if form.source.errors %} <span class="help-block" id="source_error_id"> {{ form.source.errors|join:", " }} </span>
 		            {% endif %}
 		        </div>
 		        <div class="col-md-2">
@@ -241,7 +241,7 @@
         		<label for="id_destination" class="col-md-2 control-label"><b>{% trans "Destination Address" %}</b></label>
 		        <div class="col-md-6">
 		            {% render_field form.destination class+="form-control" placeholder=form.destination.help_text %}
-		            {% if form.destination.errors %} <span class="help-block"> {{ form.destination.errors|join:", " }} </span>
+		            {% if form.destination.errors %} <span class="help-block" id = "destination_error_id"> {{ form.destination.errors|join:", " }} </span>
 		            {% endif %}
 		        </div>
 		        <div class="col-md-2">
@@ -253,7 +253,7 @@
         		<label for="id_protocol" class="col-md-2 control-label" style="font-weight: normal;">{% trans "Protocol(s)" %}</label>
 		        <div class="col-md-8">
 		            {% render_field form.protocol class+="form-control" %}
-		            {% if form.protocol.errors %} <span class="help-block"> {{ form.protocol.errors|join:", " }} </span>
+		            {% if form.protocol.errors %} <span class="help-block" id="protocol_error_id"> {{ form.protocol.errors|join:", " }} </span>
 		            {% endif %}
 		        </div>
 		        </div>
@@ -262,7 +262,7 @@
         		<label for="id_fragmenttype" class="col-md-2 control-label" style="font-weight: normal;">{% trans "Fragment Type" %}</label>
 		        <div class="col-md-8">
 		            {% render_field form.fragmenttype class+="form-control" %}
-		            {% if form.fragmenttype.errors %} <span class="help-block"> {{ form.fragmenttype.errors|join:", " }} </span>
+		            {% if form.fragmenttype.errors %} <span class="help-block" id="fragmenttype_error_id"> {{ form.fragmenttype.errors|join:", " }} </span>
 		            {% endif %}
 		        </div>
 		        </div>
@@ -277,19 +277,19 @@
         		<label for="id_sourceport" class="col-md-2 control-label" style="font-weight: normal;">{% trans "Src. Port(s)" %}</label>
 		        <div class="col-md-2">
 		            {% render_field form.sourceport class+="form-control"  %}
-		            {% if form.sourceport.errors %} <span class="help-block"> {{ form.sourceport.errors|join:", " }} </span>
+		            {% if form.sourceport.errors %} <span class="help-block" id="sourceport_error_id"> {{ form.sourceport.errors|join:", " }} </span>
 		            {% endif %}
 		        </div>
 				<label for="id_destinationport" class="col-md-1 control-label" style="font-weight: normal;">{% trans "Dest. Port(s)" %}</label>
 		        <div class="col-md-2">
 		            {% render_field form.destinationport class+="form-control"  %}
-		            {% if form.destinationport.errors %} <span class="help-block"> {{ form.destinationport.errors|join:", " }} </span>
+		            {% if form.destinationport.errors %} <span class="help-block" id="destinationport_error_id"> {{ form.destinationport.errors|join:", " }} </span>
 		            {% endif %}
 		        </div>
 		        <label for="id_port" class="col-md-1 control-label" style="font-weight: normal;">{% trans "Port(s)" %}</label>
 		        <div class="col-md-2">
 		            {% render_field form.port class+="form-control"  %}
-		            {% if form.port.errors %} <span class="help-block"> {{ form.port.errors|join:", " }} </span>
+		            {% if form.port.errors %} <span class="help-block" id="port_error_id"> {{ form.port.errors|join:", " }} </span>
 		            {% endif %}
 		        </div>
 		        </div>
@@ -304,7 +304,7 @@
         		<label for="id_then" class="col-md-2 control-label">{% trans "Then Actions" %}</label>
 		        <div class="col-md-8">
 		            {% render_field form.then class+="form-control" %}
-		            {% if form.then.errors %} <span class="help-block"> {{ form.then.errors|join:", " }} </span>
+		            {% if form.then.errors %} <span class="help-block" id="then_error_id"> {{ form.then.errors|join:", " }} </span>
 		            {% endif %}
 		        </div>
 		        </div>
@@ -316,7 +316,7 @@
                   <label for="id_then" class="col-md-2 control-label">{% trans "Expires" %} <br>(YYYY-MM-DD)</label>
 		        <div class="col-md-8">
 		            {% render_field form.expires class+="form-control datepicker" data-date-format="yyyy-mm-dd"  %}
-		            {% if form.expires.errors %} <span class="help-block"> {{ form.expires.errors|join:", " }} </span>
+		            {% if form.expires.errors %} <span class="help-block" id="expires_error_id"> {{ form.expires.errors|join:", " }} </span>
 		            {% endif %}
 		        </div>
 		        </div>
@@ -330,7 +330,7 @@
         		<label for="id_comments" class="col-md-2 control-label">{% trans "Comments" %}</label>
 		        <div class="col-md-8">
 		            {% render_field form.comments class+="form-control" placeholder="Give a short description of the intended use of this rule, that justifies the parameter selection above. Feel free to include any additional comments." %}
-		            {% if form.comments.errors %} <span class="help-block"> {{ form.comments.errors|join:", " }} </span>
+		            {% if form.comments.errors %} <span class="help-block" id="comment_error_id"> {{ form.comments.errors|join:", " }} </span>
 		            {% endif %}
 		        </div>
 		        </div>
