@@ -165,6 +165,16 @@
     color: #f0ad4e;
 }
 
+.btn-success.btn-outline:not(.active) {
+    color: #5cb85c;
+}
+.btn-info.btn-outline:not(.active) {
+    color: #5bc0de;
+}
+.btn-warning.btn-outline:not(.active) {
+    color: #f0ad4e;
+}
+
 .btn-danger.btn-outline {
     color: #d9534f;
 }
