@@ -16,7 +16,7 @@
 {% csrf_token %}
     <div class="row">
         <div class="col-md-12">
-            <h1 id="myrulesheader" class="page-header">{% trans "My rules" %} </h1>
+            <h1 class="page-header">{% trans "My rules" %} </h1>
         </div>
         <!-- /.col-lg-12 -->
     </div>
@@ -94,11 +94,11 @@
 {% endif %}
 
 <script type="text/javascript">
-var filterbtns = '<div class="btn-group col-centered" data-toggle="buttons">\
-    <button type="button" class="btn btn-outline btn-sm btn-success" name="status_filter" value="ACTIVE" id="show_active">ACTIVE</button>\
-    <button type="button" class="btn btn-outline btn-sm btn-info" name="status_filter" value="PENDING" id="show_pending">PENDING</button>\
-    <button type="button" class="btn btn-outline btn-sm btn-warning" name="status_filter" value="ERROR" id="show_error">ERROR</button>\
-    <button type="button" class="btn btn-outline btn-sm btn-default" name="status_filter" value="DEACTIVATED" id="show_deactivated">DEACTIVATED</button>\
+var filterbtns = '<div class="btn-group col-centered">\
+    <a type="button" class="btn btn-outline btn-sm btn-success" name="status_filter" value="ACTIVE" id="show_active">ACTIVE</a>\
+    <a type="button" class="btn btn-outline btn-sm btn-info" name="status_filter" value="PENDING" id="show_pending">PENDING</a>\
+    <a type="button" class="btn btn-outline btn-sm btn-warning" name="status_filter" value="ERROR" id="show_error">ERROR</a>\
+    <a type="button" class="btn btn-outline btn-sm btn-default" name="status_filter" value="DEACTIVATED" id="show_deactivated">DEACTIVATED</a>\
     </div>';
 
 
@@ -357,13 +357,13 @@ $('#filterplaceholder').html(filterbtns);
 
 
 
-    $('body').on('click', 'button[name="status_filter"]', function(){
+    $('body').on('click', 'a[name="status_filter"]', function(){
     	var reg_exp = '';
         var checkboxs = document.getElementsByName('status_filter');
         $(this).button('toggle');
         for (var i = 0, inp; inp = checkboxs[i]; i++) {
             if (inp.type.toLowerCase() == 'button' && $(inp).hasClass('active')) {
-                reg_exp = reg_exp + inp.value + '|';
+                reg_exp = reg_exp + inp.text + '|';
             }
         }
         //passing an empty string will result in no filter
