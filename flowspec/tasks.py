@@ -54,7 +54,8 @@ def add(routepk, callback=None):
         commit, response = applier.apply()
         if commit:
             status = "ACTIVE"
-            snmp_add_initial_zero_value.delay(str(route.id), True)
+            #snmp_add_initial_zero_value.delay(str(route.id), True)
+            snmp_add_initial_zero_value(str(route.id), True)
         else:
             status = "ERROR"
         route.status = status
@@ -90,7 +91,8 @@ def edit(routepk, callback=None):
         if commit:
             status = "ACTIVE"
             try:
-              snmp_add_initial_zero_value.delay(str(route.id), True)
+              #snmp_add_initial_zero_value.delay(str(route.id), True)
+              snmp_add_initial_zero_value(str(route.id), True)
             except Exception as e:
               logger.error("edit(): route="+str(route)+", ACTIVE, add_initial_zero_value failed: "+str(e))
         else:
@@ -138,7 +140,8 @@ def delete(routepk, **kwargs):
                 status = 'EXPIRED'
                 reason_text = " Reason: %s " % status
             try:
-              snmp_add_initial_zero_value.delay(str(route.id), False)
+              #snmp_add_initial_zero_value.delay(str(route.id), False)
+              snmp_add_initial_zero_value(str(route.id), False)
             except Exception as e:
               logger.error("edit(): route="+str(route)+", INACTIVE, add_null_value failed: "+str(e))
         else:
@@ -360,32 +363,37 @@ def poll_snmp_statistics():
 def snmp_add_initial_zero_value(rule_id, zero_or_null=True):
     from flowspec import snmpstats
 
-    signal.signal(signal.SIGCHLD, handleSIGCHLD)
+    use_fork = False
 
-    pid = os.getpid()
-    logger.info("snmp_add_initial_zero_value(): before fork (pid="+str(pid)+")")
-    npid = os.fork()
-    if npid == -1:
-      pass
-    elif npid > 0:
-      logger.info("snmp_add_initial_zero_value(): returning in parent process (pid="+str(pid)+", npid="+str(npid)+")")
+    if not use_fork:
+      snmpstats.add_initial_zero_value(rule_id, zero_or_null)
     else:
-      logger.info("snmp_add_initial_zero_value(): in child process (pid="+str(pid)+", npid="+str(npid)+")")
+      signal.signal(signal.SIGCHLD, handleSIGCHLD)
 
-      try:
-        snmpstats.add_initial_zero_value(rule_id, zero_or_null)
-        logger.info("snmp_add_initial_zero_value(): rule_id="+str(rule_id)+" sucesss")
-      except Exception as e:
-        logger.error("snmp_add_initial_zero_value(): rule_id="+str(rule_id)+" failed: "+str(e))
+      pid = os.getpid()
+      logger.info("snmp_add_initial_zero_value(): before fork (pid="+str(pid)+" rule_id="+str(rule_id)+","+str(zero_or_null)+")")
+      npid = os.fork()
+      if npid == -1:
+        pass
+      elif npid > 0:
+        logger.info("snmp_add_initial_zero_value(): returning in parent process (pid="+str(pid)+", npid="+str(npid)+")")
+      else:
+        logger.info("snmp_add_initial_zero_value(): in child process (pid="+str(pid)+", npid="+str(npid)+")")
 
-      #exit_process()
-      logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+")")
-      exit()
-      logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+"), after exit")
-      sys.exit()
-      logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+"), after sys.exit")
-      os._exit()
-      logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+"), after os._exit")
+        try:
+          snmpstats.add_initial_zero_value(rule_id, zero_or_null)
+          logger.info("snmp_add_initial_zero_value(): rule_id="+str(rule_id)+","+str(zero_or_null)+" sucesss")
+        except Exception as e:
+          logger.error("snmp_add_initial_zero_value(): rule_id="+str(rule_id)+","+str(zero_or_null)+" failed: "+str(e))
+
+        #exit_process()
+        logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+")")
+        exit()
+        logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+"), after exit")
+        sys.exit()
+        logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+"), after sys.exit")
+        os._exit()
+        logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+"), after os._exit")
 
 
 @shared_task(ignore_result=True,default_retry_delay=5,max_retries=2,autoretry_for=(TimeoutError,))

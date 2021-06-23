@@ -180,8 +180,15 @@ updateclasses: $(CLASSES_update_list)
 	make $(CLASSES_update_list)
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
+updateconf:
+	sed -i  -r 's/^url=.*/url=http:\/\/$(FOD_IP):$(FOD_PORT)/' configs/Configuration.properties
+	sed -i  -r 's/^login=.*/login=$(FOD_USER)/' configs/Configuration.properties
+	sed -i  -r 's/^password=.*/password=$(FOD_PWD)/' configs/Configuration.properties
+
+updateclasses2: updateconf
+
 # use mvn for running all tests
-runtest1: ensurechromedriver ensuretestuser1 updateclasses
+runtest1: ensurechromedriver ensuretestuser1 updateclasses2
 	#make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='XXXX' LOGIN_PWD1='YYYYYY' CLASS1="$(CLASS1)"
 	#make updateclass-LoginTest
 	echo "FOD_IP=$(FOD_IP)" 1>&2
