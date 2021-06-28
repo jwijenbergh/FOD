@@ -89,6 +89,31 @@ public class AddRuleTest {
 	}
 	
 	@Test
+	//public static void AddWrongName(WebDriver driver, String url) 
+	public static void AddNoName() 
+        {
+		try {
+			Login();
+			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+			driver.findElement(By.id("routebutton")).click();
+			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
+			driver.findElement(By.id("id_name")).click();
+			driver.findElement(By.id("id_name")).sendKeys("");
+			driver.findElement(By.id("applybutton")).click();
+			driver.findElements(By.xpath("//span[@class = 'required']//..//..//label"));
+		}
+		catch(Exception e) {
+			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+			    fileWriter.write(e.getMessage());
+			    fileWriter.close();
+			} catch (IOException ex) {
+			    // Cxception handling
+			}
+                        throw(e);
+		}
+	}
+	
+	@Test
 	//public static void AddWrongSourceAddress(WebDriver driver, String url) 
 	public static void AddWrongSourceAddress() 
         {
