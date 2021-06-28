@@ -75,7 +75,8 @@ public class AddRuleTest {
 			driver.findElement(By.id("id_destination")).click();
 			driver.findElement(By.id("id_destination")).sendKeys("0.0.0.0/29");
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Enter a valid \'slug\' consisting of letters, numbers, underscores or hyphens.')]"));
+			driver.findElement(By.id("name_error_id"));
+			
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
@@ -129,7 +130,7 @@ public class AddRuleTest {
 			driver.findElement(By.id("id_destination")).click();
 			driver.findElement(By.id("id_destination")).sendKeys("0.0.0.0/29");
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Invalid network address format')]"));
+			driver.findElement(By.id("source_error_id"));
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
@@ -158,7 +159,7 @@ public class AddRuleTest {
 			driver.findElement(By.id("id_destination")).click();
 			driver.findElement(By.id("id_destination")).sendKeys("drgr");
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Invalid network address format')]"));
+			driver.findElement(By.id("destination_error_id"));
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
@@ -190,7 +191,7 @@ public class AddRuleTest {
 			driver.findElement(By.id("id_expires")).click();
 			driver.findElement(By.id("id_expires")).clear();
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'This field is required.')]"));
+			driver.findElement(By.id("expires_error_id"));
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
@@ -222,7 +223,7 @@ public class AddRuleTest {
 			driver.findElement(By.id("id_sourceport")).click();
 			driver.findElement(By.id("id_sourceport")).sendKeys("f//");
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Malformed port range format, example: 80,1000-1100,6000-6010')]"));
+			driver.findElement(By.id("sourceport_error_id"));
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
@@ -254,7 +255,7 @@ public class AddRuleTest {
 			driver.findElement(By.id("id_destinationport")).click();
 			driver.findElement(By.id("id_destinationport")).sendKeys("f//");
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Malformed port range format, example: 80,1000-1100,6000-6010')]"));
+			driver.findElement(By.id("destinationport_error_id"));
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
@@ -286,7 +287,7 @@ public class AddRuleTest {
 			driver.findElement(By.id("id_port")).click();
 			driver.findElement(By.id("id_port")).sendKeys("f//");
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Malformed port range format, example: 80,1000-1100,6000-6010')]"));
+			driver.findElement(By.id("port_error_id"));
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
