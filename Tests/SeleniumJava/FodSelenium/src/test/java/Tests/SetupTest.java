@@ -389,7 +389,7 @@ public class SetupTest {
 				try {
 					driver.get(url);
 					driver.findElement(By.id("id_password")).click();
-					driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+					driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
 					driver.findElement(By.id("id_netconf_device")).click();
 					driver.findElement(By.id("id_netconf_device")).sendKeys("1.0.0.0/8");
 					driver.findElement(By.id("id_netconf_port")).click();
