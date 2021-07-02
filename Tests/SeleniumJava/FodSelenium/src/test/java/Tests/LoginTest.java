@@ -35,7 +35,7 @@ public class LoginTest {
 		driver.findElement(By.id("id_password")).click();
 		driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
 		driver.findElement(By.id("applybutton")).click();
-		driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+		driver.findElement(By.id("myrulesheader"));
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {

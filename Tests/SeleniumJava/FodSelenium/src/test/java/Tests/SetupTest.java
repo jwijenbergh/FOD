@@ -403,7 +403,7 @@ public class SetupTest {
 					driver.findElement(By.id("applybutton")).click();
 					
 					//TODO: find how to check if main page
-					driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+					driver.findElement(By.id("myrulesheader"));
 					}
 					catch(Exception e) {
 						try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {

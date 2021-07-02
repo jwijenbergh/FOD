@@ -37,9 +37,9 @@ public class AddRuleTest {
         {
 		try {
 			Login();
-			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+			driver.findElement(By.id("myrulesheader"));
 			driver.findElement(By.id("routebutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
+			driver.findElement(By.id("apply_rule_header_id"));
 			driver.findElement(By.id("id_name")).click();
 			driver.findElement(By.id("id_name")).sendKeys("npattack");
 			driver.findElement(By.id("id_source")).click();
@@ -65,9 +65,9 @@ public class AddRuleTest {
         {
 		try {
 			Login();
-			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+			driver.findElement(By.id("myrulesheader"));
 			driver.findElement(By.id("routebutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
+			driver.findElement(By.id("apply_rule_header_id"));
 			driver.findElement(By.id("id_name")).click();
 			driver.findElement(By.id("id_name")).sendKeys("1' or '1' = '1 /*");
 			driver.findElement(By.id("id_source")).click();
@@ -95,9 +95,9 @@ public class AddRuleTest {
         {
 		try {
 			Login();
-			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+			driver.findElement(By.id("myrulesheader"));
 			driver.findElement(By.id("routebutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
+			driver.findElement(By.id("apply_rule_header_id"));
 			driver.findElement(By.id("id_name")).click();
 			driver.findElement(By.id("id_name")).sendKeys("");
 			driver.findElement(By.id("applybutton")).click();
@@ -120,9 +120,9 @@ public class AddRuleTest {
         {
 		try {
 			Login();
-			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+			driver.findElement(By.id("myrulesheader"));
 			driver.findElement(By.id("routebutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
+			driver.findElement(By.id("apply_rule_header_id"));
 			driver.findElement(By.id("id_name")).click();
 			driver.findElement(By.id("id_name")).sendKeys("npattack");
 			driver.findElement(By.id("id_source")).click();
@@ -149,9 +149,9 @@ public class AddRuleTest {
         {
 		try {
 			Login();
-			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+			driver.findElement(By.id("myrulesheader"));
 			driver.findElement(By.id("routebutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
+			driver.findElement(By.id("apply_rule_header_id"));
 			driver.findElement(By.id("id_name")).click();
 			driver.findElement(By.id("id_name")).sendKeys("npattack");
 			driver.findElement(By.id("id_source")).click();
@@ -178,9 +178,9 @@ public class AddRuleTest {
         {
 		try {
 			Login();
-			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+			driver.findElement(By.id("myrulesheader"));
 			driver.findElement(By.id("routebutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
+			driver.findElement(By.id("apply_rule_header_id"));
 			driver.findElement(By.id("id_name")).click();
 			driver.findElement(By.id("id_name")).sendKeys("npattack");
 			driver.findElement(By.id("id_source")).click();
@@ -210,9 +210,9 @@ public class AddRuleTest {
         {
 		try {
 			Login();
-			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+			driver.findElement(By.id("myrulesheader"));
 			driver.findElement(By.id("routebutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
+			driver.findElement(By.id("apply_rule_header_id"));
 			driver.findElement(By.id("id_name")).click();
 			driver.findElement(By.id("id_name")).sendKeys("npattack");
 			driver.findElement(By.id("id_source")).click();
@@ -242,9 +242,9 @@ public class AddRuleTest {
         {
 		try {
 			Login();
-			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+			driver.findElement(By.id("myrulesheader"));
 			driver.findElement(By.id("routebutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
+			driver.findElement(By.id("apply_rule_header_id"));
 			driver.findElement(By.id("id_name")).click();
 			driver.findElement(By.id("id_name")).sendKeys("npattack");
 			driver.findElement(By.id("id_source")).click();
@@ -274,9 +274,9 @@ public class AddRuleTest {
         {
 		try {
 			Login();
-			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+			driver.findElement(By.id("myrulesheader"));
 			driver.findElement(By.id("routebutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Apply for a new rule')]"));
+			driver.findElement(By.id("apply_rule_header_id"));
 			driver.findElement(By.id("id_name")).click();
 			driver.findElement(By.id("id_name")).sendKeys("npattack");
 			driver.findElement(By.id("id_source")).click();
