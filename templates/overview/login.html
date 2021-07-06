@@ -45,7 +45,7 @@
             {% csrf_token %}
             {% load unescape %}
             {% if form.non_field_errors %}
-            <div class="form-group {% if form.non_field_errors %} has-error {% endif %}" style="color: #A94442;">
+            <div class="form-group {% if form.non_field_errors %} has-error {% endif %}" id="login_error_id" style="color: #A94442;">
             	{{ form.non_field_errors|unescape}}
             	</div>
             {% endif %}

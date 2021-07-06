@@ -127,7 +127,7 @@ public class LoginTest {
 			driver.findElement(By.id("id_password")).click();
 			driver.findElement(By.id("id_password")).sendKeys("wrongpassword");
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'Please enter a correct username and password. Note that both fields are case-sensitive.')]"));
+			driver.findElement(By.id("login_error_id"));
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
