@@ -272,9 +272,11 @@ class StatsRoutesViewSet(viewsets.ViewSet):
     """
     permission_classes = (IsAuthenticated,)
     def retrieve(self, request, pk=None):
+        logger.info("StatsRoutesViewSet:::retrieve(): pk="+str(pk))
         queryset = Route.objects.all()
         from flowspec.views import routestats
-        route = get_object_or_404(queryset, name=pk)
+        route = get_object_or_404(queryset, id=pk)
+        logger.info("StatsRoutesViewSet:::retrieve(): route.name="+str(route.name))
         return routestats(request, route.name)
 
 #############################################################################
