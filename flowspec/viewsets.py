@@ -35,10 +35,24 @@ class RouteViewSet(viewsets.ModelViewSet):
     serializer_class = RouteSerializer
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return Route.objects.all()
-        else:
+        scope=""
+        try:
+          logger.debug("RouteViewSet::get_queryset(): param scope="+str(self.request.query_params['scope']))
+          scope=self.request.query_params['scope'] 
+        except: 
+          pass
+
+        if scope == "applier":
+            return convert_container_to_queryset(self.get_users_routes_by_applier_only(), Route)
+        elif scope == "peer":
+            return convert_container_to_queryset(self.get_users_routes_by_its_peers(), Route)
+        elif scope == "user":
             return convert_container_to_queryset(self.get_users_routes_all(), Route)
+
+        if self.request.user.is_superuser:
+            return Route.objects.all() # default for admin is all
+        else:
+            return convert_container_to_queryset(self.get_users_routes_all(), Route) #default for non-admin is "user"
 
     def get_users_routes_all(self):
         return global__get_users_routes_all(self.request.user)
