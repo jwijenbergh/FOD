@@ -191,7 +191,7 @@ public class AddRuleTest {
 			driver.findElement(By.id("id_expires")).click();
 			driver.findElement(By.id("id_expires")).clear();
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.id("expires_error_id"));
+			driver.findElement(By.xpath("//*[contains(text(), 'This field is required.')]"));
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
