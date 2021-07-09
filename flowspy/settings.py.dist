@@ -38,6 +38,9 @@ TEMPLATE_DEBUG = DEBUG
 
 ##
 
+import _version
+SW_VERSION = _version.VERSION
+
 here = lambda x: os.path.join(os.path.abspath(os.path.dirname(__file__)), x)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -67,7 +70,8 @@ DATABASES = {
 ##############################################################################
 # logging
 
-LOG_FILE_LOCATION = "/var/log/fod"
+#LOG_FILE_LOCATION = "/var/log/fod"
+LOG_FILE_LOCATION = "/srv/flowspy/log/"
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -194,7 +198,15 @@ MIDDLEWARE = (
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+#    'django.middleware.AutoLogout', 
 )
+
+# Auto logout delay in minutes
+#AUTO_LOGOUT_DELAY = 5 #equivalent to 5 minutes
+
+#SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+#SESSION_COOKIE_AGE = 5 * 60 #
+#SESSION_COOKIE_AGE = 30 #
 
 ROOT_URLCONF = 'flowspy.urls'
 WSGI_APPLICATION = 'flowspy.wsgi.application'
@@ -247,7 +259,6 @@ INSTALLED_APPS = (
 #GRAPHS_API_URL = 'graphs'
 GRAPHS_API_URL = 'http://127.0.0.1:8080/api/routes/'
 
-
 LOGIN_URL = '/welcome'
 
 # CACHES = {
@@ -274,9 +285,6 @@ TINYMCE_DEFAULT_CONFIG = {
     'plugins': "table,spellchecker,paste,searchreplace",
     'theme': "advanced",
 }
-
-import _version
-SW_VERSION = _version.VERSION
 
 # Django Rest Framework configuration.
 # You should leave this intact.
@@ -438,6 +446,8 @@ PROTECTED_SUBNETS = ['10.10.0.0/16']
 # Add two whois servers in order to be able to get all the subnets for an AS.
 PRIMARY_WHOIS = 'whois.example.com'
 ALTERNATE_WHOIS = 'whois.example.net'
+# results in exceptions:
+#ALTERNATE_WHOIS = 'whois.example.net'
 
 PREFIX_LENGTH = 29
 
@@ -511,7 +521,9 @@ SNMP_RULESFILTER = ["__flowspec_default_inet__", "__flowspec_IAS_inet__"]
 # load new data into cache if it is older that a specified number of seconds
 SNMP_POLL_INTERVAL = 8 #seconds
 # cache file for data
-SNMP_TEMP_FILE = "/tmp/snmp_temp_data"
+#SNMP_TEMP_FILE = "/tmp/snmp_temp_data"
+SNMP_TEMP_FILE = "/srv/flowspy/snmp_temp_data"
+
 SNMP_POLL_LOCK = "/var/run/fod/snmppoll.lock"
 
 # Number of historical values to store for a route.
@@ -539,6 +551,7 @@ STATISTICS_PER_RULE__ADD_INITIAL_ZERO = True
 ##############################################################################
 # rule expiration
 
+#
 # Flowspy configuration
 #EXPIRATION_DAYS_OFFSET = 7
 EXPIRATION_DAYS_OFFSET = 30

@@ -276,7 +276,9 @@ SNMP_RULESFILTER = ["__flowspec_default_inet__", "__flowspec_IAS_inet__"]
 # load new data into cache if it is older that a specified number of seconds
 SNMP_POLL_INTERVAL = 8 #seconds
 # cache file for data
-SNMP_TEMP_FILE = "/tmp/snmp_temp_data"
+#SNMP_TEMP_FILE = "/tmp/snmp_temp_data"
+SNMP_TEMP_FILE = "/srv/flowspy/snmp_temp_data"
+
 SNMP_POLL_LOCK = "/var/run/fod/snmppoll.lock"
 
 # Number of historical values to store for a route.
