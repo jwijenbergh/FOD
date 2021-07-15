@@ -62,8 +62,10 @@ var updater = {
 			    success: updater.onFetchExisting,
 			    error: updater.onError});
 	    {% endfor %}
+	    console.log("start returning");
     },
     poll: function() {
+	console.log("poll start.");
     	{% if user.is_authenticated %}
     	if (oTable) {
     		oTable.fnReloadAjax(refreshUrl);
@@ -77,41 +79,58 @@ var updater = {
     		error: updater.onError});
         {% endfor %}
     	{% endif %}
+	console.log("poll returning.");
     },
     onSuccess: function(response) {
+	console.log("onSuccess start.");
 	try {
 	    updater.newMessages(response);
 	} catch (e) {
+	    console.log("onSuccess exception: "+e);
 	    updater.onError();
+	    console.log("onSuccess exception returing.");
 	    return;
 	}
 	window.setTimeout(updater.poll, updater.errorSleepTime);
+	console.log("onSuccess returning.");
     },
 
     onFetchExisting: function(response) {
+	console.log("onFetchExisting start. response="+response);
     	try {
     	    updater.existingMessages(response);
     	    updater.started = true;
     	} catch (e) {
+	    console.log("onFetchExisting exception: "+e);
     	    updater.onError();
+	    console.log("onFetchExisting exception returning.");
     	    return;
     	}
-        },
+	console.log("onFetchExisting returning.");
+    },
 
     onError: function(response, text) {
+	console.log("onError start.");
 	     if (text == 'timeout'){
+    	       try {
 		     if (oTable) {
 			     oTable.fnReloadAjax(refreshUrl);
 		     }
+    	       } catch (e) {
+	         console.log("exception in onError handler: "+e);
+    	       }
 	     }
+	console.log("onError step2 updater.started="+updater.started);
 	     if (updater.started == false) {
 		     window.setTimeout(updater.start, updater.errorSleepTime);
 	     } else {
 		     window.setTimeout(updater.poll, updater.errorSleepTime);
 	     }
+	console.log("onError returning.");
     },
 
     newMessages: function(response) {
+	if (response===undefined) return;
 	if (!response.messages) return;
 	if (response.messages.length == 0){
 		return true;
@@ -132,7 +151,8 @@ var updater = {
     },
 
     existingMessages: function(response) {
-    	if (!response.messages) return;
+    	if (response===undefined) return;
+        if (!response.messages) return;
     	if (response.messages.length == 0){
     		return true;
     	}
