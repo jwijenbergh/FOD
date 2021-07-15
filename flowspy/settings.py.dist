@@ -256,9 +256,6 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
 )
 
-#GRAPHS_API_URL = 'graphs'
-GRAPHS_API_URL = 'http://127.0.0.1:8080/api/routes/'
-
 LOGIN_URL = '/welcome'
 
 # CACHES = {
@@ -429,7 +426,7 @@ SHIB_FIRSTNAME = ['HTTP_SHIB_INETORGPERSON_GIVENNAME'] # value in settings.py.di
 #SHIB_FIRSTNAME = ['HTTP_GIVENNAME']
 SHIB_FIRSTNAME_DISPLAY_NAME = "GIVENNAME"
 SHIB_FIRSTNAME_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:givenName or urn:oid:2.5.4.42"
-
+ 
 SHIB_LASTNAME = ['HTTP_SHIB_PERSON_SURNAME'] # value in settings.py.dist
 #SHIB_LASTNAME = ['HTTP_SURNAME']
 SHIB_LASTNAME_DISPLAY_NAME = "SURNAME"
@@ -540,6 +537,11 @@ SNMP_REMOVE_RULES_AFTER = 3600
 ##############################################################################
 ##############################################################################
 # statistics calc
+
+#GRAPHS_API_URL = 'graphs'
+GRAPHS_API_URL = 'http://127.0.0.1:8080/api/routes/'
+
+#
 
 STATISTICS_PER_RULE = True
 
