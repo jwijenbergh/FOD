@@ -70,6 +70,30 @@ public class LoginTest {
                         throw(e);
 		}
 	}
+	
+	@Test
+	//public static void LoginWithoutLogin(WebDriver driver, String url) 
+	public static void LoginWithSQLInjection() 
+        {
+		try {
+			driver.get(url);
+			driver.findElement(By.id("id_username")).click();
+			driver.findElement(By.id("id_username")).sendKeys("105 OR 1=1");
+			driver.findElement(By.id("id_password")).click();
+			driver.findElement(By.id("id_password")).sendKeys("105 OR 1=1");
+			driver.findElement(By.id("applybutton")).click();
+			driver.findElement(By.id("login_error_id"));
+		}
+		catch(Exception e) {
+			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+			    fileWriter.write(e.getMessage());
+			    fileWriter.close();
+			} catch (IOException ex) {
+			    // Cxception handling
+			}
+                        throw(e);
+		}
+	}
 	@Test
 	//public static void LoginWithoutData(WebDriver driver, String url) 
 	public static void LoginWithoutData() 
