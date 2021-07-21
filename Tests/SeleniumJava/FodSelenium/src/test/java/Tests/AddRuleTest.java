@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import dataProvider.ConfigFileReader;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.annotations.Test;
@@ -101,7 +103,19 @@ public class AddRuleTest {
 			driver.findElement(By.id("id_name")).click();
 			driver.findElement(By.id("id_name")).sendKeys("");
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElements(By.xpath("//span[@class = 'required']//..//..//label"));
+			WebElement inputName = driver.findElement(By.id("id_name"));
+			JavascriptExecutor js = (JavascriptExecutor) driver;  
+			boolean isRequired = (Boolean) js.executeScript("return arguments[0].required;",inputName);
+			if(isRequired )
+			{
+				//buffer.append("Find required attribute: id_username");
+				//buffer.newLine();
+			}else {
+				//buffer.append("!!!!!!!!!!");
+				//buffer.append("FAILED: Find required attribute: id_username");
+				//buffer.newLine();
+			}
+			
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
@@ -191,7 +205,18 @@ public class AddRuleTest {
 			driver.findElement(By.id("id_expires")).click();
 			driver.findElement(By.id("id_expires")).clear();
 			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'This field is required.')]"));
+			WebElement inputExpires = driver.findElement(By.id("id_expires"));
+			JavascriptExecutor js = (JavascriptExecutor) driver;  
+			boolean isRequired = (Boolean) js.executeScript("return arguments[0].required;",inputExpires);
+			if(isRequired )
+			{
+				//buffer.append("Find required attribute: id_username");
+				//buffer.newLine();
+			}else {
+				//buffer.append("!!!!!!!!!!");
+				//buffer.append("FAILED: Find required attribute: id_username");
+				//buffer.newLine();
+			}
 		}
 		catch(Exception e) {
 			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
