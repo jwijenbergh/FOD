@@ -1,4 +1,31 @@
 =======
+1.7 RELEASE (in 2021)
+Completed Reimplementation
+        - Update to Python 3 and Django 2
+        - Reimplementation of many parts necessary because of changed dependencies
+        - REST API improved
+
+=======
+1.65 (in 2020)
+Basic Reimplementation
+        - Update to Python 3 and Django 2
+
+=======
+(in 2019)
+Enhancements
+        - Docker test installation container 
+        - NETCONF simulator container for testing 
+
+=======
+1.5 RELEASE (in 2018)
+Updates and Enhancements
+        - Added SNMP statistics and statistic graphs
+        - Easy specification of port ranges 
+        - Improved date picker
+        - eduGAIN errors made depending on the configuration
+        - Many other enhancements
+
+=======
 1.2 RELEASE
 Updates and enhancements. Check documentation for updating from previous versions
 	- Code Cleanup
