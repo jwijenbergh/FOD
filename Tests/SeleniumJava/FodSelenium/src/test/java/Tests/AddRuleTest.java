@@ -1,5 +1,6 @@
 package test.java.Tests;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -25,40 +26,185 @@ public class AddRuleTest {
         
         public static void Login() 
         {
-        	driver.get(url);
-			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys(configFileReader.getUserLogin());
-			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
-			driver.findElement(By.id("applybutton")).click();
+        	try(FileWriter fileWriter = new FileWriter(".\\logs\\AddRulesReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("Login");
+        		buffer.newLine();
+        				try {
+        					driver.get(url);
+        					buffer.append("Go to url: "+ url );
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				
+        				try {
+        					driver.findElement(By.id("id_username")).click();
+        					buffer.append("Find login input: id_username ");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage());
+        					buffer.newLine();
+        				}
+        				
+        				try {
+        					driver.findElement(By.id("id_username")).sendKeys(configFileReader.getUserLogin());
+        					buffer.append("Add in login input data: " + configFileReader.getUserLogin());
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage());
+        					buffer.newLine();
+        				}
+        				
+        				try {
+        					driver.findElement(By.id("id_password")).click();
+        					buffer.append("Find password input: id_password");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage());
+        					buffer.newLine();
+        				}
+        				
+        				try {
+        					driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
+        					buffer.append("Add in password input data: " + configFileReader.getUserPassword());
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage());
+        					buffer.newLine();
+        				}
+        				
+        				try {
+        					driver.findElement(By.id("applybutton")).click();
+        					buffer.append("Find and click on Apply button: applybutton");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage());
+        					buffer.newLine();
+        				}
+        				
+        				try {
+        					driver.findElement(By.id("myrulesheader"));
+        					buffer.append("Find and My rules header: myrulesheader");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage());
+        					buffer.newLine();
+        				}
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}
+        			         
+        		}
+
         }
 
 	@Test
 	//public static void AddName(WebDriver driver, String url) 
 	public static void AddName() 
         {
-		try {
-			Login();
-			driver.findElement(By.id("myrulesheader"));
-			driver.findElement(By.id("routebutton")).click();
-			driver.findElement(By.id("apply_rule_header_id"));
-			driver.findElement(By.id("id_name")).click();
-			driver.findElement(By.id("id_name")).sendKeys("npattack");
-			driver.findElement(By.id("id_source")).click();
-			driver.findElement(By.id("id_source")).sendKeys("0.0.0.0/0");
-			driver.findElement(By.id("id_destination")).click();
-			driver.findElement(By.id("id_destination")).sendKeys("0.0.0.0/29");
-			driver.findElement(By.id("applybutton")).click();
-		}
-		catch(Exception e) {
-			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
-			    fileWriter.write(e.getMessage());
-			    fileWriter.close();
-			} catch (IOException ex) {
-			    // Cxception handling
-			}
-                        throw(e);
-		}
+		Login();
+		try(FileWriter fileWriter = new FileWriter(".\\logs\\AddRulesReport.txt", true)) {
+    		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+    		buffer.newLine();
+    		buffer.append("Login");
+    		buffer.newLine();
+    				try {
+    					driver.findElement(By.id("routebutton")).click();
+    					buffer.append("Find and click on add route button: routebutton");
+    					buffer.newLine();
+    				}catch(IOException exc) {
+    					buffer.append(exc.getMessage() );
+    					buffer.newLine();
+    				}
+    				
+    				try {
+    					driver.findElement(By.id("apply_rule_header_id"));
+    					buffer.append("Find add rule header: apply_rule_header_id ");
+    					buffer.newLine();
+    				}catch(IOException exc) {
+    					buffer.append(exc.getMessage());
+    					buffer.newLine();
+    				}
+    				
+    				try {
+    					driver.findElement(By.id("id_name")).click();
+    					buffer.append("Find and click Name input: id_name");
+    					buffer.newLine();
+    				}catch(IOException exc) {
+    					buffer.append(exc.getMessage());
+    					buffer.newLine();
+    				}
+    				
+    				try {
+    					driver.findElement(By.id("id_name")).sendKeys("npattack");
+    					buffer.append("Put into name input: npattack");
+    					buffer.newLine();
+    				}catch(IOException exc) {
+    					buffer.append(exc.getMessage());
+    					buffer.newLine();
+    				}
+    				
+    				try {
+    					driver.findElement(By.id("id_source")).click();
+    					buffer.append("Find input: id_source");
+    					buffer.newLine();
+    				}catch(IOException exc) {
+    					buffer.append(exc.getMessage());
+    					buffer.newLine();
+    				}
+    				
+    				try {
+    					driver.findElement(By.id("id_source")).sendKeys("0.0.0.0/0");
+    					buffer.append("Put into source: 0.0.0.0/0");
+    					buffer.newLine();
+    				}catch(IOException exc) {
+    					buffer.append(exc.getMessage());
+    					buffer.newLine();
+    				}
+    				
+    				try {
+    					driver.findElement(By.id("id_destination")).click();
+    					buffer.append("Find Destination input: id_destination");
+    					buffer.newLine();
+    				}catch(IOException exc) {
+    					buffer.append(exc.getMessage());
+    					buffer.newLine();
+    				}
+    				try {
+    					driver.findElement(By.id("id_destination")).sendKeys("0.0.0.0/29");
+    					buffer.append("Put into Destination input: 0.0.0.0/29");
+    					buffer.newLine();
+    				}catch(IOException exc) {
+    					buffer.append(exc.getMessage());
+    					buffer.newLine();
+    				}
+    				try {
+    					driver.findElement(By.id("applybutton")).click();
+    					buffer.append("Find and click Apply button: applybutton");
+    					buffer.newLine();
+    				}catch(IOException exc) {
+    					buffer.append(exc.getMessage());
+    					buffer.newLine();
+    				}
+    				 buffer.close(); 
+    		}
+    		catch(Exception e) {
+    			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+    			    fileWriter.write(e.getMessage());
+    			    fileWriter.close();
+    			} catch (IOException ex) {
+    			    // Cxception handling
+    			}	         
+    		}	
 	}
 	
 	@Test
