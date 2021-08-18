@@ -1,3 +1,5 @@
+# Configuration v1.3
+
 Time to configure flowspy.
 
 First of all you have to copy the dist files to their proper position:

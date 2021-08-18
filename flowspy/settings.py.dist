@@ -30,13 +30,17 @@ except ImportError:
 import os
 from celery.schedules import crontab
 
+##############################################################################
+##############################################################################
+
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-    ('AdminName', 'admin@example.com'),
-)
-MANAGERS = ADMINS
+##
+
+import _version
+SW_VERSION = _version.VERSION
+
 here = lambda x: os.path.join(os.path.abspath(os.path.dirname(__file__)), x)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -47,6 +51,8 @@ SITE_ID = 1
 # Place a sequence of random chars here
 SECRET_KEY = '@sa@5234#$%345345^@#$%*()123^@12!&!()$JMNDF#$@(@#8FRNJWX_'
 
+##############################################################################
+##############################################################################
 # Set up database
 
 DATABASES = {
@@ -59,6 +65,45 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default.
     }
 }
+
+##############################################################################
+##############################################################################
+# logging
+
+#LOG_FILE_LOCATION = "/var/log/fod"
+LOG_FILE_LOCATION = "/srv/flowspy/log/"
+
+# A sample logging configuration. The only tangible logging
+# performed by this configuration is to send an email to
+# the site admins on every HTTP 500 error when DEBUG=False.
+# See http://docs.djangoproject.com/en/dev/topics/logging for
+# more details on how to customize your logging configuration.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    }
+}
+
+##############################################################################
+##############################################################################
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -153,10 +198,37 @@ MIDDLEWARE = (
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+#    'django.middleware.AutoLogout', 
 )
+
+# Auto logout delay in minutes
+#AUTO_LOGOUT_DELAY = 5 #equivalent to 5 minutes
+
+#SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+#SESSION_COOKIE_AGE = 5 * 60 #
+#SESSION_COOKIE_AGE = 30 #
 
 ROOT_URLCONF = 'flowspy.urls'
 WSGI_APPLICATION = 'flowspy.wsgi.application'
+
+BRANDING = {
+    'name': 'Example',
+    'url': 'https://example.com',
+    'footer_iframe': 'https://example.com/iframe',
+    'facebook': '//facebook.com/',
+    'twitter': '//twitter.com/',
+    'phone': '800-example-com',
+    'email': 'helpdesk@example.com',
+    'logo': 'fodlogo2.png',
+    'favicon': 'favicon.ico',
+}
+
+SETTINGS_EXPORT = [
+    'BRANDING',
+    'SW_VERSION',
+    'LANGUAGES',
+    'LANGUAGE_CODE',
+]
 
 AUTHENTICATION_BACKENDS = (
     'djangobackends.shibauthBackend.shibauthBackend',
@@ -184,38 +256,6 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
 )
 
-#GRAPHS_API_URL = 'graphs'
-GRAPHS_API_URL = 'http://127.0.0.1:8080/api/routes/'
-
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error when DEBUG=False.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
-}
-
 LOGIN_URL = '/welcome'
 
 # CACHES = {
@@ -232,42 +272,42 @@ CACHES = {
 
 AUTH_PROFILE_MODULE = 'accounts.UserProfile'
 
-# Netconf Device credentials
-# The following variables should contain the address of the device with
-# flowspec, the username and password of the appliers account and the netconf
-# port.
-NETCONF_DEVICE = ""
-NETCONF_USER = ""
-NETCONF_PASS = ""
-NETCONF_PORT = 830
-
-# The filter applied in the device in order to find the flowspec routes
-ROUTES_FILTER = "<configuration><routing-options><flow/></routing-options></configuration>"
-ROUTE_FILTER = "<configuration><routing-options><flow><route><name>%s</name></route></flow></routing-options></configuration>"
-COMMIT_CONFIRMED_TIMEOUT = "120"
-
-# Change the following values only if you know what you are doing!!!
-# To integrate FoD with tables (Peer, Networks, Contacts)
-# from your CRM platform, set the following values to False and create the views that are
-# exact matches of the tables in peers/models.py
-PEER_MANAGED_TABLE = True
-PEER_RANGE_MANAGED_TABLE = True
-PEER_TECHC_MANAGED_TABLE = True
-
-# Actually apply the rules
-COMMIT = True
-
-# Flowspy configuration
-#EXPIRATION_DAYS_OFFSET = 7
-EXPIRATION_DAYS_OFFSET = 30
-
 USE_X_FORWARDED_HOST = True
+
+
+TINYMCE_JS_URL = STATIC_URL + 'js/tinymce/tiny_mce.js'
+
+TINYMCE_DEFAULT_CONFIG = {
+    'extended_valid_elements': 'iframe[src|width|height|name|align]',
+    'plugins': "table,spellchecker,paste,searchreplace",
+    'theme': "advanced",
+}
+
+# Django Rest Framework configuration.
+# You should leave this intact.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissions',
+        'rest_framework.permissions.IsAuthenticated'
+    ]
+}
+
+##############################################################################
+##############################################################################
+# polling (live status etc.)
 
 # configuration of celery task manager
 POLLS_TUBE = 'polls'
 CELERY_BROKER_URL = "redis://localhost//"
 BROKER_VHOST = "/"
 CELERY_CONCURRENCY = 1
+
 POLL_SESSION_UPDATE = 60.0
 
 CELERYBEAT_SCHEDULE = {
@@ -291,20 +331,50 @@ CELERYBEAT_SCHEDULE = {
 # List of modules to import when celery starts.
 CELERY_IMPORTS = ("flowspec.tasks", )
 
+# Maximum size of stream of notification messages per each peer tag
+NOTIF_STREAM_MAXSIZE = 50
+# Maximum time that notifications persist on the server in seconds
+NOTIF_STREAM_MAXLIFE = 1800
+
+##############################################################################
+##############################################################################
+# user config
+
+ADMINS = (
+    ('AdminName', 'admin@example.com'),
+)
+
+MANAGERS = ADMINS
+
+##############################################################################
+##############################################################################
+# email config
+
 # Notifications
 DISABLE_EMAIL_NOTIFICATION = True
 SERVER_EMAIL = "Example FoD Service <noreply@example.com>"
 EMAIL_SUBJECT_PREFIX = "[FoD] "
-EXPIRATION_NOTIFY_DAYS = 4
-# max number of days into the future that is allowed to pick in rule expiration datepicker
-MAX_RULE_EXPIRE_DAYS = 30
-PREFIX_LENGTH = 29
-POLL_SESSION_UPDATE = 60.0
+#DEFAULT_FROM_EMAIL = "myemail@gmail.com"
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 25
+
+
+# BCC mail addresses
+NOTIFY_ADMIN_MAILS = ["admin@example.com"]
+
+MAIL_NOTIFICATION_TO_ALL_MATCHING_PEERS = True
+
+##############################################################################
+##############################################################################
 # Shibboleth
+
 SHIB_AUTH_ENTITLEMENT = 'urn:mace:example.com:pki:user'
 SHIB_ADMIN_DOMAIN = 'example.com'
 SHIB_LOGOUT_URL = 'https://example.com/Shibboleth.sso/Logout'
+
+ACCOUNT_ACTIVATION_DAYS = 7
 
 ##############################################################################
 # Shibboleth attribute map
@@ -356,74 +426,71 @@ SHIB_FIRSTNAME = ['HTTP_SHIB_INETORGPERSON_GIVENNAME'] # value in settings.py.di
 #SHIB_FIRSTNAME = ['HTTP_GIVENNAME']
 SHIB_FIRSTNAME_DISPLAY_NAME = "GIVENNAME"
 SHIB_FIRSTNAME_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:givenName or urn:oid:2.5.4.42"
-
+ 
 SHIB_LASTNAME = ['HTTP_SHIB_PERSON_SURNAME'] # value in settings.py.dist
 #SHIB_LASTNAME = ['HTTP_SURNAME']
 SHIB_LASTNAME_DISPLAY_NAME = "SURNAME"
 SHIB_LASTNAME_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:sn or urn:oid:2.5.4.4"
 
 ##############################################################################
-
-# BCC mail addresses
-NOTIFY_ADMIN_MAILS = ["admin@example.com"]
-
-# Then actions in the ui (dropdown)
-UI_USER_THEN_ACTIONS = ['discard', 'rate-limit']
-UI_USER_PROTOCOLS = ['icmp', 'tcp', 'udp']
-ACCOUNT_ACTIVATION_DAYS = 7
+##############################################################################
+# net data specific settings
 
 # Define subnets that should not have any rules applied whatsoever
 PROTECTED_SUBNETS = ['10.10.0.0/16']
+#PROTECTED_SUBNETS = []
 
 # Add two whois servers in order to be able to get all the subnets for an AS.
 PRIMARY_WHOIS = 'whois.example.com'
 ALTERNATE_WHOIS = 'whois.example.net'
+# results in exceptions:
+#ALTERNATE_WHOIS = 'whois.example.net'
 
-TINYMCE_JS_URL = STATIC_URL + 'js/tinymce/tiny_mce.js'
-
-TINYMCE_DEFAULT_CONFIG = {
-    'extended_valid_elements': 'iframe[src|width|height|name|align]',
-    'plugins': "table,spellchecker,paste,searchreplace",
-    'theme': "advanced",
-}
-
-import _version
-SW_VERSION = _version.VERSION
-
-LOG_FILE_LOCATION = "/var/log/fod"
-
-
-BRANDING = {
-    'name': 'Example',
-    'url': 'https://example.com',
-    'footer_iframe': 'https://example.com/iframe',
-    'facebook': '//facebook.com/',
-    'twitter': '//twitter.com/',
-    'phone': '800-example-com',
-    'email': 'helpdesk@example.com',
-    'logo': 'fodlogo2.png',
-    'favicon': 'favicon.ico',
-}
-
-
-# Django Rest Framework configuration.
-# You should leave this intact.
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-    ),
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissions',
-        'rest_framework.permissions.IsAuthenticated'
-    ]
-}
+PREFIX_LENGTH = 29
 
 # Limit of ports in 'ports' / 'SrcPorts' / 'DstPorts' of a rule:
 #PORTRANGE_LIMIT = 100
 PORTRANGE_LIMIT = 65535
+
+# Then actions in the ui (dropdown)
+UI_USER_THEN_ACTIONS = ['discard', 'rate-limit']
+UI_USER_PROTOCOLS = ['icmp', 'tcp', 'udp']
+
+##############################################################################
+##############################################################################
+# netconf low-level
+
+# The filter applied in the device in order to find the flowspec routes
+ROUTES_FILTER = "<configuration><routing-options><flow/></routing-options></configuration>"
+ROUTE_FILTER = "<configuration><routing-options><flow><route><name>%s</name></route></flow></routing-options></configuration>"
+COMMIT_CONFIRMED_TIMEOUT = "120"
+
+# Change the following values only if you know what you are doing!!!
+# To integrate FoD with tables (Peer, Networks, Contacts)
+# from your CRM platform, set the following values to False and create the views that are
+# exact matches of the tables in peers/models.py
+PEER_MANAGED_TABLE = True
+PEER_RANGE_MANAGED_TABLE = True
+PEER_TECHC_MANAGED_TABLE = True
+
+# Actually apply the rules
+COMMIT = True
+
+##############################################################################
+##############################################################################
+# Netconf Device credentials
+
+# The following variables should contain the address of the device with
+# flowspec, the username and password of the appliers account and the netconf
+# port.
+NETCONF_DEVICE = ""
+NETCONF_USER = ""
+NETCONF_PASS = ""
+NETCONF_PORT = 830
+
+##############################################################################
+##############################################################################
+# SNMP statistic fetching
 
 # Statistics polled via SNMP:
 # Default community string
@@ -451,55 +518,75 @@ SNMP_RULESFILTER = ["__flowspec_default_inet__", "__flowspec_IAS_inet__"]
 # load new data into cache if it is older that a specified number of seconds
 SNMP_POLL_INTERVAL = 8 #seconds
 # cache file for data
-SNMP_TEMP_FILE = "/tmp/snmp_temp_data"
+#SNMP_TEMP_FILE = "/tmp/snmp_temp_data"
+SNMP_TEMP_FILE = "/srv/flowspy/snmp_temp_data"
+
 SNMP_POLL_LOCK = "/var/run/fod/snmppoll.lock"
 
 # Number of historical values to store for a route.
 # Polling interval must be set for "snmp-stats-poll" celery task in CELERYBEAT_SCHEDULE.
 # By default, it is 5 min interval, so SNMP_MAX_SAMPLECOUNT=12 means we have about
 # one hour history.
+#SNMP_MAX_SAMPLECOUNT = 2016
 SNMP_MAX_SAMPLECOUNT = 12
 
 # Age of inactive routes that can be already removed (in seconds)
+#SNMP_REMOVE_RULES_AFTER = 604800
 SNMP_REMOVE_RULES_AFTER = 3600
 
 ##############################################################################
 ##############################################################################
-
-# REST API config (v1.6 only)
-
-DISABLE_RULE_OVERLAP_CHECK = False
-
-# Perform checking for route duplicates (i.e., forbid creating multiple rules
-# with the same addresses). By default it is enabled (True).
-ROUTES_DUPLICATES_CHECKING = True
-
-ALLOW_DELETE_FULL_FOR_NONADMIN = False
-
-MAIL_NOTIFICATION_TO_ALL_MATCHING_PEERS = True
-
 # statistics calc
 
-STATISTICS_PER_MATCHACTION_ADD_FINAL_ZERO = False # not necessary if STATISTICS_PER_RULE==True
+#GRAPHS_API_URL = 'graphs'
+GRAPHS_API_URL = 'http://127.0.0.1:8080/api/routes/'
+
+#
+
 STATISTICS_PER_RULE = True
+
+STATISTICS_PER_MATCHACTION_ADD_FINAL_ZERO = False # not necessary if STATISTICS_PER_RULE==True
 
 STATISTICS_PER_RULE__ADD_INITIAL_ZERO = True
 
 ##############################################################################
 ##############################################################################
+# rule expiration
 
-SETTINGS_EXPORT = [
-    'BRANDING',
-    'SW_VERSION',
-    'LANGUAGES',
-    'LANGUAGE_CODE',
-]
+#
+# Flowspy configuration
+#EXPIRATION_DAYS_OFFSET = 7
+EXPIRATION_DAYS_OFFSET = 30
+
+EXPIRATION_NOTIFY_DAYS = 4
+
+# max number of days into the future that is allowed to pick in rule expiration datepicker
+#MAX_RULE_EXPIRE_DAYS = 9999999
+MAX_RULE_EXPIRE_DAYS = 30
+
+##############################################################################
+##############################################################################
+# rule deletion (via rest)
+
+ALLOW_ADMIN__FULL_RULEDEL = True
+ALLOW_DELETE_FULL_FOR_NONADMIN = False
+
+##############################################################################
+##############################################################################
+# REST API config 
+
+# Perform checking for route duplicates (i.e., forbid creating multiple rules
+# with the same addresses). By default it is enabled (True).
+#DISABLE_RULE_OVERLAP_CHECK = False
+ROUTES_DUPLICATES_CHECKING = True
+
+##############################################################################
+##############################################################################
+# special test installation 
 
 ENABLE_SETUP_VIEW = False
 
-# Maximum size of stream of notification messages per each peer tag
-NOTIF_STREAM_MAXSIZE = 50
-# Maximum time that notifications persist on the server in seconds
-NOTIF_STREAM_MAXLIFE = 1800
+##############################################################################
+##############################################################################
 
 from flowspy.settings_local import *

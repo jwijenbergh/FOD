@@ -1,13 +1,25 @@
 site_name: Firewall On Demand
-repo_url: https://github.com/grnet/flowspy/
+#repo_url: https://github.com/grnet/flowspy/
+repo_url: https://github.com/GEANT/FOD/
+#site_author: Stavros Kroustouris
+site_author: GÉANT4-3 WP8 T3
 docs_dir: doc
-site_author: Stavros Kroustouris
-theme: readthedocs
-pages:
+#theme: readthedocs
+#pages:
+nav:
     - 'Introduction': 'index.md'
     - 'Installation':
-        - 'Generic': 'installation/generic.md'
-        - 'Debian': 'installation/debian_wheezy.md'
-        - 'Red Hat': 'installation/redhat.md'
-    - 'Configuration': 'configuration.md'
-    - 'API': 'api.md'
+        - 'v1.3': 
+          - 'Generic': 'installation/v1.3/generic.md'
+          - 'Debian': 'installation/v1.3/debian_wheezy.md'
+          - 'Red Hat': 'installation/v1.3/redhat.md'
+        - 'v1.7':
+          - 'Generic': 'installation/v1.7/generic.md'
+          - 'Docker': 'installation/v1.7/docker.md'
+    - 'Configuration': 
+        - 'v1.3': 'configuration/configuration-v1.3.md'
+        - 'v1.7': 'configuration/configuration-v1.7.md'
+    - 'API': 
+        - 'v1.3': 'api/api-v1.3.md'
+        - 'v1.7': 'api/api-v1.7.md'
+

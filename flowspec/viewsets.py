@@ -35,10 +35,24 @@ class RouteViewSet(viewsets.ModelViewSet):
     serializer_class = RouteSerializer
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return Route.objects.all()
-        else:
+        scope=""
+        try:
+          logger.debug("RouteViewSet::get_queryset(): param scope="+str(self.request.query_params['scope']))
+          scope=self.request.query_params['scope'] 
+        except: 
+          pass
+
+        if scope == "applier":
+            return convert_container_to_queryset(self.get_users_routes_by_applier_only(), Route)
+        elif scope == "peer":
+            return convert_container_to_queryset(self.get_users_routes_by_its_peers(), Route)
+        elif scope == "user":
             return convert_container_to_queryset(self.get_users_routes_all(), Route)
+
+        if self.request.user.is_superuser:
+            return Route.objects.all() # default for admin is all
+        else:
+            return convert_container_to_queryset(self.get_users_routes_all(), Route) #default for non-admin is "user"
 
     def get_users_routes_all(self):
         return global__get_users_routes_all(self.request.user)
@@ -272,9 +286,11 @@ class StatsRoutesViewSet(viewsets.ViewSet):
     """
     permission_classes = (IsAuthenticated,)
     def retrieve(self, request, pk=None):
+        logger.info("StatsRoutesViewSet:::retrieve(): pk="+str(pk))
         queryset = Route.objects.all()
         from flowspec.views import routestats
-        route = get_object_or_404(queryset, name=pk)
+        route = get_object_or_404(queryset, id=pk)
+        logger.info("StatsRoutesViewSet:::retrieve(): route.name="+str(route.name))
         return routestats(request, route.name)
 
 #############################################################################

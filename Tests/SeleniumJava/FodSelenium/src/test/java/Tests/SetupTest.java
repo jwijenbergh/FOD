@@ -389,7 +389,7 @@ public class SetupTest {
 				try {
 					driver.get(url);
 					driver.findElement(By.id("id_password")).click();
-					driver.findElement(By.id("id_password")).sendKeys("adminpwd1");
+					driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
 					driver.findElement(By.id("id_netconf_device")).click();
 					driver.findElement(By.id("id_netconf_device")).sendKeys("1.0.0.0/8");
 					driver.findElement(By.id("id_netconf_port")).click();
@@ -403,7 +403,7 @@ public class SetupTest {
 					driver.findElement(By.id("applybutton")).click();
 					
 					//TODO: find how to check if main page
-					driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
+					driver.findElement(By.id("myrulesheader"));
 					}
 					catch(Exception e) {
 						try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {

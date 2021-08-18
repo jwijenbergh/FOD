@@ -58,4 +58,16 @@ public class ConfigFileReader {
 		 if(password != null) return password;
 		 else throw new RuntimeException("login not specified in the Configuration.properties file.");
 		 }
+	 
+	 public String getSourceIPAddress() {
+		 String sourceIPAddress = properties.getProperty("sourceipaddress");
+		 if(sourceIPAddress != null) return sourceIPAddress;
+		 else throw new RuntimeException("source ip address not specified in the Configuration.properties file.");
+		 }
+	 
+	 public String getDestinationIPAddress() {
+		 String destinationIPAddress = properties.getProperty("destinationipaddress");
+		 if(destinationIPAddress != null) return destinationIPAddress;
+		 else throw new RuntimeException("destination ip address not specified in the Configuration.properties file.");
+		 }
 }

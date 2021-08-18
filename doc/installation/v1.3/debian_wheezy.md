@@ -1,4 +1,5 @@
-# Debian Wheezy (x64) - Django 1.4.x
+# Installing Flowspy v1.3 on Debian Wheezy (x64) - Django 1.4.x
+
 The following document describes the installation process of Firewall On Demand
 on a Debian Wheezy machine with Django 1.4
 

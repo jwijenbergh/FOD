@@ -65,7 +65,7 @@ else
   (
         set +e
 	source /srv/venv/bin/activate
-	mkdir -p /srv/flowspy/
+	mkdir -p /srv/flowspy/log/
 
 	# Select source dir and copy FoD into /srv/flowspy/
 	if [ "`basename "$0"`" = install-centos.sh ]; then
