@@ -7,8 +7,6 @@ $(document).ready(function() {
     $("#message").select();
     {% if user.is_authenticated %}
     updater.start();
-    updater.poll();
-
     {% endif %}
 });
 
@@ -52,30 +50,27 @@ jQuery.fn.enable = function(opt_enable) {
 };
 
 var updater = {
-    errorSleepTime: 500,
-    cursor: null,
+    started: false,
+    last_ids: new Object(),
     start: function() {
-    	var date = new Date();
-	var timestamp = date.getTime();
-        {% for peer in user.userprofile.peers.all %}
-        $.ajax({url: "{% url 'fetch-existing' peer.pk %}?="+timestamp, type: "POST", dataType: "json", cache: false,
-    		success: updater.onFetchExisting,
-    		error: updater.onError});
-        {% endfor %}
-        },
-
+	    //console.log("Initial fetching of all notifications.");
+	    {% for peer in user.userprofile.peers.all %}
+	    updater.last_ids["{{ peer.pk }}"] = null;
+        try {
+	    $.ajax({url: "{% url 'fetch-existing'  peer.pk %}", type: "POST", dataType: "json", cache:false,
+			    success: updater.onFetchExisting,
+			    error: updater.onError});
+        } catch (e) {
+            console.log("Error: " + e);
+        }
+	    {% endfor %}
+    },
     poll: function() {
     	{% if user.is_authenticated %}
-    	if (updater.errorSleepTime > 128000){
-    		window.setTimeout('location.reload()', 500);
-    	}
     	timeout = {{timeout}};
-    	var date = new Date();
-        var timestamp = date.getTime();
-
-
         {% for peer in user.userprofile.peers.all %}
-        $.ajax({url: "{% url 'fetch-updates' peer.pk %}?="+timestamp, type: "POST", dataType: "json", cache: false,
+        //console.log("Polling new notifications from", updater.last_ids["{{ peer.pk }}"], "peerid {{ peer.pk }}");
+        $.ajax({url: "{% url 'fetch-updates'  peer.pk 'PLACEHOLDER' %}".replace("PLACEHOLDER", updater.last_ids["{{ peer.pk }}"]), type: "POST", dataType: "json", cache:false,
     		success: updater.onSuccess,
     		timeout: timeout,
     		error: updater.onError});
@@ -83,93 +78,116 @@ var updater = {
     	{% endif %}
     },
     onSuccess: function(response) {
-	try {
-	    updater.newMessages(response);
-	} catch (e) {
-	    updater.onError();
-	    return;
-	}
-	updater.errorSleepTime = 500;
-	window.setTimeout(updater.poll, 0);
+        try {
+            updater.newMessages(response);
+            var errdialog = $('#ajaxerror')
+            if (errdialog[0]) {
+                errdialog[0].remove();
+            }
+            if (oTable) {
+                try {
+                    oTable.fnReloadAjax(refreshUrl);
+                } catch (e) {
+                    console.log("DataTable reload failed.");
+                }
+            }
+        } catch (e) {
+            console.log(e);
+            return;
+        }
     },
 
     onFetchExisting: function(response) {
     	try {
     	    updater.existingMessages(response);
-
+    	    if (updater.started == false) {
+                updater.started = true;
+                setInterval(updater.poll, 3000);
+            }
     	} catch (e) {
+            console.log(e);
     	    updater.onError();
     	    return;
     	}
-        },
+    },
 
     onError: function(response, text) {
-        	if (text == 'timeout'){
-        		window.setTimeout('location.reload()', 3000);
-        	}
-        	updater.errorSleepTime *= 2;
-			console.log("Poll error; sleeping for", updater.errorSleepTime, "ms");
-			window.setTimeout(updater.poll, updater.errorSleepTime);
-
+        var errdialog = $('#ajaxerror');
+        if (!errdialog[0]) {
+           $('#page-wrapper').after("<div id='ajaxerror'>Loading...</div>");
+        }
+        $('#ajaxerror').css({"position": "fixed", "right": "100px", "bottom": "10px", "padding": "5px", "font-weight": "bold", "color": "#fff", "background-color": "#f00", "z-index": "10"});
     },
 
     newMessages: function(response) {
-	if (!response.messages) return;
-	if (response.messages.length == 0){
-		return true;
-	}
-	updater.cursor = response.cursor;
-	var messages = response.messages;
-	updater.cursor = messages[messages.length - 1].id;
-	console.log(messages.length, "new messages, cursor:", updater.cursor);
+        if (!response || !response.messages) return;
+        if (response.messages.length == 0){
+            return true;
+        }
+        var messages = response.messages;
+        var peerid = messages[messages.length - 1]["peerid"];
+        var msgid = messages[messages.length - 1]["id"];
+        updater.last_ids[peerid] = msgid;
+        //console.log(messages.length, "new messages, last_id:", msgid, "peerid", peerid);
 
-	for (var i = 0; i < messages.length; i++) {
-	    updater.showMessage(messages[i]);
-	}
-	$("#hid_mid").val('UPDATED');
-	window.setTimeout('location.reload()', 2000);
+        var reloadContent = false;
+        for (var i = 0; i < messages.length; i++) {
+            updater.showMessage(messages[i]);
+            if (messages[i].body.match(/Successfully committed$/)) {
+                reloadContent = true;
+            }
+        }
+        $("#hid_mid").val('UPDATED');
+        if (reloadContent) {
+            if (oTable) {
+                try {
+                    oTable.fnReloadAjax(refreshUrl);
+                } catch (e) {
+                    console.log("DataTable reload failed.");
+                }
+            } else {
+                location.reload();
+            }
+        }
     },
 
     existingMessages: function(response) {
-    	if (!response.messages) return;
+    	if (!response || !response.messages) return;
     	if (response.messages.length == 0){
-    		return true;
+            return true;
     	}
-    	updater.cursor = response.cursor;
+        $("#inbox").empty();
     	var messages = response.messages;
-    	updater.cursor = messages[messages.length - 1].id;
-    	var i = messages.length
+        var peerid = messages[messages.length - 1]["peerid"];
+        var msgid = messages[messages.length - 1]["id"];
+        updater.last_ids[peerid] = msgid;
+        //console.log("got", messages.length, "messages with last_id", msgid);
     	for (var i = 0; i < messages.length; i++) {
     	    updater.showMessage(messages[i]);
     	}
-        },
+    },
 
     showMessage: function(message) {
-	var existing = $("#m" + message.id);
-	if (existing.length > 0) return;
-	var username = message.body.split("]")[0].replace("[","");
-	var mbody = message.body.replace("["+username+"] ","");
-	var htmlnode = '<li class="left clearfix">\
-                                    <span style="font-size: 25px; color: #55C1E7" class="chat-img pull-left"> \
-                                       <i class="fa fa-exclamation-circle"></i> \
-                                    </span> \
-                                    <div class="chat-body clearfix"> \
+        var existing = $("#m" + message.id);
+        if (existing.length > 0) return;
+        var username = message.body.split("]")[0].replace("[","");
+        var mbody = message.body.replace("["+username+"] ","");
+        var htmlnode = '<li class="left clearfix">\
+                                    <div class="chat-body clearfix" style="margin-left: 0px;"> \
                                         <div class="header"> \
-                                        <strong class="primary-font">'+username+'</strong> \
                                             <small class="pull-right text-muted"> \
                                                 <i class="fa fa-clock-o fa-fw"></i> '+ message.time +'  \
                                             </small>\
                                         </div>\
-                                        <p>\
+                                        <p><small><strong class="primary-font">'+username+'</strong>:\
                                             '+ mbody+'\
-                                        </p>\
+                                        </small></p>\
                                     </div>\
                                 </li>';
-	var node = $(htmlnode);
-	node.hide();
-//	 $('#inbox').val($('#inbox').val()+message.text);
-	$("#inbox").prepend(node);
-	node.slideDown();
+        var node = $(htmlnode);
+        node.hide();
+        $("#inbox").prepend(node);
+        node.slideDown();
     }
 };
 
