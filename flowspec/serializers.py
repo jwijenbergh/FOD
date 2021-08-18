@@ -85,6 +85,11 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
         protocol = validated_data.pop('protocol')
         then = validated_data.pop('then')
         fragmenttype = validated_data.pop('fragmenttype')
+        try:
+            status = validated_data.pop("status")
+        except KeyError:
+            status = 'INACTIVE'
+            validated_data["status"] = status
         route = Route.objects.create(**validated_data)
         route.protocol.set(protocol)
         route.then.set(then)

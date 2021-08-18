@@ -88,7 +88,7 @@ class RouteViewSet(viewsets.ModelViewSet):
                 else:
                     #return super(RouteViewSet, self).create(request)
                     obj = super(RouteViewSet, self).create(request)
-                    requested_status = request.data["status"]
+                    requested_status = request.data.get("status", "INACTIVE")
                     logger.debug("RouteViewSet::create(): requested_status="+str(requested_status))
                     logger.info("RouteViewSet::create(): obj.type="+str(type(obj)))
                     logger.info("RouteViewSet::create(): obj="+str(obj))
@@ -97,11 +97,14 @@ class RouteViewSet(viewsets.ModelViewSet):
                     logger.info("RouteViewSet::create(): obj.data="+str(obj.data))
                     logger.info("RouteViewSet::create(): obj.data.id="+str(obj.data["id"]))
                     route = get_object_or_404(self.get_queryset(), pk=obj.data["id"])
+                    route.response = "N/A"
+
                     if requested_status == "ACTIVE":
-                      route.status = "PENDING"
-                      route.response = "N/A"
-                      route.save()
-                      route.commit_add()
+                        route.status = "PENDING"
+                        route.save()
+                        route.commit_add()
+                    else:
+                        route.save()
                     return obj
             else:
                 return Response(serializer.errors, status=400)
