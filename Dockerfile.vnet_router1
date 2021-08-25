@@ -31,6 +31,22 @@
 #> docker exec -i -t DOCKERID /fod_vnet_router --init --topo=tree,2 # accepts arguments for mininet as --init.sysstart
 # after exiting mininet shell, now ovs and snmpd will stay running
 
+# ADDITIONAL INFOMATION:
+# Of course one needs to have a running working FoD container in parallel
+# and that one has to be configured
+# to use the vnet_router container for NETCONF and SNMP stats polling:
+# flowspy/settings.py OR flowspy/settings_local.py (the latter will override settings of thee former):
+
+# ...
+# 'NETCONF_DEVICE': '172.17.0.3', # only an example, so change value to whatever is the IP address of the netconf db server container
+# 'NETCONF_PASS': 'netconf',
+# 'NETCONF_PORT': 830,
+# 'NETCONF_USER': 'netconf',
+#
+# 'SNMP_IP': ['172.17.0.3'], # only an example, so change value to whatever is the IP address of the netconf db server container
+# 'SNMP_COMMUNITY': 'public',
+# ...
+
 ##############################################################################
 ##############################################################################
 # Dockerfile proper:
