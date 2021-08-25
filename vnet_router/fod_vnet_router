@@ -44,6 +44,14 @@ if [ "$1" = "--init" ]; then #arg
 
   "$0" --runmn "$@" #arg rest
 
+elif [ "$1" = "--init.sysstart" ]; then #arg
+  shift 1
+
+  nohup /usr/bin/supervisord -c /etc/supervisord.conf & # start NETCONF container
+  sleep 5
+
+  exec "$0" --init "$@"
+
 elif [ "$1" = "--runmn" ]; then #arg
   shift 1
   

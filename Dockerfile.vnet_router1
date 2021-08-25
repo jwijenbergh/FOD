@@ -1,0 +1,38 @@
+
+# 1. build container, e.g. by 
+#> docker build -f Dockerfile.vnet_router1 -t vnet .
+
+# 2. before running container make sure openvswitch module is loaded in kernel (modprobe openvswitch) and run container with --privileged (needed for openvswitch inside container)
+#> modprobe openvswitch
+#> docker run -t -i --privileged vnet
+
+# 3. after being started you can additionally enter the container (find its DOCKERID by 'docker ps'), e.g. by
+#> docker exec -i -t DOCKERID /fod_vnet_router --mnexec h1 ping h2
+#> docker exec -i -t DOCKERID /fod_vnet_router --mnexec h2 hping3 --udp -s 15 -k 10.0.0.3
+
+# 4. '/fod_vnet_router --init.sysstart' in the start CMD below accept mininet arguments after '--init.sysstart' which it will pass on to the started mininet; so change line below accordingly: e.g.
+# CMD [ "/fod_vnet_router", "--init.sysstart", "--topo=linear,10" ]
+# CMD [ "/fod_vnet_router", "--init.sysstart", "--topo=tree" ]
+#
+
+##
+
+FROM cejkat/fod-router
+
+#ENV LC_ALL en_US.utf8
+
+COPY vnet_router/fod_vnet_router /
+COPY vnet_router/snmp/pass_persisttest_bgpflowspec /
+COPY vnet_router/snmp/snmp-release/pass_persisttest /
+
+##
+
+RUN apt-get -qqy update
+RUN DEBIAN_FRONTEND="noninteractive" apt-get -qqy install mininet iptables iproute2 tcpdump tshark iputils-ping iputils-tracepath hping3 gawk sshpass lsof strace snmpd snmp
+
+##
+
+#CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+#CMD [ "bash", "-c", "set -x; nohup /usr/bin/supervisord -c /etc/supervisord.conf & sleep 5 ;/fod_vnet_router --init" ]
+CMD [ "/fod_vnet_router", "--init.sysstart" ]
+
