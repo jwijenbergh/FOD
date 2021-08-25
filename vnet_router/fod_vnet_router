@@ -47,10 +47,15 @@ if [ "$1" = "--init" ]; then #arg
 elif [ "$1" = "--init.sysstart" ]; then #arg
   shift 1
 
-  nohup /usr/bin/supervisord -c /etc/supervisord.conf & # start NETCONF container
+  "$0" --init.netconfserver &
   sleep 5
 
   exec "$0" --init "$@"
+
+elif [ "$1" = "--init.netconfserver" ]; then #arg
+  shift 1
+
+  exec nohup /usr/bin/supervisord -c /etc/supervisord.conf # start NETCONF container
 
 elif [ "$1" = "--runmn" ]; then #arg
   shift 1
@@ -326,7 +331,7 @@ elif [ "$1" = "--get_counters_for_rule" ]; then #arg
   shift 1
 
   ovs-vsctl list-br | tr " " "\n" | while read bridge; do
-     line1="$(ovs-ofctl dump-flows s1 "cookie=0x$cookie/-1" | grep "0x$cookie" | head -1)"
+     line1="$(ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "0x$cookie" | head -1)"
      npkts="$(printf "%s" "$line1" | grep -Eo "n_packets=[0-9]+" | sed -e 's/^n_packets=//')"
      nbytes="$(printf "%s" "$line1" | grep -Eo "n_bytes=[0-9]+" | sed -e 's/^n_bytes=//')"
     [ -n "$npkts" ] || npkts="0"
