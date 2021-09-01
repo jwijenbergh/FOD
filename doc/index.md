@@ -7,16 +7,18 @@ combination of a Shibboleth attribute and the peer network address range
 that the user originates from. FoD is meant to operate over this
 architecture:
 
-    +-----------+          +------------+        +------------+
-    |   FoD     | NETCONF  | flowspec   | ebgp   |   router   |
-    | web app   +----------> device     +-------->            |
-    +-----------+          +------+-----+        +------------+
-                                  | ebgp
-                                  |
-                           +------v-----+
-                           |   router   |
-                           |            |
-                           +------------+
+```
+    +-----------+          +------------+        +------------+  
+    |   FoD     | NETCONF  | flowspec   | ebgp   |   router   |  
+    | web app   +----------> device     +-------->            |  
+    +-----------+          +------+-----+        +------------+  
+                                  | ebgp  
+                                  |  
+                           +------v-----+  
+                           |   router   |  
+                           |            |  
+                           +------------+  
+```
 
 NETCONF is chosen as the mgmt protocol to apply rules to a single
 flowspec capable device. Rules are then propagated via igbp to all
@@ -28,7 +30,14 @@ case the flowspec capable device is an EX4200.
 >
 > Make sure your FoD server has SSH access to your flowspec device.
 
-# Contact
+# Contact 
+
+You can find more about FoD or raise your issues at [Github FoD
+repository].
+
+You can contact us directly at fod{at}geant[dot]net
+
+# GRNET Contact 
 
 You can find more about FoD or raise your issues at [Github FoD
 repository].
@@ -37,10 +46,14 @@ You can contact us directly at dev{at}noc[dot]grnet(.)gr
 
 # Repositories
 
-  - [Github FoD repository](https://github.com/grnet/flowspy)
+  - [GEANT Github FoD repository](https://github.com/GEANT/FOD)
+
+  - [GRNET Github FoD repository](https://github.com/grnet/flowspy)
 
 
 ## Copyright and license
+
+Copyright © 2017-2021 GÉANT4-3 WP8 T3
 
 Copyright © 2010-2017 Greek Research and Technology Network (GRNET S.A.)
 

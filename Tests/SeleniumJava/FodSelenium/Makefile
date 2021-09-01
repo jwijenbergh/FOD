@@ -60,11 +60,12 @@ installchromedriver:
 	#RUN wget -N https://chromedriver.storage.googleapis.com/$(google-chrome --version | grep -Eo "[0-9\.]+")/chromedriver_linux64.zip -P /root/
 	#wget -N https://chromedriver.storage.googleapis.com/89.0.4389.23/chromedriver_linux64.zip -P /root
 	#wget -N https://chromedriver.storage.googleapis.com/90.0.4430.24/chromedriver_linux64.zip -P /root
+	chromium_version="$$(google-chrome --version | grep -Eo "[0-9\.]+" | grep -Eo "^[0-9]+")"; \
+	echo "chromium_version=$$chromium_version" 1>&2 ; \
+	driver_version="$$(curl https://chromedriver.storage.googleapis.com | grep -Eo "$$chromium_version"'\.0\.[0-9]+\.[0-9]+' | sort -s -u | head -1)"; \
+	echo "driver_version=$$driver_version" 1>&2 ; \
+	wget -N "https://chromedriver.storage.googleapis.com/$$driver_version/chromedriver_linux64.zip" -P /root
 	#wget -N https://chromedriver.storage.googleapis.com/91.0.4472.19/chromedriver_linux64.zip -P /root
-	chromium_version="$$(chromium --version | grep -Eo [0-9\.]+ | head -1 | sed -e 's/\..*$$//')"; \
-	chromedriver_version="$$(curl https://chromedriver.storage.googleapis.com/|grep -Eo "$$chromium_version"'\.[0-9\.]+' | head -1)"; \
-	echo "$$chromium_version => $$chromedriver_version" 1>&2; \
-	wget -N "https://chromedriver.storage.googleapis.com/$$chromedriver_version/chromedriver_linux64.zip" -P /root
 	unzip /root/chromedriver_linux64.zip -d /root
 	mv -f /root/chromedriver /usr/local/bin/chromedriver
 	chown root:root /usr/local/bin/chromedriver
@@ -75,7 +76,7 @@ installchromedriver:
 clean: ensuremaven
 	if [ "$$(id -u)" = 0 ]; then \
 	  echo using sudo user; \
-	  chown -R test1 .; \
+	  chown -R test1 ../../..; \
 	  sudo -u test1 env DISPLAY=:0 mvn clean; \
 	else \
 	  echo user; \
@@ -87,7 +88,7 @@ clean: ensuremaven
 package1: ensuremaven
 	if [ "$$(id -u)" = 0 ]; then \
 	  echo using sudo user; \
-	  chown -R test1 .; \
+	  chown -R test1 ../../..; \
 	  sudo -u test1 env DISPLAY=:0 mvn -Dmaven.test.skip=true compile package assembly:single; \
 	else \
 	  echo "user $$(id -un)"; \
@@ -97,7 +98,7 @@ package1: ensuremaven
 mvntest1: ensuremaven
 	if [ "$$(id -u)" = 0 ]; then \
 	  echo using sudo user; \
-	  chown -R test1 .; \
+	  chown -R test1 ../../..; \
 	  sudo -u test1 env DISPLAY=:0 mvn test; \
 	else \
 	  echo "user $$(id -un)"; \
@@ -149,7 +150,7 @@ run1: ensurechromedriver ensuretestuser1
 	#make package1
 	echo "FOD_IP=$(FOD_IP)" 1>&2
 	make chg_src_login_url1 LOGIN_URL1='http:\/\/$(FOD_IP):$(FOD_PORT)' LOGIN_USER1='$(FOD_USER)' LOGIN_PWD1='$(FOD_PWD)' CLASS1="$(CLASS1)"
-	chown -R test1 .
+	chown -R test1 ../../..
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 	ln -sf /usr/local/bin/chromedriver .\\driver\\chromedriver.exe
 	echo "X server (e.g. vnc) should be running on :0 and be accessible for test 1 user" 1>&2
@@ -196,7 +197,7 @@ runtest1: ensurechromedriver ensuretestuser1 updateclasses2
 	#make chg_src_login_url1 LOGIN_URL1='http:\/\/172.17.0.2:8000' LOGIN_USER1='XXXX' LOGIN_PWD1='YYYYYY' CLASS1="$(CLASS1)"
 	#make updateclass-LoginTest
 	echo "FOD_IP=$(FOD_IP)" 1>&2
-	chown -R test1 .
+	chown -R test1 ../../..
 	make ./target/fodselenium-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 	ln -sf /usr/local/bin/chromedriver .\\driver\\chromedriver.exe
 	echo "X server (e.g. vnc) should be running on :0 and be accessible for test 1 user" 1>&2

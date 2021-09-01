@@ -1,3 +1,5 @@
+# Configuration v1.3
+
 Time to configure flowspy.
 
 First of all you have to copy the dist files to their proper position:
@@ -80,7 +82,7 @@ any cache backend supported by django should work fine.
 	    }
 	}
 
-### Network device access for rule changes (NETCONF)
+### Network device access
 We have to inform django about the device we set up earlier.
 
 	NETCONF_DEVICE = "device.example.com"
@@ -88,46 +90,17 @@ We have to inform django about the device we set up earlier.
 	NETCONF_PASS = "<netconf password>"
 	NETCONF_PORT = 830
 
-### Network device access for mitigation counters (SNMP)
-We have to inform django about the device we set up earlier.
 
-	SNMP_COMMUNITY = "abcd"
+### Beanstalkd
+Beanstalk configuration (as a broker for celery)
 
-	SNMP_IP = [
-	  {"ip": "192.168.0.1", "port": 1000},
-	  {"ip": "192.168.0.2", "port": 1001, "community": "abcdef"},
-	  {"ip": "192.168.0.3", "port": 1002},
-	  {"ip": "192.168.0.4", "port": 1002}
-]
-
-	SNMP_CNTBYTES =     "1.3.6.1.4.1.2636.3.5.2.1.5" # OID of bytes counter (currently unused)
-	SNMP_CNTPACKETS =   "1.3.6.1.4.1.2636.3.5.2.1.4" # OID of packet counter
-	SNMP_RULESFILTER = ["__flowspec_default_inet__", "__flowspec_IAS_inet__"] # get only statistics of specified tables$
-	SNMP_POLL_INTERVAL = 8 #seconds # load new data into cache if it is older that a specified number of seconds
-	SNMP_TEMP_FILE = "/srv/flowspy/snmp_temp_data"
-	SNMP_POLL_LOCK = "/var/run/fod/snmppoll.lock"
-	SNMP_MAX_SAMPLECOUNT = 2016 # one month
-	SNMP_REMOVE_RULES_AFTER = 604800 # one month
-
-### statistics calc based on the SNMP counters
-	
-	GRAPHS_API_URL = 'http://127.0.0.1:8080/api/routes/'
-
-	STATISTICS_PER_RULE = True
-	STATISTICS_PER_RULE__ADD_INITIAL_ZERO = True
-
-### redis 
-Redis connection configuration (as a broker for celery)
-
-	CELERY_BROKER_URL = "redis://localhost//"
+	BROKER_HOST = "localhost"
+	BROKER_PORT = 11300
 	POLLS_TUBE = 'polls'
-	BROKER_VHOST = "/"
-	CELERY_CONCURRENCY = 1
+	BROKER_URL = "beanstalk://localhost:11300//"
 
 ### Notifications
 Outgoing mail address and prefix.
-
-	DISABLE_EMAIL_NOTIFICATION = False # only disable for testing
 
 	SERVER_EMAIL = "Example FoD Service <noreply@example.com>"
 	EMAIL_SUBJECT_PREFIX = "[FoD] "
@@ -137,7 +110,6 @@ Outgoing mail address and prefix.
 If you have not installed an outgoing mail server you can always use your own account (either corporate or gmail, hotmail ,etc) by adding the
 following lines in settings.py:
 
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_USE_TLS = True #(or False)
     EMAIL_HOST = 'smtp.example.com'
     EMAIL_HOST_USER = 'username'
@@ -169,34 +141,14 @@ Fill your company's information in order to show it in flowspy.
 ### Shibboleth
 Flowspy supports shibboleth authentication.
 
+	SHIB_AUTH_ENTITLEMENT = 'urn:mace'
 	SHIB_ADMIN_DOMAIN = 'example.com'
 	SHIB_LOGOUT_URL = 'https://example.com/Shibboleth.sso/Logout'
-
-	SHIB_AUTH_ENTITLEMENT = 'urn:mace' # can also be set to '', if no filtering of users by entitlement is not needed
-
-	SHIB_SLUGIFY_USERNAME = False
-
-attribute configuration:
-
-	SHIB_USERNAME = ['HTTP_EPPN'] # essential attribute, needed for identification of the user
-	SHIB_USERNAME_DISPLAY_NAME = "eduPersonPrincipalName" # only needed for displaying the error message of missing attribute
-	SHIB_USERNAME_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:eduPersonPrincipalName or urn:oid:1.3.6.1.4.1.5923.1.1.1.6" # only needed for displaying the error message of missing attribute
-
-	SHIB_MAIL = ['mail', 'HTTP_MAIL', 'HTTP_SHIB_INETORGPERSON_MAIL'] # essential attribute, because mail is needed for registration and notifications
-	SHIB_MAIL_DISPLAY_NAME = "MAIL" # only needed for displaying the error message of missing attribute
-	SHIB_MAIL_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:mail or urn:oid:0.9.2342.19200300.100.1.3 or SHIB_INETORGPERSON_MAIL" # only needed for displaying the error message of missing attribute
-
-	SHIB_FIRSTNAME = ['HTTP_SHIB_INETORGPERSON_GIVENNAME'] # not essential attribute
-	SHIB_FIRSTNAME_DISPLAY_NAME = "GIVENNAME" # only needed for displaying the error message of missing attribute
-	SHIB_FIRSTNAME_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:givenName or urn:oid:2.5.4.42" # only needed for displaying the error message of missing attribute
-
-	SHIB_LASTNAME = ['HTTP_SHIB_PERSON_SURNAME'] # not essential attribute
-	SHIB_LASTNAME_DISPLAY_NAME = "SURNAME" # only needed for displaying the error message of missing attribute
-	SHIB_LASTNAME_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:sn or urn:oid:2.5.4.4" # only needed for displaying the error message of missing attribute
-
-	SHIB_ENTITLEMENT = ['HTTP_SHIB_EP_ENTITLEMENT'] # not essential, if SHIB_AUTH_ENTITLEMENT='', otherwise essential
-	SHIB_ENTITLEMENT_DISPLAY_NAME = "eduPersonEntitlement" # only needed for displaying the error message of missing attribute
-	SHIB_ENTITLEMENT_DISPLAY_ADDINFO = "urn:oid:1.3.6.1.4.1.5923.1.1.1.7; the value of this attribute also has to include 'urn:mace:example.com:pki:user'" # only needed for displaying the error message of missing attribute
+	SHIB_USERNAME = ['HTTP_EPPN']
+	SHIB_MAIL = ['mail', 'HTTP_MAIL', 'HTTP_SHIB_INETORGPERSON_MAIL']
+	SHIB_FIRSTNAME = ['HTTP_SHIB_INETORGPERSON_GIVENNAME']
+	SHIB_LASTNAME = ['HTTP_SHIB_PERSON_SURNAME']
+	SHIB_ENTITLEMENT = ['HTTP_SHIB_EP_ENTITLEMENT']
 
 ### Syncing the database
 To create all the tables needed by FoD we have to run the following commands:

@@ -57,6 +57,20 @@ class MatchProtocolSerializer(serializers.Serializer):
             except MatchProtocol.DoesNotExist:
                 raise serializers.ValidationError('MatchProtocol does not exist.')
 
+class FragmentTypeSerializer(serializers.Serializer):
+    def to_representation(self, obj):
+        return obj.fragmenttype
+
+    def to_internal_value(self, data):
+        try:
+            fragmenttype = data
+            return FragmentType.objects.get(fragmenttype=fragmenttype)
+        except FragmentType.DoesNotExist:
+            try:
+                return FragmentType.objects.get(id=data)
+            except FragmentType.DoesNotExist:
+                raise serializers.ValidationError('FragmentType does not exist.')
+
 class RouteSerializer(serializers.HyperlinkedModelSerializer):
     """
     A serializer for `Route` objects
@@ -70,9 +84,16 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
             validated_data["applier"] = u
         protocol = validated_data.pop('protocol')
         then = validated_data.pop('then')
+        fragmenttype = validated_data.pop('fragmenttype')
+        try:
+            status = validated_data.pop("status")
+        except KeyError:
+            status = 'INACTIVE'
+            validated_data["status"] = status
         route = Route.objects.create(**validated_data)
         route.protocol.set(protocol)
         route.then.set(then)
+        route.fragmenttype.set(fragmenttype)
         return route
 
     def validate_applier(self, attrs, source):
@@ -131,6 +152,8 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
 
     then = ThenActionSerializer(many=True)
     protocol = MatchProtocolSerializer(many=True)
+    fragmenttype = FragmentTypeSerializer(many=True)
+
     class Meta:
         model = Route
         fields = (
@@ -147,12 +170,6 @@ class PortSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MatchPort
         fields = ('id', 'port', )
-        read_only_fields = ('id', )
-
-class FragmentTypeSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = FragmentType
-        fields = ('id', 'fragmenttype', )
         read_only_fields = ('id', )
 
 class MatchDscpSerializer(serializers.HyperlinkedModelSerializer):
