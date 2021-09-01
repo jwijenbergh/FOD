@@ -71,7 +71,7 @@ installchromedriver:
 clean: ensuremaven
 	if [ "$$(id -u)" = 0 ]; then \
 	  echo using sudo user; \
-	  chown -R test1 .; \
+	  chown -R test1 ../../..; \
 	  sudo -u test1 env DISPLAY=:0 mvn clean; \
 	else \
 	  echo user; \
