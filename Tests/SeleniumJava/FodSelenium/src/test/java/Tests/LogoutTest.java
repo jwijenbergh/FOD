@@ -1,11 +1,14 @@
 package test.java.Tests;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import dataProvider.ConfigFileReader;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.Wait;
@@ -24,28 +27,108 @@ public class LogoutTest {
 	@Test
 	//public static void SuccessLogout(WebDriver driver, String url) {
 	public static void SuccessLogout() {
-		try {
-			driver.get(url);
-			driver.findElement(By.id("id_username")).click();
-			driver.findElement(By.id("id_username")).sendKeys(configFileReader.getUserLogin());
-			driver.findElement(By.id("id_password")).click();
-			driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
-			driver.findElement(By.id("applybutton")).click();
-			driver.findElement(By.xpath("//*[contains(text(), 'My rules')]"));
-			driver.findElement(By.className("user_icon_id")).click();
-			driver.findElement(By.className("log_out_id")).click();
+		try(FileWriter fileWriter = new FileWriter(".\\logs\\LogOut.txt", true)) {
+			BufferedWriter buffer = new BufferedWriter(fileWriter); 
+			buffer.newLine();
+			buffer.append("SuccessLogout");
+			buffer.newLine();
+			try {
+				driver.get(url);
+				buffer.append("Go to url: "+ url );
+				buffer.newLine();
+			}catch(IOException exc) {
+				buffer.append(exc.getMessage() );
+				buffer.newLine();
+			}
 			
-			driver.getTitle().contains("Example Domain");
+			try {
+				driver.findElement(By.id("id_username")).click();
+				buffer.append("Find login input: id_username ");
+				buffer.newLine();
+			}catch(IOException exc) {
+				buffer.append(exc.getMessage());
+				buffer.newLine();
 			}
-			catch(Exception e) {
-				try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
-				    fileWriter.write(e.getMessage());
-				    fileWriter.close();
-				} catch (IOException ex) {
-				    // Cxception handling
-				}
-                                throw(e);
+			
+			try {
+				driver.findElement(By.id("id_username")).sendKeys(configFileReader.getUserLogin());
+				buffer.append("Add in login input data: " + configFileReader.getUserLogin());
+				buffer.newLine();
+			}catch(IOException exc) {
+				buffer.append(exc.getMessage());
+				buffer.newLine();
 			}
+			
+			try {
+				driver.findElement(By.id("id_password")).click();
+				buffer.append("Find password input: id_password");
+				buffer.newLine();
+			}catch(IOException exc) {
+				buffer.append(exc.getMessage());
+				buffer.newLine();
+			}
+			
+			try {
+				driver.findElement(By.id("id_password")).sendKeys(configFileReader.getUserPassword());
+				buffer.append("Add in password input data: " + configFileReader.getUserPassword());
+				buffer.newLine();
+			}catch(IOException exc) {
+				buffer.append(exc.getMessage());
+				buffer.newLine();
+			}
+			
+			try {
+				driver.findElement(By.id("applybutton")).click();
+				buffer.append("Find and click on Apply button: applybutton");
+				buffer.newLine();
+			}catch(IOException exc) {
+				buffer.append(exc.getMessage());
+				buffer.newLine();
+			}
+			
+			try {
+				driver.findElement(By.id("myrulesheader"));
+				buffer.append("Find and My rules header: myrulesheader");
+				buffer.newLine();
+			}catch(IOException exc) {
+				buffer.append(exc.getMessage());
+				buffer.newLine();
+			}
+			try {
+				driver.findElement(By.id("user_icon_id")).click();
+				buffer.append("Find and click on User icon: user_icon_id");
+				buffer.newLine();
+			}catch(IOException exc) {
+				buffer.append(exc.getMessage());
+				buffer.newLine();
+			}
+			try {
+				driver.findElement(By.id("log_out_id")).click();
+				buffer.append("Find and click on LogOut button: log_out_id");
+				buffer.newLine();
+			}catch(IOException exc) {
+				buffer.append(exc.getMessage());
+				buffer.newLine();
+			}
+			try {
+				driver.getTitle().contains("Example Domain");
+				buffer.append("Find first page title: Example Domain");
+				buffer.newLine();
+			}catch(IOException exc) {
+				buffer.append(exc.getMessage());
+				buffer.newLine();
+			}
+		 buffer.close(); 
+        }
+	catch(Exception e) {
+		try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+		    fileWriter.write(e.getMessage());
+		    fileWriter.close();
+		} catch (IOException ex) {
+		    // Cxception handling
+		}
+		         
+	}
 	}
 	
         @BeforeClass
