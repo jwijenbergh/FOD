@@ -177,8 +177,8 @@ def clean_route_form(data):
         return _('Once destination port is matched, destination has to be filled as well. Either deselect destination port or fill destination address')
     if not (source or sourceports or ports or destination or destinationports):
         return _('Fill at least a Rule Match Condition')
-    if (destinationports or sourceports or ports) and not protocol:
-        return _('Protocol must be specified if ports are given')
+    #if (destinationports or sourceports or ports) and not protocol:
+    #    return _('Protocol must be specified if ports are given')
     if protocol and MatchProtocol(protocol="icmp") in protocol and (destinationports or sourceports or ports):
         return _('ICMP protocol does not allow to specify ports')
     if not user.is_superuser and then[0].action not in settings.UI_USER_THEN_ACTIONS:

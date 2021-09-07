@@ -80,7 +80,6 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
     def create(self, validated_data):
         if "applier" not in validated_data:
             u = self.context.get('request').user
-            logger.info("Adding applier according to authentized user %s" % u.username)
             validated_data["applier"] = u
         protocol = validated_data.pop('protocol', set())
         then = validated_data.pop('then')
@@ -91,10 +90,8 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
             status = 'INACTIVE'
             validated_data["status"] = status
         route = Route.objects.create(**validated_data)
-        if protocol:
-            route.protocol.set(protocol)
-        if fragmenttype:
-            route.fragmenttype.set(fragmenttype)
+        route.protocol.set(protocol)
+        route.fragmenttype.set(fragmenttype)
         route.then.set(then)
         return route
 
@@ -141,7 +138,7 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
         return res
 
     def validate(self, data):
-        if self.context and self.context["request"] and self.context["request"] == "POST":
+        if self.context and self.context["request"] and self.context["request"].method == "POST":
             if "applier" not in data:
                 u = self.context.get('request').user
                 logger.info("Adding applier according to authentized user %s" % u.username)
