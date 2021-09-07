@@ -5,7 +5,7 @@ from rest_framework import serializers
 from flowspec.models import (
     Route, MatchPort, ThenAction, FragmentType, MatchProtocol, MatchDscp)
 from flowspec.validators import (
-    clean_source, clean_destination, clean_expires, clean_status)
+    clean_source, clean_destination, clean_expires, clean_status, clean_route_form)
 
 from django.conf import settings
 import os
@@ -82,18 +82,20 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
             u = self.context.get('request').user
             logger.info("Adding applier according to authentized user %s" % u.username)
             validated_data["applier"] = u
-        protocol = validated_data.pop('protocol')
+        protocol = validated_data.pop('protocol', set())
         then = validated_data.pop('then')
-        fragmenttype = validated_data.pop('fragmenttype')
+        fragmenttype = validated_data.pop('fragmenttype', set())
         try:
             status = validated_data.pop("status")
         except KeyError:
             status = 'INACTIVE'
             validated_data["status"] = status
         route = Route.objects.create(**validated_data)
-        route.protocol.set(protocol)
+        if protocol:
+            route.protocol.set(protocol)
+        if fragmenttype:
+            route.fragmenttype.set(fragmenttype)
         route.then.set(then)
-        route.fragmenttype.set(fragmenttype)
         return route
 
     def validate_applier(self, attrs, source):
@@ -138,6 +140,17 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
         #return attrs
         return res
 
+    def validate(self, data):
+        if self.context and self.context["request"] and self.context["request"] == "POST":
+            if "applier" not in data:
+                u = self.context.get('request').user
+                logger.info("Adding applier according to authentized user %s" % u.username)
+                data["applier"] = u
+            error = clean_route_form(data) 
+            if error:
+                raise serializers.ValidationError(error)
+        return super().validate(data)
+
     def update(self, instance, validated_data):
         if 'name' in validated_data:
             del validated_data["name"]	
@@ -151,8 +164,8 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
         return instance
 
     then = ThenActionSerializer(many=True)
-    protocol = MatchProtocolSerializer(many=True)
-    fragmenttype = FragmentTypeSerializer(many=True)
+    protocol = MatchProtocolSerializer(many=True, required=False)
+    fragmenttype = FragmentTypeSerializer(many=True, required=False)
 
     class Meta:
         model = Route

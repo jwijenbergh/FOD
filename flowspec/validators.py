@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.translation import ugettext as _
 from peers.models import PeerRange, Peer
-from flowspec.models import Route
+from flowspec.models import Route, MatchProtocol
 from django.urls import reverse
 
 import os
@@ -158,13 +158,15 @@ def get_matchingprotocol_route_pks(protocolist, routes):
 
 
 def clean_route_form(data):
-    source = data.get('source', None)
-    sourceports = data.get('sourceport', None)
-    ports = data.get('port', None)
+    source = data.get('source', set())
+    sourceports = data.get('sourceport', set())
+    ports = data.get('port', set())
     then = data.get('then', None)
     destination = data.get('destination', None)
     destinationports = data.get('destinationport', None)
     user = data.get('applier', None)
+    fragmenttypes = data.get('fragmenttypes', set())
+    protocol = data.get('protocol', set())
     if (sourceports and ports):
         return _('Cannot create rule for source ports and ports at the same time. Select either ports or source ports')
     if (destinationports and ports):
@@ -175,8 +177,14 @@ def clean_route_form(data):
         return _('Once destination port is matched, destination has to be filled as well. Either deselect destination port or fill destination address')
     if not (source or sourceports or ports or destination or destinationports):
         return _('Fill at least a Rule Match Condition')
+    if (destinationports or sourceports or ports) and not protocol:
+        return _('Protocol must be specified if ports are given')
+    if protocol and MatchProtocol(protocol="icmp") in protocol and (destinationports or sourceports or ports):
+        return _('ICMP protocol does not allow to specify ports')
     if not user.is_superuser and then[0].action not in settings.UI_USER_THEN_ACTIONS:
         return _('This action "%s" is not permitted') % (then[0].action)
+
+    return None
 
 
 def check_if_rule_exists(fields, queryset):
