@@ -38,10 +38,7 @@ class ThenActionSerializer(serializers.Serializer):
         try:
             return ThenAction.objects.get(action=action, action_value=action_value)
         except ThenAction.DoesNotExist:
-            try:
-                return ThenAction.objects.get(id=int(action))
-            except ThenAction.DoesNotExist:
-                raise serializers.ValidationError('ThenAction does not exist.')
+            raise serializers.ValidationError('ThenAction does not exist.')
 
 class MatchProtocolSerializer(serializers.Serializer):
     def to_representation(self, obj):
@@ -49,13 +46,9 @@ class MatchProtocolSerializer(serializers.Serializer):
 
     def to_internal_value(self, data):
         try:
-            protocol = data
-            return MatchProtocol.objects.get(protocol=protocol)
+            return MatchProtocol.objects.get(protocol=data)
         except MatchProtocol.DoesNotExist:
-            try:
-                return MatchProtocol.objects.get(id=data)
-            except MatchProtocol.DoesNotExist:
-                raise serializers.ValidationError('MatchProtocol does not exist.')
+            raise serializers.ValidationError('MatchProtocol does not exist.')
 
 class FragmentTypeSerializer(serializers.Serializer):
     def to_representation(self, obj):
@@ -63,13 +56,9 @@ class FragmentTypeSerializer(serializers.Serializer):
 
     def to_internal_value(self, data):
         try:
-            fragmenttype = data
-            return FragmentType.objects.get(fragmenttype=fragmenttype)
+            return FragmentType.objects.get(fragmenttype=data)
         except FragmentType.DoesNotExist:
-            try:
-                return FragmentType.objects.get(id=data)
-            except FragmentType.DoesNotExist:
-                raise serializers.ValidationError('FragmentType does not exist.')
+            raise serializers.ValidationError('FragmentType does not exist.')
 
 class RouteSerializer(serializers.HyperlinkedModelSerializer):
     """
