@@ -125,11 +125,25 @@ elif [ "$1" = "--loop" ]; then  #arg
 elif [ "$1" = "--process1" ]; then #arg
   shift 1
 
-  "$0" --get_netconf_data "$@" | "$0" --parse_netconf_to_ruleinfo | "$0" --process_ruleinfo
+  tmpfile1="$(mktemp XXXXXXXXXXXX.list)"
+
+  set -o pipefail
+  "$0" --get_netconf_data "$@" | "$0" --parse_netconf_to_ruleinfo > "$tmpfile1"
+
+  status1="$?"
+  if [ "$status1" != 0 ]; then
+    echo "$0: get_netconf_data failed: $status1" 1>&2
+    rm -f "$tmpfile1"
+    exit "$status1"
+  else
+    "$0" --process_ruleinfo < "$tmpfile1"
+    rm -f "$tmpfile1"
+  fi
 
 elif [ "$1" = "--get_ruleinfo" ]; then #arg
   shift 1
 
+  set -o pipefail
   "$0" --get_netconf_data | "$0" --parse_netconf_to_ruleinfo 
 
 elif [ "$1" = "--process_netconf" ]; then #arg
@@ -152,6 +166,7 @@ elif [ "$1" = "--parse_netconf_to_ruleinfo" -o "$1" = "--parse" ]; then #arg
   shift 1
 
   which gawk &>/dev/null || apt-get install gawk 1>&2
+
   exec gawk '
 
   function esc1(val) {
@@ -211,7 +226,6 @@ elif [ "$1" = "--parse_netconf_to_ruleinfo" -o "$1" = "--parse" ]; then #arg
   END { if (start) { print "#not found"; } }
 
   ' FS='[<>]'
-
 
 elif [ "$1" = "--process_ruleinfo" ]; then #arg
   shift 1
