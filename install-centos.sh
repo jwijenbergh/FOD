@@ -52,6 +52,9 @@ if [ "$install_fodproper" = 0 ]; then
   echo "Setup partial python environment for FoD"
   virtualenv-3 /srv/venv
   source /srv/venv/bin/activate
+
+  #fix for broken anyjson and cl
+  pip install 'setuptools<58'
   pip install -r requirements.txt
 
 else
@@ -90,6 +93,8 @@ else
 		cp -f settings.py.dist settings.py
 		patch settings.py < settings.py.patch
 	)
+
+        pip install 'setuptools<58'
 	pip install -r requirements.txt
 
 	touch flowspy/settings_local.py
