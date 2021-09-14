@@ -55,16 +55,16 @@
 # (built from router-container/Dockerfile , but currently fails to be rebuilt):
 FROM cejkat/fod-router
 
-# 2. copy vnet_router management script + snmp feeder pass_persisttest_bgpflowspec (+ pass_persisttest only for testing/demonstration)
+##
+
+# 2. install all dependencies in advance (/fod_vnet_router --init.sysstart will check again and might install anything still missing)
+RUN apt-get -qqy update
+RUN DEBIAN_FRONTEND="noninteractive" apt-get -qqy install mininet iptables iproute2 tcpdump tshark iputils-ping iputils-tracepath hping3 gawk sshpass lsof strace snmpd snmp
+
+# 3. copy vnet_router management script + snmp feeder pass_persisttest_bgpflowspec (+ pass_persisttest only for testing/demonstration)
 COPY vnet_router/fod_vnet_router /
 COPY vnet_router/snmp/pass_persisttest_bgpflowspec /
 COPY vnet_router/snmp/snmp-release/pass_persisttest /
-
-##
-
-# 3. install all dependencies in advance (/fod_vnet_router --init.sysstart will check again and might install anything still missing)
-RUN apt-get -qqy update
-RUN DEBIAN_FRONTEND="noninteractive" apt-get -qqy install mininet iptables iproute2 tcpdump tshark iputils-ping iputils-tracepath hping3 gawk sshpass lsof strace snmpd snmp
 
 ##
 

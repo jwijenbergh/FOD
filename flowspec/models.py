@@ -118,6 +118,11 @@ class MatchProtocol(models.Model):
         return self.protocol
     def __str__(self):
         return self.__unicode__()
+    def __eq__(self, b):
+        if self.protocol == b.protocol:
+            return True
+        else:
+            return super().__eq__(b)
     class Meta:
         db_table = u'match_protocol'
 
