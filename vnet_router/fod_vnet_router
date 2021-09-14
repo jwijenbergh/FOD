@@ -160,7 +160,8 @@ elif [ "$1" = "--get_netconf_data" ]; then #arg
   ssh-keygen -l -f ~/.ssh/known_hosts -F [localhost]:830 >/dev/null || ssh-keyscan -4 -p 830 localhost >> ~/.ssh/known_hosts
 
   which sshpass &>/dev/null || apt-get install sshpass 1>&2
-  echo -e "connect -l netconf -p 830 localhost\nget-config --source running" | sshpass -pnetconf /usr/local/bin/netopeer2-cli
+  #echo -e "connect -l netconf -p 830 localhost\nget-config --source running" | sshpass -pnetconf /usr/local/bin/netopeer2-cli
+  echo -e "connect -l netconf -p 830 localhost\nget-config --source running" | sshpass -v -PPassword: -pnetconf /usr/local/bin/netopeer2-cli
 
 elif [ "$1" = "--parse_netconf_to_ruleinfo" -o "$1" = "--parse" ]; then #arg
   shift 1
