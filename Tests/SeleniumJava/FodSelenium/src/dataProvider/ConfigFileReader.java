@@ -70,4 +70,10 @@ public class ConfigFileReader {
 		 if(destinationIPAddress != null) return destinationIPAddress;
 		 else throw new RuntimeException("destination ip address not specified in the Configuration.properties file.");
 		 }
+	 
+	 public String getRuleName() {
+		 String ruleName = properties.getProperty("ruleName");
+		 if(ruleName != null) return ruleName;
+		 else throw new RuntimeException("rule Name not specified in the Configuration.properties file.");
+		 }
 }

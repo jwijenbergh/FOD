@@ -115,7 +115,7 @@ public class AddRuleTest {
 		try(FileWriter fileWriter = new FileWriter(".\\logs\\AddRulesReport.txt", true)) {
     		BufferedWriter buffer = new BufferedWriter(fileWriter);  
     		buffer.newLine();
-    		buffer.append("Login");
+    		buffer.append("AddName");
     		buffer.newLine();
     				try {
     					driver.findElement(By.id("routebutton")).click();
@@ -190,6 +190,14 @@ public class AddRuleTest {
     				try {
     					driver.findElement(By.id("applybutton")).click();
     					buffer.append("Find and click Apply button: applybutton");
+    					buffer.newLine();
+    				}catch(IOException exc) {
+    					buffer.append(exc.getMessage());
+    					buffer.newLine();
+    				}
+    				try {
+    					driver.findElement(By.id("myrulesheader"));
+    					buffer.append("Find and My rules header: myrulesheader");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
