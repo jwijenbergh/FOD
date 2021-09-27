@@ -103,8 +103,16 @@ class RouteViewSet(viewsets.ModelViewSet):
                         route.status = "PENDING"
                         route.save()
                         route.commit_add()
+                    elif requested_status == "INACTIVE":
+                        route.status = "INACTIVE"
+                        route.save()
                     else:
                         route.save()
+                    obj.data["status"] = route.status
+                    logger.info("RouteViewSet::create(): => route="+str(route))
+                    logger.info("RouteViewSet::create(): => route.status="+str(route.status))
+                    logger.info("RouteViewSet::create(): => obj="+str(obj))
+
                     return obj
             else:
                 return Response(serializer.errors, status=400)
