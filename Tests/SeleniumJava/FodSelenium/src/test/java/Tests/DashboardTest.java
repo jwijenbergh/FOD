@@ -1,6 +1,7 @@
 package test.java.Tests;
 
 import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import dataProvider.ConfigFileReader;

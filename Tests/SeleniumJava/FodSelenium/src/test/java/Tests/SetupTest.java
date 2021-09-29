@@ -47,7 +47,7 @@ public class SetupTest {
 					    buffer.append("Find access denied: access_denied_id");
 						buffer.newLine();
 					  }
-					   catch(Exception e){
+					   catch(Exception exc){
 						   buffer.append(exc.getMessage() );
 							buffer.newLine();
 					    flag_to_stop = false;
@@ -135,7 +135,7 @@ public class SetupTest {
 					    buffer.append("Find access denied: access_denied_id");
 						buffer.newLine();
 					  }
-					   catch(Exception e){
+					   catch(Exception exc){
 						   buffer.append(exc.getMessage() );
 							buffer.newLine();
 					    flag_to_stop = false;
@@ -223,7 +223,7 @@ public class SetupTest {
 					    buffer.append("Find access denied: access_denied_id");
 						buffer.newLine();
 					  }
-					   catch(Exception e){
+					   catch(Exception exc){
 						   buffer.append(exc.getMessage() );
 							buffer.newLine();
 					    flag_to_stop = false;
@@ -312,7 +312,7 @@ public class SetupTest {
 						    buffer.append("Find access denied: access_denied_id");
 							buffer.newLine();
 						  }
-						   catch(Exception e){
+						   catch(Exception exc){
 							   buffer.append(exc.getMessage() );
 								buffer.newLine();
 						    flag_to_stop = false;
@@ -401,7 +401,7 @@ public class SetupTest {
 						    buffer.append("Find access denied: access_denied_id");
 							buffer.newLine();
 						  }
-						   catch(Exception e){
+						   catch(Exception exc){
 							   buffer.append(exc.getMessage() );
 								buffer.newLine();
 						    flag_to_stop = false;
@@ -490,7 +490,7 @@ public class SetupTest {
 						    buffer.append("Find access denied: access_denied_id");
 							buffer.newLine();
 						  }
-						   catch(Exception e){
+						   catch(Exception exc){
 							   buffer.append(exc.getMessage() );
 								buffer.newLine();
 						    flag_to_stop = false;
@@ -580,7 +580,7 @@ public class SetupTest {
 						    buffer.append("Find access denied: access_denied_id");
 							buffer.newLine();
 						  }
-						   catch(Exception e){
+						   catch(Exception exc){
 							   buffer.append(exc.getMessage() );
 								buffer.newLine();
 						    flag_to_stop = false;
@@ -670,7 +670,7 @@ public class SetupTest {
 						    buffer.append("Find access denied: access_denied_id");
 							buffer.newLine();
 						  }
-						   catch(Exception e){
+						   catch(Exception exc){
 							   buffer.append(exc.getMessage() );
 								buffer.newLine();
 						    flag_to_stop = false;
@@ -760,7 +760,7 @@ public class SetupTest {
 						    buffer.append("Find access denied: access_denied_id");
 							buffer.newLine();
 						  }
-						   catch(Exception e){
+						   catch(Exception exc){
 							   buffer.append(exc.getMessage() );
 								buffer.newLine();
 						    flag_to_stop = false;
@@ -849,7 +849,7 @@ public class SetupTest {
 						    buffer.append("Find access denied: access_denied_id");
 							buffer.newLine();
 						  }
-						   catch(Exception e){
+						   catch(Exception exc){
 							   buffer.append(exc.getMessage() );
 								buffer.newLine();
 						    flag_to_stop = false;
@@ -938,7 +938,7 @@ public class SetupTest {
 						    buffer.append("Find access denied: access_denied_id");
 							buffer.newLine();
 						  }
-						   catch(Exception e){
+						   catch(Exception exc){
 							   buffer.append(exc.getMessage() );
 								buffer.newLine();
 						    flag_to_stop = false;
@@ -1027,7 +1027,7 @@ public class SetupTest {
 						    buffer.append("Find access denied: access_denied_id");
 							buffer.newLine();
 						  }
-						   catch(Exception e){
+						   catch(Exception exc){
 							   buffer.append(exc.getMessage() );
 								buffer.newLine();
 						    flag_to_stop = false;
@@ -1117,7 +1117,7 @@ public class SetupTest {
 						    buffer.append("Find access denied: access_denied_id");
 							buffer.newLine();
 						  }
-						   catch(Exception e){
+						   catch(Exception exc){
 							   buffer.append(exc.getMessage() );
 								buffer.newLine();
 						    flag_to_stop = false;
