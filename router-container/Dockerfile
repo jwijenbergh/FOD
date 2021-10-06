@@ -43,7 +43,7 @@ WORKDIR /opt/dev
 
 # libyang
 RUN \
-      git clone https://github.com/CESNET/libyang.git && \
+      git clone -b libyang1 https://github.com/CESNET/libyang.git && \
       cd libyang && mkdir build && cd build && \
       cmake -DCMAKE_BUILD_TYPE:String="Debug" -DENABLE_BUILD_TESTS=OFF .. && \
       make -j2 && \
