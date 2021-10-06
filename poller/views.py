@@ -44,7 +44,7 @@ import os
 LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'poller.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 handler = logging.FileHandler(LOG_FILENAME)
 handler.setFormatter(formatter)
 logger.addHandler(handler)

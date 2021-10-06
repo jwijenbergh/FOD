@@ -90,7 +90,7 @@
     <script src="{% static 'js/dataTableslatest/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'js/dataTableslatest/dataTables.bootstrap.js' %}"></script>
     {% if user.is_authenticated %}
-<script type="text/javascript" src="{% url 'load-js' 'poller' %}"></script>
+<script type="text/javascript" src="{% url 'load-js' 'pollerdash' %}"></script>
 {% endif %}
 
 <script type="text/javascript">
@@ -108,6 +108,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
     // 1.10s API has ajax reloading built in, so we use those abilities
     // directly.
     if ( $.fn.dataTable.versionCheck ) {
+	try {
         var api = new $.fn.dataTable.Api( oSettings );
 
         if ( sNewSource ) {
@@ -117,6 +118,10 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
             api.ajax.reload( fnCallback, !bStandingRedraw );
         }
         return;
+	} catch (e) {
+		console.log("Error: " + e);
+		return;
+	}
     }
 
     if ( sNewSource !== undefined && sNewSource !== null ) {
@@ -169,6 +174,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
         }
     }, oSettings );
 };
+$.fn.dataTable.ext.errMode = 'throw';
 var oTable;
 var start;
 var end;

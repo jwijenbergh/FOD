@@ -1,0 +1,1102 @@
+module configuration {
+  namespace "http://xml.juniper.net/xnm/1.1/xnm";
+  prefix jc;
+
+  organization
+    "Juniper Networks, Inc.";
+  description
+    "Junos YANG module for a subset of configuration hierarchies - it represents a route rules that are used by Firewall on Demand";
+
+  revision 2021-10-06 {
+    description "Adapted configuration module in progress.";
+  }
+
+
+  typedef daemon {
+    type string;
+  }
+
+  typedef filename {
+    type string;
+  }
+
+  typedef client-filename {
+    type string;
+  }
+
+  typedef hostname {
+    type string;
+  }
+
+  typedef ipaddr {
+    type string;
+  }
+
+  typedef sysid {
+    type string;
+  }
+
+  typedef interface-device {
+    type string;
+  }
+
+  typedef ddl-bits {
+    type string;
+  }
+
+  typedef isoaddr {
+    type string;
+  }
+
+  typedef ipprefix {
+    type string;
+  }
+
+  typedef ipprefix-mandatory {
+    type string;
+  }
+
+  typedef interface-unit {
+    type string;
+  }
+
+  typedef ipaddr-or-interface {
+    type string;
+  }
+
+  typedef areaid {
+    type string;
+  }
+
+  typedef interface-name {
+    type string;
+  }
+
+  typedef community {
+    type string;
+  }
+
+  typedef interface-wildcard {
+    type string;
+  }
+
+  typedef unreadable {
+    type string;
+  }
+
+  typedef ipprefix-optional {
+    type string;
+  }
+
+  typedef policy-algebra {
+    type string;
+  }
+
+  typedef regular-expression {
+    type string;
+  }
+
+  typedef group-glob {
+    type string;
+  }
+
+  typedef atm-vci {
+    type string;
+  }
+
+  typedef ipprefix-only {
+    type string;
+  }
+
+  typedef ipv4addr {
+    type string;
+  }
+
+  typedef ipv4prefix {
+    type string;
+  }
+
+  typedef ipv4prefix-mandatory {
+    type string;
+  }
+
+  typedef ipv4addr-or-interface {
+    type string;
+  }
+
+  typedef ipv4prefix-optional {
+    type string;
+  }
+
+  typedef ipv4prefix-only {
+    type string;
+  }
+
+  typedef ipv6addr {
+    type string;
+  }
+
+  typedef ipv6prefix {
+    type string;
+  }
+
+  typedef ipv6prefix-mandatory {
+    type string;
+  }
+
+  typedef ipv6addr-or-interface {
+    type string;
+  }
+
+  typedef ipv6prefix-optional {
+    type string;
+  }
+
+  typedef ipv6prefix-only {
+    type string;
+  }
+
+  typedef interface-device-wildcard {
+    type string;
+  }
+
+  typedef time {
+    type string;
+  }
+
+  typedef mac-addr {
+    type string;
+  }
+
+  typedef mac-addr-prefix {
+    type string;
+  }
+
+  typedef mac-unicaset {
+    type string;
+  }
+
+  typedef mac-unicast-prefix {
+    type string;
+  }
+
+  typedef mac-multicast {
+    type string;
+  }
+
+  typedef mac-multicast-prefix {
+    type string;
+  }
+
+  typedef mpls-label {
+    type string;
+  }
+
+  typedef unsigned-float {
+    type string;
+  }
+
+  typedef isoprefix {
+    type string;
+  }
+
+  typedef isosysid {
+    type string;
+  }
+
+  typedef string-huge {
+    type string;
+  }
+
+  typedef variable {
+    type string;
+  }
+
+  typedef glob-variable {
+    type string;
+  }
+
+  typedef vlan-range {
+    type string;
+  }
+
+  typedef interface-range-wild {
+    type string;
+  }
+
+  typedef fc-addr {
+    type string;
+  }
+
+  typedef wwn {
+    type string;
+  }
+
+  typedef logfilename {
+    type string;
+  }
+
+  typedef range {
+    type string;
+  }
+
+  typedef esi {
+    type string;
+  }
+
+  grouping juniper-config {
+    leaf rcsid {
+      type string;
+      description
+        "Revision control system identifier";
+    }
+
+    leaf version {
+      type string;
+      description
+        "Software version information";
+    }
+
+    container routing-options {
+      description
+        "Protocol-independent routing option configuration";
+      uses juniper-routing-options;
+    }
+  }
+
+  grouping juniper-routing-options {
+    uses apply-advanced;
+
+    container flow {
+      description
+        "Locally defined flow routing information";
+      uses apply-advanced;
+
+      list route {
+        key "name";
+        ordered-by user;
+        description
+          "Flow route";
+        uses flow-route-inet;
+      }
+    }
+
+    leaf router-id {
+      type ipv4addr;
+      description
+        "Router identifier";
+    }
+  }
+
+  grouping apply-advanced {
+    description
+      "Apply advanced configuration logic";
+    leaf-list apply-groups {
+      type string;
+      description
+        "Groups from which to inherit configuration data";
+    }
+
+    leaf-list apply-groups-except {
+      type string;
+      description
+        "Don't inherit configuration data from these groups";
+    }
+  }
+
+  grouping flow-route-inet {
+    leaf name {
+      type string;
+      description
+        "(null)";
+    }
+
+    uses apply-advanced;
+
+    leaf no-install {
+      type empty;
+      description
+        "Don't install firewall filter in forwarding";
+    }
+
+    container then {
+      description
+        "Actions to take for this flow";
+      uses flow-route-op;
+    }
+
+    container match {
+      description
+        "Flow definition";
+      uses flow-route-qualifier-inet;
+    }
+  }
+
+  grouping flow-route-inet6 {
+    leaf route_name {
+      type string;
+      description
+        "(null)";
+    }
+
+    uses apply-advanced;
+
+    leaf no-install {
+      type empty;
+      description
+        "Don't install firewall filter in forwarding";
+    }
+
+    container then {
+      description
+        "Actions to take for this flow";
+      uses flow-route-op;
+    }
+
+    container match {
+      description
+        "Flow definition";
+      uses flow-route-qualifier-inet6;
+    }
+  }
+
+  grouping flow-route-op {
+    uses apply-advanced;
+
+    leaf community {
+      type string;
+      description
+        "Name of BGP community";
+    }
+
+    choice flow_op_action {
+      leaf accept {
+        type empty;
+        description
+          "Allow traffic through";
+      }
+
+      leaf discard {
+        type empty;
+        description
+          "Discard all traffic for this flow";
+      }
+
+      leaf rate-limit {
+        type string;
+        description
+          "Rate in bits/sec to limit the flow traffic";
+      }
+    }
+
+    leaf routing-instance {
+      type string;
+      description
+        "Redirect to instance identified via Route Target community";
+    }
+
+    leaf sample {
+      type empty;
+      description
+        "Sample traffic that matches this flow";
+    }
+
+    leaf mark {
+      type uint32 {
+        range "0 .. 63";
+      }
+      description
+        "Set DSCP value for traffic that matches this flow";
+    }
+
+    leaf next-term {
+      type empty;
+      description
+        "Continue the filter evaluation after matching this flow";
+    }
+  }
+
+  grouping flow-route-qualifier-inet6 {
+    uses apply-advanced;
+
+    leaf-list protocol {
+      type enumeration {
+        enum "icmp" {
+          description
+            "Internet Control Message Protocol";
+        }
+        enum "igmp" {
+          description
+            "Internet Group Management Protocol";
+        }
+        enum "ipip" {
+          description
+            "IP in IP";
+        }
+        enum "tcp" {
+          description
+            "Transmission Control Protocol";
+        }
+        enum "egp" {
+          description
+            "Exterior gateway protocol";
+        }
+        enum "udp" {
+          description
+            "User Datagram Protocol";
+        }
+        enum "rsvp" {
+          description
+            "Resource Reservation Protocol";
+        }
+        enum "gre" {
+          description
+            "Generic routing encapsulation";
+        }
+        enum "esp" {
+          description
+            "IPSec Encapsulating Security Payload";
+        }
+        enum "ah" {
+          description
+            "IP Security authentication header";
+        }
+        enum "icmp6" {
+          description
+            "Internet Control Message Protocol Version 6";
+        }
+        enum "ospf" {
+          description
+            "Open Shortest Path First";
+        }
+        enum "pim" {
+          description
+            "Protocol Independent Multicast";
+        }
+        enum "sctp" {
+          description
+            "Stream Control Transmission Protocol";
+        }
+        enum "expression" {
+          description
+            "(null)";
+        }
+      }
+      description
+        "IP protocol value";
+    }
+
+    leaf-list port {
+      type string;
+      ordered-by user;
+      description
+        "Source or destination TCP/UDP port";
+    }
+
+    leaf-list destination-port {
+      type string;
+      ordered-by user;
+      description
+        "Destination TCP/UDP port";
+    }
+
+    leaf-list source-port {
+      type string;
+      ordered-by user;
+      description
+        "Source TCP/UDP port";
+    }
+
+    leaf-list tcp-flags {
+      type enumeration {
+        enum "fin" {
+          description
+            "FIN";
+        }
+        enum "syn" {
+          description
+            "SYN";
+        }
+        enum "rst" {
+          description
+            "RST";
+        }
+        enum "push" {
+          description
+            "PUSH";
+        }
+        enum "ack" {
+          description
+            "ACK";
+        }
+        enum "urgent" {
+          description
+            "Urgent";
+        }
+        enum "expression" {
+          description
+            "(null)";
+        }
+      }
+      description
+        "TCP flags";
+    }
+
+    leaf-list packet-length {
+      type policy-algebra;
+      description
+        "Packet length (0-65535)";
+    }
+
+    leaf-list dscp {
+      type policy-algebra;
+      description
+        "Differentiated Services (DiffServ) code point (DSCP) (0-63)";
+    }
+
+    leaf-list fragment {
+      type enumeration {
+        enum "dont-fragment" {
+          description
+            "Don't Fragment flag is set";
+        }
+        enum "not-a-fragment" {
+          description
+            "Not a fragment";
+        }
+        enum "is-fragment" {
+          description
+            "Fragmented packet";
+        }
+        enum "first-fragment" {
+          description
+            "First fragment";
+        }
+        enum "last-fragment" {
+          description
+            "Last fragment";
+        }
+      }
+      description
+        "(null)";
+    }
+
+    container destination {
+      description
+        "Destination prefix for this traffic flow";
+      uses flow-prefix-with-offset;
+    }
+
+    container source {
+      description
+        "Source prefix for this traffic flow";
+      uses flow-prefix-with-offset;
+    }
+
+    leaf-list icmp6-type {
+      type enumeration {
+        enum "echo-request" {
+          description
+            "Echo request";
+        }
+        enum "echo-reply" {
+          description
+            "Echo reply";
+        }
+        enum "destination-unreachable" {
+          description
+            "Unreachable";
+        }
+        enum "router-advertisement" {
+          description
+            "Router advertisement";
+        }
+        enum "router-solicit" {
+          description
+            "Router solicit";
+        }
+        enum "time-exceeded" {
+          description
+            "Time exceeded";
+        }
+        enum "parameter-problem" {
+          description
+            "Parameter problem";
+        }
+        enum "packet-too-big" {
+          description
+            "Packet too big";
+        }
+        enum "membership-query" {
+          description
+            "Query for multicast listener";
+        }
+        enum "membership-report" {
+          description
+            "Report for multicast listener";
+        }
+        enum "membership-termination" {
+          description
+            "Terminate multicast listener";
+        }
+        enum "redirect" {
+          description
+            "Router informs host of a better first hop for a destination";
+        }
+        enum "neighbor-solicit" {
+          description
+            "Request link-layer address of neighbor";
+        }
+        enum "neighbor-advertisement" {
+          description
+            "Provide link-layer address to neighbor";
+        }
+        enum "router-renumbering" {
+          description
+            "Router renumbering command";
+        }
+        enum "node-information-request" {
+          description
+            "Query for information on address or name";
+        }
+        enum "node-information-reply" {
+          description
+            "Reply to node information request";
+        }
+        enum "expression" {
+          description
+            "(null)";
+        }
+      }
+      description
+        "ICMP message type";
+    }
+
+    leaf-list icmp6-code {
+      type enumeration {
+        enum "no-route-to-destination" {
+          description
+            "Route to destination not found";
+        }
+        enum "administratively-prohibited" {
+          description
+            "Communication with destination prohibited by filter";
+        }
+        enum "address-unreachable" {
+          description
+            "Problem with resolving address or other link-specific problem";
+        }
+        enum "port-unreachable" {
+          description
+            "Port unreachable";
+        }
+        enum "ttl-eq-zero-during-transit" {
+          description
+            "TTL eq zero during transit";
+        }
+        enum "ttl-eq-zero-during-reassembly" {
+          description
+            "TTL eq zero during reassembly";
+        }
+        enum "ip6-header-bad" {
+          description
+            "IP header bad";
+        }
+        enum "unrecognized-next-header" {
+          description
+            "Unrecognized next header type encountered";
+        }
+        enum "unrecognized-option" {
+          description
+            "Unrecogzined IPv6 option";
+        }
+        enum "expression" {
+          description
+            "(null)";
+        }
+      }
+      description
+        "ICMP message code";
+    }
+
+    leaf-list flow-label {
+      type policy-algebra;
+      description
+        "Flow-label (0-1048575)";
+    }
+  }
+
+  grouping flow-route-qualifier-inet {
+    uses apply-advanced;
+
+    leaf-list protocol {
+      type enumeration {
+        enum "icmp" {
+          description
+            "Internet Control Message Protocol";
+        }
+        enum "igmp" {
+          description
+            "Internet Group Management Protocol";
+        }
+        enum "ipip" {
+          description
+            "IP in IP";
+        }
+        enum "tcp" {
+          description
+            "Transmission Control Protocol";
+        }
+        enum "egp" {
+          description
+            "Exterior gateway protocol";
+        }
+        enum "udp" {
+          description
+            "User Datagram Protocol";
+        }
+        enum "rsvp" {
+          description
+            "Resource Reservation Protocol";
+        }
+        enum "gre" {
+          description
+            "Generic routing encapsulation";
+        }
+        enum "esp" {
+          description
+            "IPSec Encapsulating Security Payload";
+        }
+        enum "ah" {
+          description
+            "IP Security authentication header";
+        }
+        enum "icmp6" {
+          description
+            "Internet Control Message Protocol Version 6";
+        }
+        enum "ospf" {
+          description
+            "Open Shortest Path First";
+        }
+        enum "pim" {
+          description
+            "Protocol Independent Multicast";
+        }
+        enum "sctp" {
+          description
+            "Stream Control Transmission Protocol";
+        }
+        enum "expression" {
+          description
+            "(null)";
+        }
+      }
+      description
+        "IP protocol value";
+    }
+
+    leaf-list port {
+      type string;
+      ordered-by user;
+      description
+        "Source or destination TCP/UDP port";
+    }
+
+    leaf-list destination-port {
+      type string;
+      ordered-by user;
+      description
+        "Destination TCP/UDP port";
+    }
+
+    leaf-list source-port {
+      type string;
+      ordered-by user;
+      description
+        "Source TCP/UDP port";
+    }
+
+    leaf-list tcp-flags {
+      type enumeration {
+        enum "fin" {
+          description
+            "FIN";
+        }
+        enum "syn" {
+          description
+            "SYN";
+        }
+        enum "rst" {
+          description
+            "RST";
+        }
+        enum "push" {
+          description
+            "PUSH";
+        }
+        enum "ack" {
+          description
+            "ACK";
+        }
+        enum "urgent" {
+          description
+            "Urgent";
+        }
+        enum "expression" {
+          description
+            "(null)";
+        }
+      }
+      description
+        "TCP flags";
+    }
+
+    leaf-list packet-length {
+      type policy-algebra;
+      description
+        "Packet length (0-65535)";
+    }
+
+    leaf-list dscp {
+      type policy-algebra;
+      description
+        "Differentiated Services (DiffServ) code point (DSCP) (0-63)";
+    }
+
+    leaf-list fragment {
+      type enumeration {
+        enum "dont-fragment" {
+          description
+            "Don't Fragment flag is set";
+        }
+        enum "not-a-fragment" {
+          description
+            "Not a fragment";
+        }
+        enum "is-fragment" {
+          description
+            "Fragmented packet";
+        }
+        enum "first-fragment" {
+          description
+            "First fragment";
+        }
+        enum "last-fragment" {
+          description
+            "Last fragment";
+        }
+      }
+      description
+        "(null)";
+    }
+
+    leaf destination {
+      type ipprefix;
+      description
+        "Destination prefix for this traffic flow";
+    }
+
+    leaf source {
+      type ipprefix;
+      description
+        "Source prefix for this traffic flow";
+    }
+
+    leaf-list icmp-code {
+      type enumeration {
+        enum "network-unreachable" {
+          description
+            "Network unreachable";
+        }
+        enum "host-unreachable" {
+          description
+            "Host unreachable";
+        }
+        enum "protocol-unreachable" {
+          description
+            "Protocol unreachable";
+        }
+        enum "port-unreachable" {
+          description
+            "Port unreachable";
+        }
+        enum "fragmentation-needed" {
+          description
+            "Fragmentation needed";
+        }
+        enum "source-route-failed" {
+          description
+            "Source route failed";
+        }
+        enum "destination-network-unknown" {
+          description
+            "Destination network unknown";
+        }
+        enum "destination-host-unknown" {
+          description
+            "Destination host unknown";
+        }
+        enum "source-host-isolated" {
+          description
+            "Source host isolated";
+        }
+        enum "destination-network-prohibited" {
+          description
+            "Destination network prohibited";
+        }
+        enum "destination-host-prohibited" {
+          description
+            "Destination host prohibited";
+        }
+        enum "network-unreachable-for-tos" {
+          description
+            "Network unreachable for ToS";
+        }
+        enum "host-unreachable-for-tos" {
+          description
+            "Host unreachable for ToS";
+        }
+        enum "communication-prohibited-by-filtering" {
+          description
+            "Communication prohibited by filtering";
+        }
+        enum "host-precedence-violation" {
+          description
+            "Host precedence violation";
+        }
+        enum "precedence-cutoff-in-effect" {
+          description
+            "Precedence cutoff in effect";
+        }
+        enum "redirect-for-network" {
+          description
+            "Redirect for network";
+        }
+        enum "redirect-for-host" {
+          description
+            "Redirect for host";
+        }
+        enum "redirect-for-tos-and-net" {
+          description
+            "Redirect for ToS and net";
+        }
+        enum "redirect-for-tos-and-host" {
+          description
+            "Redirect for ToS and host";
+        }
+        enum "ttl-eq-zero-during-transit" {
+          description
+            "TTL eq zero during transit";
+        }
+        enum "ttl-eq-zero-during-reassembly" {
+          description
+            "TTL eq zero during reassembly";
+        }
+        enum "ip-header-bad" {
+          description
+            "IP header bad";
+        }
+        enum "required-option-missing" {
+          description
+            "Required option missing";
+        }
+        enum "expression" {
+          description
+            "(null)";
+        }
+      }
+      description
+        "ICMP message code";
+    }
+
+    leaf-list icmp-type {
+      type enumeration {
+        enum "echo-request" {
+          description
+            "Echo request";
+        }
+        enum "echo-reply" {
+          description
+            "Echo reply";
+        }
+        enum "unreachable" {
+          description
+            "Unreachable";
+        }
+        enum "source-quench" {
+          description
+            "Source quench";
+        }
+        enum "redirect" {
+          description
+            "Redirect";
+        }
+        enum "router-advertisement" {
+          description
+            "Router advertisement";
+        }
+        enum "router-solicit" {
+          description
+            "Router solicit";
+        }
+        enum "time-exceeded" {
+          description
+            "Time exceeded";
+        }
+        enum "parameter-problem" {
+          description
+            "Parameter problem";
+        }
+        enum "timestamp" {
+          description
+            "Timestamp";
+        }
+        enum "timestamp-reply" {
+          description
+            "Timestamp reply";
+        }
+        enum "info-request" {
+          description
+            "Informational request";
+        }
+        enum "info-reply" {
+          description
+            "Informational reply";
+        }
+        enum "mask-request" {
+          description
+            "Mask request";
+        }
+        enum "mask-reply" {
+          description
+            "Mask reply";
+        }
+        enum "expression" {
+          description
+            "(null)";
+        }
+      }
+      description
+        "ICMP message type";
+    }
+  }
+
+  grouping flow-prefix-with-offset {
+    leaf prefix {
+      type ipprefix;
+      description
+        "(null)";
+    }
+
+    leaf prefix-offset {
+      type uint32;
+      description
+        "Offset from where prefix match will start";
+    }
+  }
+
+  container configuration {
+    uses juniper-config;
+  }
+}

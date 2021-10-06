@@ -97,24 +97,24 @@
             <div class="sidebar-collapse">
                 <ul class="nav" id="side-menu">
                     <li>
-                        <a href="{% url 'dashboard' %}"><i class="fa fa-dashboard fa-fw"></i> {% trans "Dashboard" %}</a>
+                        <a href="{% url 'dashboard' %}" id="navigation_dashboard_id"><i class="fa fa-dashboard fa-fw"></i> {% trans "Dashboard" %}</a>
                     </li>
                     <li>
-                        <a href="{% url 'group-routes' %}"><i class="fa fa-shield fa-fw"></i> {% trans "Rules" %}</a>
+                        <a href="{% url 'group-routes' %}" id="navigation_rules_id"><i class="fa fa-shield fa-fw"></i> {% trans "Rules" %}</a>
                     </li>
                     <li>
-                        <a href="{% url 'add-route' %}"><i class="fa fa-plus-circle fa-fw"></i> {% trans "Add Rule" %}</a>
+                        <a href="{% url 'add-route' %}" id="navigation_add_rule_id"><i class="fa fa-plus-circle fa-fw"></i> {% trans "Add Rule" %}</a>
                     </li>
                     {% if perms.accounts.overview %}<li>
-                            <a href="{% url 'overview' %}"><i class="fa fa-desktop fa-fw"></i> {% trans "Overview" %}</a>
+                            <a href="{% url 'overview' %}" id="navigation_overview_id"><i class="fa fa-desktop fa-fw"></i> {% trans "Overview" %}</a>
                         </li>{% endif %}
                     {% if user.is_superuser %}
-                        <li><a href="{% url 'admin:index' %}"><i class="fa fa-cogs fa-fw"></i> {% trans "Admin" %}</a>
+                        <li><a href="{% url 'admin:index' %}" id="navigation_admin_id"><i class="fa fa-cogs fa-fw"></i> {% trans "Admin" %}</a>
                         </li>
 						{% endif %}
                     {% if user.userprofile.peers.all %}
 				        <li>
-				            <a href="{% url 'user-profile' %}"><i class="fa fa-user fa-fw"></i> {% trans "My profile" %}</a>
+				            <a href="{% url 'user-profile' %}" id="navigation_my_rule_id"><i class="fa fa-user fa-fw"></i> {% trans "My profile" %}</a>
 				        </li>
 				    {% endif %}
                 </ul>
@@ -152,7 +152,7 @@
 				{% include "footer.html" %}
 			{% endblock %}
     <!-- Core Scripts - Include with every page -->
-    <script src="{% static 'b3theme/js/jquery-1.10.2.js' %}"></script>
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
     <script src="{% static 'js/jquery_csrf_protect.js' %}" type="text/javascript"></script>
     <script src="{% static 'b3theme/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'b3theme/js/plugins/metisMenu/jquery.metisMenu.js' %}"></script>

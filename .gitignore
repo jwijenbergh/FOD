@@ -73,6 +73,12 @@ supervisord.conf
 .vs
 Tests/Selenium/.vs
 
+Tests/SeleniumJava/.metadata/*
+Tests/SeleniumJava/FodSelenium/logs/log.txt
+Tests/SeleniumJava/FodSelenium/logs/report.txt
+Tests/SeleniumJava/FodSelenium/test-output/*
+
+
 #############################################################################
 #############################################################################
 

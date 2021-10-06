@@ -5,7 +5,7 @@ from rest_framework import serializers
 from flowspec.models import (
     Route, MatchPort, ThenAction, FragmentType, MatchProtocol, MatchDscp)
 from flowspec.validators import (
-    clean_source, clean_destination, clean_expires, clean_status)
+    clean_source, clean_destination, clean_expires, clean_status, clean_route_form)
 
 from django.conf import settings
 import os
@@ -38,10 +38,7 @@ class ThenActionSerializer(serializers.Serializer):
         try:
             return ThenAction.objects.get(action=action, action_value=action_value)
         except ThenAction.DoesNotExist:
-            try:
-                return ThenAction.objects.get(id=int(action))
-            except ThenAction.DoesNotExist:
-                raise serializers.ValidationError('ThenAction does not exist.')
+            raise serializers.ValidationError('ThenAction does not exist.')
 
 class MatchProtocolSerializer(serializers.Serializer):
     def to_representation(self, obj):
@@ -49,13 +46,19 @@ class MatchProtocolSerializer(serializers.Serializer):
 
     def to_internal_value(self, data):
         try:
-            protocol = data
-            return MatchProtocol.objects.get(protocol=protocol)
+            return MatchProtocol.objects.get(protocol=data)
         except MatchProtocol.DoesNotExist:
-            try:
-                return MatchProtocol.objects.get(id=data)
-            except MatchProtocol.DoesNotExist:
-                raise serializers.ValidationError('MatchProtocol does not exist.')
+            raise serializers.ValidationError('MatchProtocol does not exist.')
+
+class FragmentTypeSerializer(serializers.Serializer):
+    def to_representation(self, obj):
+        return obj.fragmenttype
+
+    def to_internal_value(self, data):
+        try:
+            return FragmentType.objects.get(fragmenttype=data)
+        except FragmentType.DoesNotExist:
+            raise serializers.ValidationError('FragmentType does not exist.')
 
 class RouteSerializer(serializers.HyperlinkedModelSerializer):
     """
@@ -66,12 +69,18 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
     def create(self, validated_data):
         if "applier" not in validated_data:
             u = self.context.get('request').user
-            logger.info("Adding applier according to authentized user %s" % u.username)
             validated_data["applier"] = u
-        protocol = validated_data.pop('protocol')
+        protocol = validated_data.pop('protocol', set())
         then = validated_data.pop('then')
+        fragmenttype = validated_data.pop('fragmenttype', set())
+        try:
+            status = validated_data.pop("status")
+        except KeyError:
+            status = 'INACTIVE'
+            validated_data["status"] = status
         route = Route.objects.create(**validated_data)
         route.protocol.set(protocol)
+        route.fragmenttype.set(fragmenttype)
         route.then.set(then)
         return route
 
@@ -117,6 +126,17 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
         #return attrs
         return res
 
+    def validate(self, data):
+        if self.context and self.context["request"] and self.context["request"].method == "POST":
+            if "applier" not in data:
+                u = self.context.get('request').user
+                logger.info("Adding applier according to authentized user %s" % u.username)
+                data["applier"] = u
+            error = clean_route_form(data) 
+            if error:
+                raise serializers.ValidationError(error)
+        return super().validate(data)
+
     def update(self, instance, validated_data):
         if 'name' in validated_data:
             del validated_data["name"]	
@@ -130,7 +150,9 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
         return instance
 
     then = ThenActionSerializer(many=True)
-    protocol = MatchProtocolSerializer(many=True)
+    protocol = MatchProtocolSerializer(many=True, required=False)
+    fragmenttype = FragmentTypeSerializer(many=True, required=False)
+
     class Meta:
         model = Route
         fields = (
@@ -147,12 +169,6 @@ class PortSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MatchPort
         fields = ('id', 'port', )
-        read_only_fields = ('id', )
-
-class FragmentTypeSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = FragmentType
-        fields = ('id', 'fragmenttype', )
         read_only_fields = ('id', )
 
 class MatchDscpSerializer(serializers.HyperlinkedModelSerializer):

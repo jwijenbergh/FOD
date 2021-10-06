@@ -1,0 +1,45 @@
+
+LoginWithSQLInjection
+Go to url: http://localhost:8083/altlogin
+Find login input: id_username 
+Add in login input data: 105 OR 1=1
+Find password input: id_password
+Add in password input data: 105 OR 1=1
+Find and click on Apply button: applybutton
+Find error: login_error_id
+
+LoginWithWrongData
+Go to url: http://localhost:8083/altlogin
+Find login input: id_username 
+Add in login input data: wrong
+Find password input: id_password
+Add in password input data: wrong
+Find and click on Apply button: applybutton
+Find error: login_error_id
+
+LoginWithoutLogin
+Go to url: http://localhost:8083/altlogin
+Find login input: id_username 
+Add in login input empty data: 
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find required attribute: id_username
+
+LoginWithoutPassword
+Go to url: http://localhost:8083/altlogin
+Find login input: id_username 
+Add in login input data: id_usernameadmin
+Find password input: id_password
+Add in password input empty data: 
+Find and click on Apply button: applybutton
+Find required attribute: id_password
+
+SuccessLogin
+Go to url: http://localhost:8083/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader

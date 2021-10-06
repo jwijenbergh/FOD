@@ -1,0 +1,263 @@
+#!/usr/bin/perl
+
+# adapted from default/pass_persisttest
+
+# Persistent perl script to respond to pass-through smnp requests
+
+# put the following in your snmpd.conf file to call this script:
+#
+# Unix systems and Cygwin:
+# pass_persist .1.3.6.1.4.1.8072.2.255 /path/to/pass_persisttest
+# Windows systems except Cygwin:
+# pass_persist .1.3.6.1.4.1.8072.2.255 perl /path/to/pass_persisttest
+
+#use Data::Dumper;
+#my $debug = 1;
+my $debug = 0;
+
+##
+
+#if (!open(STDERR, ">>/dev/shm/outx")) {
+#  print STDERR "/dev/shm/outx: $!$/";
+#}
+
+##
+
+# Forces a buffer flush after every print
+$|=1;
+
+# Save my PID, to help kill this instance.
+$PIDFILE=$ENV{'PASS_PERSIST_PIDFILE'} || "/tmp/pass_persist_bgpflowspec.pid";
+open(PIDFILE, ">$PIDFILE");
+print PIDFILE "$$\n";
+close(PIDFILE);
+
+use strict;
+
+##
+
+#my $counter = 0;
+
+#my $place = ".1.3.6.1.4.1.8072.2.255";
+my $place_pkts = ".1.3.6.1.4.1.2636.3.5.2.1.4"; # SNMP_CNTPKTS
+my $place_bytes = ".1.3.6.1.4.1.2636.3.5.2.1.5"; # SNMP_CNTBYTES
+
+##
+
+my $state_filename = "/fod_vnet_router.state";
+
+my $rulesfilter_oidlist = string_to_oid_list("__flowspec_default_inet__");
+#my $place2 = $place.$rulesfilter_oidlist;
+
+##
+
+sub read_statefile($)
+{
+  my ($state_filename) = @_;
+
+  if (!open(STATEFILE, $state_filename)) {
+    print STDERR "$state_filename: $!$/" if ($debug);
+    return [];
+  } 
+  my @lines = <STATEFILE>;
+  chomp @lines;
+  close STATEFILE;
+  return @lines;
+}
+
+sub get_ports_str($)
+{
+  my ($port_spec) = @_;
+
+  my @port_specs = split(/,/, $port_spec);
+
+  my $ret = "";
+
+  for my $port_spec0 (@port_specs) {
+    my $add1;
+    if ($port_spec0 =~ /^[0-9]+$/) {
+      $add1 = "=".$port_spec0;
+    } elsif ($port_spec0 =~ /^([0-9]+)-([0-9]+)$/) {
+      $add1 = ">=".$1."&<=".$2;
+    } else {
+      print STDERR "unknown port spec part $port_spec0$/" if ($debug);
+      $add1 = $port_spec0; # TODO
+    }
+    
+    $ret = ($ret=="") ? $add1 : ($ret.",".$add1); 
+  }
+
+  print STDERR "port_spec=$port_spec => ret=$ret$/" if ($debug);
+
+  return $ret;
+}
+
+#my $rulename1_oidlist = string_to_oid_list("10.0.0.2,10.0.0.1,proto=1");
+sub get_snmp_rulename
+{
+  my ($src, $dst, $protocol, $protocol_num, $srcports, $dstports, $fragment_options, $thenaction, @rest) = @_;
+
+  # TODO
+
+  $dst =~ s/\/32//;
+  $src =~ s/\/32//;
+
+  my $rulename = $dst.",".$src;
+
+  my $proto = $protocol_num;  
+  #if ($protocol eq 'icmp') {
+  #  $proto = "1";
+  #} elsif ($protocol eq 'udp') {
+  #  $proto = "17";
+  #} elsif ($protocol eq 'tcp') {
+  #  $proto = "6";
+  #}
+
+  my $src_port_str = ($srcports!="-") ? get_ports_str($srcports) : undef;
+  my $dst_port_str = ($dstports!="-") ? get_ports_str($dstports) : undef;
+
+  if (defined($proto)) {
+    $rulename .= ",proto=$proto";
+  }
+
+  if (defined($dst_port_str) && $dst_port_str ne "") {
+    $rulename .= ",dstport$dst_port_str";
+  }
+
+  if (defined($src_port_str) && $src_port_str ne "") {
+    $rulename .= ",srcport$src_port_str";
+  }
+
+  if (defined($fragment_options) && $fragment_options ne "-") {
+    my $frag_types = {
+      "dont-fragment" => ":01",
+      "is-fragment" => ":02",
+      "first-fragment" => ":04",
+      "last-fragment" => ":08",
+      "not-a-fragment" => "!:02",
+    };
+    $rulename .= ",frag".join(",", (map { $frag_types->{$_}; } split(/,/, $fragment_options)));
+  }
+
+  print STDERR "rulename=$rulename$/" if ($debug);
+
+  return $rulename;
+}
+
+sub get_state($)
+{
+  my ($state_filename) = @_;
+
+  my $state_hash = {};
+
+  my @lines = read_statefile($state_filename);
+
+  for my $line (@lines) 
+  {
+    # 0x4c8c66ccd9b34fc0 mn1_O8VMZ6 10.0.0.1/32 10.0.0.2/32 icmp - - 
+    my ($cookie, $typex, $byte_ctr, $pkt_ctr, $rulename, @rule_params) = split(/\s+/, $line);
+    next if ($typex eq 'default');
+
+    my $snmp_rulename = get_snmp_rulename(@rule_params);
+    if ($snmp_rulename ne '') {
+      my $prefix1 = string_to_oid_list($snmp_rulename);
+      my $snmp_oid_counter_pkts = $place_pkts.$rulesfilter_oidlist.$prefix1.".2";
+      my $snmp_oid_counter_bytes = $place_bytes.$rulesfilter_oidlist.$prefix1.".2";
+      $state_hash->{$snmp_oid_counter_bytes} = $byte_ctr;
+      $state_hash->{$snmp_oid_counter_pkts} = $pkt_ctr;
+    }
+  }
+
+  print STDERR Data::Dumper::Dumper($state_hash) if ($debug);
+
+  return $state_hash;
+}
+
+##
+
+sub string_to_oid_list($)
+{
+  my ($str) = @_;
+  
+  my $ret = ".".length($str).".".join(".", (map { ord($_); } split(//, $str)));
+
+  print STDERR "str=$str => ret=$ret$/" if ($debug);
+
+  return $ret;
+} 
+
+##############################################################################
+##############################################################################
+
+REQLOOP: while (<>){
+
+  if (m!^PING!){
+    print "PONG\n";
+    next;
+  }
+
+  my $cmd = $_;
+  my $req = <>;
+  my $ret;
+  chomp($cmd);
+  chomp($req);
+
+  my $state_hash = get_state($state_filename);
+  my @oids = sort keys %$state_hash;
+
+  print STDERR Data::Dumper::Dumper(\@oids) if ($debug);
+
+  my $ret;
+  if ($cmd eq "getnext") 
+  {
+    LOOP1: while (@oids) {
+      my $oid = shift @oids;
+      
+      my $req_is_equal = $oid eq $req;
+      print STDERR "oid=$oid => req_is_equal=$req_is_equal$/" if ($debug);
+      if ($req_is_equal) {
+        if (!@oids) {
+          print "NONE\n";
+          next REQLOOP;
+        } else {
+          $ret = shift @oids;
+          last LOOP1;
+        }
+      }
+
+      my $req_is_prefix = (substr($oid, 0, length($req)) eq $req);
+      print STDERR "oid=$oid => req_is_prefix=$req_is_prefix$/" if ($debug);
+      if ($req_is_prefix) {
+         $ret = $oid;
+         print STDERR "oid=$oid => req_is_prefix=$req_is_prefix => ret=$ret$/" if ($debug);
+         last LOOP1;
+      }
+    } # end while LOOP1 
+
+  } else {
+    if ($req eq $place_bytes || $req eq $place_pkts) {
+      print "NONE\n";
+      next;
+    } else {
+      $ret = $req;
+    }
+  }
+
+  print STDERR "ret=$ret$/" if ($debug);
+
+  if (!defined($ret)) {
+    print "NONE\n";
+    next;
+  } else  {
+    print "$ret\n";
+
+    my $counter = $state_hash->{$ret};
+    print "counter64\n$counter\n";
+  }
+
+}
+
+##############################################################################
+##############################################################################
+
+
