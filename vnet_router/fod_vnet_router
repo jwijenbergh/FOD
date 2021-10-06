@@ -150,6 +150,7 @@ elif [ "$1" = "--init.netconfserver.netconfd" ]; then #arg # alternative to neto
   /etc/init.d/rsyslog start
 
   #netconfd --module configuration --superuser=netconf --log-level=debug4
+  #nohup netconfd --modpath "/usr/share/yuma/modules/:." --module configuration --superuser=netconf --log-level=info &> netconfd.log &
   nohup netconfd --module configuration --superuser=netconf --log-level=info &> netconfd.log &
 
 ##############################################################################
@@ -214,6 +215,7 @@ elif [ "$1" = "--get_netconf_data" ]; then #arg
     #which socat &>/dev/null || apt-get install socat 1>&2
     #echo "get-config --source running" | socat - EXEC:'yangcli display-mode=xml server=localhost user=netconf password=netconf',pty,setsid,ctty | awk '/^yangcli netconf@localhost> get-config --source running/ { start=1; } start { print; }'
 
+    ulimit -c 0
     # yangcli has issue when it is not running on a terminal, even in batch-mode
     echo "get-config --source running" | socat - EXEC:'yangcli display-mode=xml server=localhost user=netconf password=netconf',pty,setsid,ctty | awk '/^RPC Data Reply/ { start=1; } start { print; }'
 
