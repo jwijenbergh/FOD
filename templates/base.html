@@ -39,10 +39,19 @@
             <!-- /.navbar-header -->
 
             <ul class="nav navbar-top-links navbar-right">
-            	<!--<li class="dropdown">
+            	<li class="dropdown">
+		           <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Documentation" %}<b class="caret"> </b></a>
+
+				            <ul class="dropdown-menu">
+				                <li>
+					            <a class="unknown" target="_blank" href="/static/site/index.html">Documentation Main</a>
+				            </li>
+				            </ul>
+               </li>
+            	<li class="dropdown">
 				            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Language" %}: {% for lang in settings.LANGUAGES %}{% ifequal settings.LANGUAGE_CODE lang.0 %}{% trans lang.1 %}{% endifequal %}{% endfor %}<b class="caret"></b></a>
 				            <ul class="dropdown-menu">
-				            <form action="{% url 'set_language' %}" method="post" style="display:inline;" id="langform">
+						    <form action="/set_language/" method="post" style="display:inline;" id="langform">
 												{% csrf_token %}
 												<input name="next" type="hidden" value="{{ next }}" />
 												<input id="langsel" name="language" type="hidden" value="" />
@@ -53,7 +62,7 @@
 				                </li>
 				              {% endfor %}
 				            </ul>
-				        </li>-->
+				        </li>
                 <!-- /.dropdown -->
 
 

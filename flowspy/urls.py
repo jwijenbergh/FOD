@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.views import LoginView
+from django.views.i18n import set_language
 from rest_framework import routers
 from flowspec import views as flowspec_views
 from accounts import views as accounts_views
@@ -43,8 +44,12 @@ urlpatterns = [
     url(r'^login/?', flowspec_views.user_login, name="login"),
     path('welcome/', flowspec_views.welcome, name="welcome"),
     url(r'^logout/?', flowspec_views.user_logout, name="logout"),
-    # TODO (r'^setlang/?$', django.views.i18n.set_language),
+
     path('/', include('django.conf.urls.i18n')),
+    #url(r'^setlang/?$', django.views.i18n.set_language),
+    #url(r'^setlang/?$', set_language),
+    url(r'^set_language/?$', set_language),
+
     url(r'^selectinst/?$', flowspec_views.selectinst, name="selectinst"),
     url(r'^profile/token/$', accounts_views.generate_token, name="user-profile-token"),
 
