@@ -284,7 +284,10 @@ elif [ "$1" = "--parse_netconf_to_ruleinfo" -o "$1" = "--parse" ]; then #arg
      param[$2]=all
      next
   }
-  match1==1 && /<[a-z]+/ { param[$2]=$3; next; }
+  match1==1 && /<[a-z]+/ { 
+    param[$2] = (param[$2]=="") ? $3 : (param[$2] "," $3); 
+    next; 
+  }
 
   /<then>/ { then1=1; next; }
   /<\/then>/ { then1=0; next; }
