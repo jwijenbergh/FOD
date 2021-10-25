@@ -481,7 +481,7 @@ def delete_route(request, route_slug):
 
             username_request = request.user.username
             user_is_admin = request.user.is_superuser
-            full_delete_is_allowed = (user_is_admin and settings.ALLOW_DELETE_FULL_FOR_ADMIN) or settings.ALLOW_DELETE_FULL_FOR_USER_ALL or settings.ALLOW_DELETE_FULL_FOR_USER_LIST.contains(username_request)
+            full_delete_is_allowed = (user_is_admin and settings.ALLOW_DELETE_FULL_FOR_ADMIN) or settings.ALLOW_DELETE_FULL_FOR_USER_ALL or (username_request in settings.ALLOW_DELETE_FULL_FOR_USER_LIST)
             logger.info("views.delete(): username_request="+str(username_request)+" user_is_admin="+str(user_is_admin)+" => full_delete_is_allowed="+str(full_delete_is_allowed)+", but will not be used in views::delete")
             #if full_delete_is_allowed:
             #  route.status = "PENDING_TODELETE"; 

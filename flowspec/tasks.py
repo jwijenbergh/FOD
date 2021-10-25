@@ -236,7 +236,7 @@ def check_sync(route_name=None, selected_routes=[]):
     if route_name:
         routes = routes.filter(name=route_name)
     for route in routes:
-        if route.has_expired() and (route.status != 'EXPIRED' and route.status != 'ADMININACTIVE' and route.status != 'INACTIVE' and route.status != 'INACTIVE_TODELETE'):
+        if route.has_expired() and (route.status != 'EXPIRED' and route.status != 'ADMININACTIVE' and route.status != 'INACTIVE' and route.status != 'INACTIVE_TODELETE' and route.status != 'PENDING_TODELETE'):
             if route.status != 'ERROR':
                 logger.info('Expiring %s route %s' %(route.status, route.name))
                 subtask(delete).delay(route, reason="EXPIRED")
@@ -252,7 +252,7 @@ def notify_expired():
     logger.info('Initializing expiration notification')
     routes = Route.objects.all()
     for route in routes:
-        if route.status not in ['EXPIRED', 'ADMININACTIVE', 'INACTIVE', 'INACTIVE_TODELETE', 'ERROR']:
+        if route.status not in ['EXPIRED', 'ADMININACTIVE', 'INACTIVE', 'INACTIVE_TODELETE', 'PENDING_TODELETE', 'ERROR']:
             expiration_days = (route.expires - datetime.date.today()).days
             if expiration_days < settings.EXPIRATION_NOTIFY_DAYS:
                 try:
