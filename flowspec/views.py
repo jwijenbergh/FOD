@@ -53,7 +53,7 @@ from flowspec.helpers import send_new_mail, get_peer_techc_mails
 import datetime
 import os
 
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
+LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'views.log')
 # FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 # logging.basicConfig(format=FORMAT)
 #formatter = logging.Formatter('%(asctime)s %(levelname)s %(user)s: %(message)s')
@@ -478,6 +478,15 @@ def delete_route(request, route_slug):
             except:
                 # in case the header is not provided
                 route.requesters_address = 'unknown'
+
+            username_request = request.user.username
+            user_is_admin = request.user.is_superuser
+            full_delete_is_allowed = (user_is_admin and settings.ALLOW_DELETE_FULL_FOR_ADMIN) or settings.ALLOW_DELETE_FULL_FOR_USER_ALL or settings.ALLOW_DELETE_FULL_FOR_USER_LIST.contains(username_request)
+            logger.info("views.delete(): username_request="+str(username_request)+" user_is_admin="+str(user_is_admin)+" => full_delete_is_allowed="+str(full_delete_is_allowed)+", but will not be used in views::delete")
+            #if full_delete_is_allowed:
+            #  route.status = "PENDING_TODELETE"; 
+            #  logger.info("tasks.delete(): => status="+str(route.status))
+
             route.save()
             route.commit_delete()
         html = "<html><body>Done</body></html>"

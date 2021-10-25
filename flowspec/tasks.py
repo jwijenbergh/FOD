@@ -94,7 +94,7 @@ def edit(routepk, callback=None):
               #snmp_add_initial_zero_value.delay(str(route.id), True)
               snmp_add_initial_zero_value(str(route.id), True)
             except Exception as e:
-              logger.error("edit(): route="+str(route)+", ACTIVE, add_initial_zero_value failed: "+str(e))
+              logger.error("tasks::edit(): route="+str(route)+", ACTIVE, add_initial_zero_value failed: "+str(e))
         else:
             status = "ERROR"
         route.status = status
@@ -125,11 +125,14 @@ def delete(routepk, **kwargs):
     route = Route.objects.get(pk=routepk)
     initial_status = route.status
     try:
+        #username = request.user.username
+        #user_is_admin = request.user.is_superuser()
+        #logger.info("tasks::delete(): username="+str(username)+" route="+str(route)+" initial_status="+str(initial_status))
         applier = PR.Applier(route_object=route)
         commit, response = applier.apply(operation="delete")
         reason_text = ''
-        logger.info("tasks::delete(): route="+str(route)+" initial_status="+str(initial_status))
-        if commit and initial_status == "INACTIVE_TODELETE": # special new case for fully deleting a rule via REST API
+        logger.info("tasks::delete(): initial_status="+str(initial_status))
+        if commit and initial_status == "PENDING_TODELETE": # special new case for fully deleting a rule via REST API
            route.delete()
            msg1 = "[%s] Fully deleted route : %s%s- Result %s" % (route.applier, route.name, reason_text, response)
            logger.info("tasks::delete(): DELETED msg="+msg1)
@@ -161,7 +164,7 @@ def delete(routepk, **kwargs):
         route.save()
         announce("[%s] Suspending rule : %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
     except Exception as e:
-        logger.error("edit(): route="+str(route)+", got unexpected exception="+str(e))
+        logger.error("tasks::edit(): route="+str(route)+", got unexpected exception="+str(e))
         route.status = "ERROR"
         route.response = "Error"
         route.save()

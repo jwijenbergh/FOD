@@ -568,8 +568,11 @@ MAX_RULE_EXPIRE_DAYS = 30
 ##############################################################################
 # rule deletion (via rest)
 
-ALLOW_ADMIN__FULL_RULEDEL = True
-ALLOW_DELETE_FULL_FOR_NONADMIN = False
+ALLOW_DELETE_FULL_FOR_ADMIN = True
+ALLOW_DELETE_FULL_FOR_USER_ALL = False
+ALLOW_DELETE_FULL_FOR_USER_LIST = [
+  'admin1', 'nemo1'
+]
 
 ##############################################################################
 ##############################################################################

@@ -22,7 +22,7 @@ FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'mylog.log')
+LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'viewsets.log')
 handler = logging.FileHandler(LOG_FILENAME)
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 handler.setFormatter(formatter)
@@ -213,6 +213,7 @@ class RouteViewSet(viewsets.ModelViewSet):
                 work_on_active_object(obj, new_status)
             elif old_status in ['INACTIVE', 'ERROR']:
                 work_on_inactive_object(obj, new_status)
+            logger.info("RouteViewSet::update(): obj="+str(obj))
             return Response(
                 RouteSerializer(obj,context={'request': request}).data,
                 status=200)
@@ -237,26 +238,42 @@ class RouteViewSet(viewsets.ModelViewSet):
             obj.commit_add()
 
     def pre_delete(self, obj):
-        logger.info("pre delete(): start")
+        logger.info("RouteViewSet::pre delete(): start")
         if True or not self.request.user.is_superuser:
            raise PermissionDenied('Permission Denied')
-        logger.info("pre delete: pre commit_delete")
+        logger.info("RouteViewSet::pre delete: pre commit_delete")
         obj.commit_delete()
 
     def delete(self, request, pk=None, partial=False):
         obj = get_object_or_404(self.queryset, pk=pk)
-        logger.info("delete(): pk="+str(pk)+" obj="+str(obj))
-        if True or not self.request.user.is_superuser():
+        logger.info("RouteViewSet::delete(): pk="+str(pk)+" obj="+str(obj))
+
+        username_request = request.user.username
+        user_is_admin = request.user.is_superuser
+        full_delete_is_allowed = (user_is_admin and settings.ALLOW_DELETE_FULL_FOR_ADMIN) or settings.ALLOW_DELETE_FULL_FOR_USER_ALL or settings.ALLOW_DELETE_FULL_FOR_USER_LIST.contains(username_request)
+        logger.info("RouteViewSet::delete(): username_request="+str(username_request)+" user_is_admin="+str(user_is_admin)+" => full_delete_is_allowed="+str(full_delete_is_allowed))
+
+        #if True or not self.request.user.is_superuser():
+        if not full_delete_is_allowed:
            raise PermissionDenied('Permission Denied')
-        logger.info("delete(): pre commit_delete")
+        logger.info("RouteViewSet::delete(): pre commit_delete")
         obj.commit_delete()
 
     def destroy(self, request, pk=None):
         obj = get_object_or_404(self.queryset, pk=pk)
-        logger.info("destroy(): pk="+str(pk)+" obj="+str(obj))
-        logger.info("destroy(): pre commit_delete")
+        logger.info("RouteViewSet::destroy(): pk="+str(pk)+" obj="+str(obj))
+        logger.info("RouteViewSet::destroy(): pre commit_delete")
+
+        username_request = request.user.username
+        user_is_admin = request.user.is_superuser
+        full_delete_is_allowed = (user_is_admin and settings.ALLOW_DELETE_FULL_FOR_ADMIN) or settings.ALLOW_DELETE_FULL_FOR_USER_ALL or settings.ALLOW_DELETE_FULL_FOR_USER_LIST.contains(username_request)
+        logger.info("RouteViewSet::destroy(): username_request="+str(username_request)+" user_is_admin="+str(user_is_admin)+" => full_delete_is_allowed="+str(full_delete_is_allowed))
+
         if obj.status == 'ACTIVE':
-          obj.status = "PENDING"
+          if full_delete_is_allowed:
+            obj.status = "PENDING_TODELETE"
+          else:
+            obj.status = "PENDING"
           obj.response = "N/A"
           obj.save()
           obj.commit_delete()
@@ -264,7 +281,8 @@ class RouteViewSet(viewsets.ModelViewSet):
           return Response(serializer.data)
         else:
           try:
-            if not settings.ALLOW_ADMIN__FULL_RULEDEL or not self.request.user.is_superuser:
+            #if not settings.ALLOW_ADMIN__FULL_RULEDEL or not self.request.user.is_superuser:
+            if not full_delete_is_allowed:
               raise PermissionDenied('Permission Denied')
           except Exception as e:
               raise PermissionDenied('Permission Denied')
