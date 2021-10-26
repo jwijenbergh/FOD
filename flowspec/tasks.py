@@ -132,7 +132,10 @@ def delete(routepk, **kwargs):
         commit, response = applier.apply(operation="delete")
         reason_text = ''
         logger.info("tasks::delete(): initial_status="+str(initial_status))
+        fully_deleted=False
         if commit and initial_status == "PENDING_TODELETE": # special new case for fully deleting a rule via REST API
+           fully_deleted=True
+           route.status="INACTIVE"
            route.delete()
            msg1 = "[%s] Fully deleted route : %s%s- Result %s" % (route.applier, route.name, reason_text, response)
            logger.info("tasks::delete(): DELETED msg="+msg1)
@@ -149,10 +152,11 @@ def delete(routepk, **kwargs):
               logger.error("edit(): route="+str(route)+", INACTIVE, add_null_value failed: "+str(e))
         else:
             status = "ERROR"
-        route.status = status
-        route.response = response
-        route.save()
-        announce("[%s] Suspending rule : %s%s- Result %s" % (route.applier_username_nice, route.name, reason_text, response), route.applier, route)
+        if not fully_deleted:
+          route.status = status
+          route.response = response
+          route.save()
+          announce("[%s] Suspending rule : %s%s- Result %s" % (route.applier_username_nice, route.name, reason_text, response), route.applier, route)
     except TimeLimitExceeded:
         route.status = "ERROR"
         route.response = "Task timeout"
