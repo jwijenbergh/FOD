@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import pytest
 from utils import proxy as PR
 from celery import shared_task, subtask
 import logging
@@ -397,6 +398,7 @@ def snmp_add_initial_zero_value(rule_id, zero_or_null=True):
         logger.info("exit_process(): before exit in child process (pid="+str(pid)+", npid="+str(npid)+"), after os._exit")
 
 
+@pytest.mark.skip
 @shared_task(ignore_result=True,default_retry_delay=5,max_retries=2,autoretry_for=(TimeoutError,))
 def testcelerytask():
     lockname = "/tmp/testlock"
