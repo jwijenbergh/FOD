@@ -260,6 +260,7 @@ def build_routes_json(groutes, is_superuser):
         rd['filed'] = "%s" % r.filed.strftime("%F %T")
         rd['last_updated'] = "%s" % r.last_updated.strftime("%F %T")
         rd['expires'] = "%s" % r.expires
+        rd['isnonexpire'] = "%s" % r.is_no_expire
         rd['response'] = "%s" % r.response
         routes.append(rd)
     return routes
