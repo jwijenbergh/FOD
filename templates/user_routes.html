@@ -307,8 +307,6 @@ $(document).ready( function(){
                      },
                      {"mData":"expires", "sClass" : "alignCenter","bSearchable": true,"bSortable": true,
                      "mRender": function (data, type, full) {
-                             expires = new Date(data);
-                             today = new Date();
                              if (full.isnonexpire === 'True') {
                                      return '<small>No</small>';
                              }
