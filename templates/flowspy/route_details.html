@@ -21,7 +21,7 @@ function myreloadPage() {
 <div class="row">
      <div class="col-md-12">
         <div>
-            <i class="fa fa-clock-o"></i> {% trans "Expires" %}: {{ route.expires|date:"d M y" }}
+            <i class="fa fa-clock-o"></i> {% trans "Expires" %}: {% if not route.is_no_expire %}{{ route.expires|date:"d M y" }}{% else %}{% trans "No" %}{% endif %}
         </div>
     </div>
      <div class="col-md-12">
