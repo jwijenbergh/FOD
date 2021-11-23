@@ -130,29 +130,26 @@ def delete(routepk, **kwargs):
         commit, response = applier.apply(operation="delete")
         reason_text = ''
         logger.info("tasks::delete(): initial_status="+str(initial_status))
-        if commit and initial_status == "PENDING_TODELETE": # special new case for fully deleting a rule via REST API (only for users/admins authorized by special settings)
+        if commit:
             route.status="INACTIVE"
-            msg1 = "[%s] Fully deleted route : %s%s- Result %s" % (route.applier, route.name, reason_text, response)
-            logger.info("tasks::delete(): FULLY DELETED msg="+msg1)
-            announce(msg1, route.applier, route)
             try:
                 snmp_add_initial_zero_value(str(route.id), False)
             except Exception as e:
                 logger.error("edit(): route="+str(route)+", INACTIVE, add_null_value failed: "+str(e))
-            route.delete()
-            return
-        elif commit: # commit worked, but rule should stay in DB (NOT PENDING_TODELETE)
-            route.status="INACTIVE"
-            msg1 = "[%s] Deleted route : %s%s- Result %s" % (route.applier, route.name, reason_text, response)
-            logger.info("tasks::delete(): DELETED msg="+msg1)
-            announce(msg1, route.applier, route)
-            try:
-                snmp_add_initial_zero_value(str(route.id), False)
-            except Exception as e:
-                logger.error("edit(): route="+str(route)+", INACTIVE, add_null_value failed: "+str(e))
-            route.response = response
-            route.save()
-            return
+
+                if initial_status == "PENDING_TODELETE": # special new case for fully deleting a rule via REST API (only for users/admins authorized by special settings)
+                    msg1 = "[%s] Fully deleted route : %s%s- Result %s" % (route.applier, route.name, reason_text, response)
+                    logger.info("tasks::delete(): FULLY DELETED msg="+msg1)
+                    announce(msg1, route.applier, route)
+                    route.delete()
+                    return
+                else:
+                    msg1 = "[%s] Deleted route : %s%s- Result %s" % (route.applier, route.name, reason_text, response)
+                    logger.info("tasks::delete(): DELETED msg="+msg1)
+                    announce(msg1, route.applier, route)
+                    route.response = response
+                    route.save()
+                    return
         else: # removing rule in NETCONF failed, it is still ACTIVE and also collects statistics
             # NETCONF "delete" operation failed, keep the object in DB
             if "reason" in kwargs and kwargs['reason'] == 'EXPIRED':
