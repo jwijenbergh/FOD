@@ -69,7 +69,7 @@
                                                 <small class="text-muted"><i class="fa fa-pencil-square-o"></i> {% trans "Last update" %}: {{route.last_updated}} {% trans "by" %} {{route.applier_username_nice}}</small>
                                             </p>
                                             <p>
-                                                <small class="text-muted"><i class="fa fa-clock-o"></i> {% trans "Expires" %}: {{ route.expires|date:"d M y" }}</small>
+                                                <small class="text-muted"><i class="fa fa-clock-o"></i> {% trans "Expires" %}: {% if not route.is_no_expire %}{{ route.expires|date:"d M y" }}{% else %}{% trans "No" %}{% endif %}</small>
                                             </p>
                                         </div>
                                         <div class="timeline-body">

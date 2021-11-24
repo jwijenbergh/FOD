@@ -84,6 +84,7 @@ ROUTE_STATES = (
     ("ERROR", "ERROR"),
     ("EXPIRED", "EXPIRED"),
     ("PENDING", "PENDING"),
+    ("PENDING_TODELETE", "PENDING_TODELETE"),
     ("OUTOFSYNC", "OUTOFSYNC"),
     ("INACTIVE", "INACTIVE"),
     ("INACTIVE_TODELETE", "INACTIVE_TODELETE"),
@@ -407,6 +408,15 @@ class Route(models.Model):
             return True
         return False
 
+    @property
+    def is_no_expire(self):
+        """Return True if route expires in more than 50 years"""
+        return self.expires - datetime.timedelta(days=365*50) > datetime.date.today()
+
+    def set_no_expire(self):
+        """Used for REST API created routes that should have no expiration date"""
+        self.expires = datetime.date.today() + datetime.timedelta(days=365*100) 
+
     def check_sync(self):
         if not self.is_synced():
             self.status = "OUTOFSYNC"
@@ -565,7 +575,7 @@ class Route(models.Model):
                     self.status = "ACTIVE"
                     self.save()
                     found = True
-            if self.status == "ADMININACTIVE" or self.status == "INACTIVE" or self.status == "INACTIVE_TODELETE" or self.status == "EXPIRED":
+            if self.status == "ADMININACTIVE" or self.status == "INACTIVE" or self.status == "INACTIVE_TODELETE" or self.status == "PENDING_TODELETE" or self.status == "EXPIRED":
                 found = True
         return found
 
@@ -661,7 +671,7 @@ class Route(models.Model):
 
     @property
     def days_to_expire(self):
-        if self.status not in ['EXPIRED', 'ADMININACTIVE', 'ERROR', 'INACTIVE', 'INACTIVE_TODELETE']:
+        if self.status not in ['EXPIRED', 'ADMININACTIVE', 'ERROR', 'INACTIVE', 'INACTIVE_TODELETE', 'PENDING_TODELETE']:
             expiration_days = (self.expires - datetime.date.today()).days
             if expiration_days < settings.EXPIRATION_NOTIFY_DAYS:
                 return "%s" %expiration_days
