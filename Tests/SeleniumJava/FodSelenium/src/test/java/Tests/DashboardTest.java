@@ -664,7 +664,7 @@ public class DashboardTest {
     	}
     	
     	@Test
-    	static void GoToSideAdminFromDashboard() {
+    	static void GoToSideMyProfileFromDashboard() {
     		Login();
     		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
