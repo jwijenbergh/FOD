@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 
@@ -37,31 +38,43 @@ class RouteViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         scope=""
         try:
-          logger.debug("RouteViewSet::get_queryset(): param scope="+str(self.request.query_params['scope']))
+          logger.info("RouteViewSet::get_queryset(): param scope="+str(self.request.query_params['scope']))
           scope=self.request.query_params['scope'] 
-        except: 
+        except:
           pass
 
+        user=self.request.user
+        try:
+          if self.request.user.is_superuser and 'username' in self.request.query_params:
+            username=self.request.query_params['username'] 
+            logger.info("RouteViewSet::get_queryset(): username="+str(username))
+            user=User.objects.get(username=username)
+            logger.info("RouteViewSet::get_queryset(): param username="+str(self.request.query_params['username']))
+        except Exception as e: 
+          logger.info("RouteViewSet::get_queryset(): got exception e="+str(e))
+          return convert_container_to_queryset([], Route)
+        logger.info("RouteViewSet::get_queryset(): user="+str(user))
+
         if scope == "applier":
-            return convert_container_to_queryset(self.get_users_routes_by_applier_only(), Route)
+            return convert_container_to_queryset(self.get_users_routes_by_applier_only(user), Route)
         elif scope == "peer":
-            return convert_container_to_queryset(self.get_users_routes_by_its_peers(), Route)
+            return convert_container_to_queryset(self.get_users_routes_by_its_peers(user), Route)
         elif scope == "user":
-            return convert_container_to_queryset(self.get_users_routes_all(), Route)
+            return convert_container_to_queryset(self.get_users_routes_all(user), Route)
 
         if self.request.user.is_superuser:
             return Route.objects.all() # default for admin is all
         else:
-            return convert_container_to_queryset(self.get_users_routes_all(), Route) #default for non-admin is "user"
+            return convert_container_to_queryset(self.get_users_routes_all(user), Route) #default for non-admin is "user"
 
-    def get_users_routes_all(self):
-        return global__get_users_routes_all(self.request.user)
+    def get_users_routes_all(self, user):
+        return global__get_users_routes_all(user)
 
-    def get_users_routes_by_its_peers(self):
-        return global__get_users_routes_by_its_peers(self.request.user)
+    def get_users_routes_by_its_peers(self, user):
+        return global__get_users_routes_by_its_peers(user)
 
-    def get_users_routes_by_applier_only(self):
-        return global__get_users_routes_by_applier_only(self.request.user)
+    def get_users_routes_by_applier_only(self, user):
+        return global__get_users_routes_by_applier_only(user)
 
 
     def list(self, request):
