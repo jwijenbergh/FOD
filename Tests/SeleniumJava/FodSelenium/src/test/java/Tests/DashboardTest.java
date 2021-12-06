@@ -301,6 +301,144 @@ public class DashboardTest {
         			}	         
         		}	
     	}
+    	
+    	@Test
+    	static void GoToAddRuleFromDashboard() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.newLine();
+        				try {
+        					driver.findElement(By.id("navigation_dashboard_id")).click();
+        					buffer.append("Find and click on dashboard button: navigation_dashboard_id");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("routebutton")).click();
+        					buffer.append("Find and click on add rule button: routebutton");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("apply_rule_header_id"));
+        					buffer.append("Find edir rule header: apply_rule_header_id");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        					
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void GoToMyRulesFromDashboard() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.newLine();
+        				try {
+        					driver.findElement(By.id("navigation_dashboard_id")).click();
+        					buffer.append("Find and click on dashboard button: navigation_dashboard_id");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("myrulesbutton")).click();
+        					buffer.append("Find and click on my rules button: myrulesbutton");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("myrulesheader"));
+        					buffer.append("Find edir rule header: myrulesheader");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        					
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void GoToMyProfileFromDashboard() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.newLine();
+        				try {
+        					driver.findElement(By.id("navigation_dashboard_id")).click();
+        					buffer.append("Find and click on dashboard button: navigation_dashboard_id");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("myprofilebutton")).click();
+        					buffer.append("Find and click on my profile button: myprofilebutton");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("my_profile_header_id"));
+        					buffer.append("Find edir my profile header: my_profile_header_id");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        					
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
 	
       @BeforeClass
       static void testSetUp() {
