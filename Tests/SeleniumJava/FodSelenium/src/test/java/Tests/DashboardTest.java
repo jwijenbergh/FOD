@@ -255,6 +255,52 @@ public class DashboardTest {
         			}	         
         		}	
     	}
+    	
+    	@Test
+    	static void FixItButtonOnDashboard() {
+    		AddRule();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.newLine();
+        				try {
+        					driver.findElement(By.id("navigation_dashboard_id")).click();
+        					buffer.append("Find and click on dashboard button: navigation_dashboard_id");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("edit_button_1")).click();
+        					buffer.append("Find and click on fix it button: edit_button_1");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("apply_rule_header_id"));
+        					buffer.append("Find edir rule header: apply_rule_header_id");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        					
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
 	
       @BeforeClass
       static void testSetUp() {
