@@ -262,7 +262,7 @@ public class DashboardTest {
     		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
-        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.append("FixItButtonOnDashboard");
         		buffer.newLine();
         				try {
         					driver.findElement(By.id("navigation_dashboard_id")).click();
@@ -308,7 +308,7 @@ public class DashboardTest {
     		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
-        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.append("GoToAddRuleFromDashboard");
         		buffer.newLine();
         				try {
         					driver.findElement(By.id("navigation_dashboard_id")).click();
@@ -354,7 +354,7 @@ public class DashboardTest {
     		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
-        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.append("GoToMyRulesFromDashboard");
         		buffer.newLine();
         				try {
         					driver.findElement(By.id("navigation_dashboard_id")).click();
@@ -400,7 +400,7 @@ public class DashboardTest {
     		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
-        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.append("GoToMyProfileFromDashboard");
         		buffer.newLine();
         				try {
         					driver.findElement(By.id("navigation_dashboard_id")).click();
@@ -446,7 +446,7 @@ public class DashboardTest {
     		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
-        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.append("GoToSideDashboardFromDashboard");
         		buffer.newLine();
         				try {
         					driver.findElement(By.id("navigation_dashboard_id")).click();
@@ -492,7 +492,7 @@ public class DashboardTest {
     		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
-        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.append("GoToSideRulesFromDashboard");
         		buffer.newLine();
         				try {
         					driver.findElement(By.id("navigation_dashboard_id")).click();
@@ -538,7 +538,7 @@ public class DashboardTest {
     		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
-        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.append("GoToSideAddRuleFromDashboard");
         		buffer.newLine();
         				try {
         					driver.findElement(By.id("navigation_dashboard_id")).click();
@@ -584,7 +584,7 @@ public class DashboardTest {
     		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
-        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.append("GoToSideOverviewFromDashboard");
         		buffer.newLine();
         				try {
         					driver.findElement(By.id("navigation_dashboard_id")).click();
@@ -630,7 +630,7 @@ public class DashboardTest {
     		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
-        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.append("GoToSideAdminFromDashboard");
         		buffer.newLine();
         				try {
         					driver.findElement(By.id("navigation_dashboard_id")).click();
@@ -669,7 +669,7 @@ public class DashboardTest {
     		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
-        		buffer.append("AppearedRuleOnDashboard");
+        		buffer.append("GoToSideMyProfileFromDashboard");
         		buffer.newLine();
         				try {
         					driver.findElement(By.id("navigation_dashboard_id")).click();
