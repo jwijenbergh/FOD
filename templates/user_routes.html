@@ -3,14 +3,12 @@
 {% load i18n %}
 {% block extrahead %}
 <link href="{% static 'b3theme/css/plugins/dataTables/dataTables.bootstrap.css' %}" rel="stylesheet">
+
 {% endblock %}
+
 {% block pagejsbodttom %}
-
-<script type="text/javascript" src="{% static 'js/jquery.dataTables.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/datatables_bootstrap.js' %}"></script>
-
-
 {% endblock %}
+
 {% block title %}{% trans "My rules" %}{% endblock %}
 {% block contentplaceholder %}
 {% csrf_token %}
@@ -87,8 +85,10 @@
 {% endblock %}
 
 {% block pagejsbottom %}
+<div id="confirmDialog"></div>
     <script src="{% static 'js/dataTableslatest/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'js/dataTableslatest/dataTables.bootstrap.js' %}"></script>
+
     {% if user.is_authenticated %}
 <script type="text/javascript" src="{% url 'load-js' 'pollerdash' %}"></script>
 {% endif %}
@@ -208,36 +208,60 @@ $(document).ready( function(){
             	last_element = false;
             	return false;
             });
-            $('body').on('click', ".del_buttonpre", function(){
-            	var my = $(this);
-            	if (last_element != false){
-            		last_element.html(oldhtml);
-            	}
-            	oldhtml = my.parent().html();
-            	last_element = my.parent();
-            	var routename = $(this).data("routename");
-				var btn = '<a href="#" data-toggle="tooltip" title="This will deactivate your rule"  data-routename="'+routename+'" class="del_button btn btn-sm btn-warning"> {% trans "Deactivate" %}</a>'
-				var back = '<a href="#" class="revertbutton btn btn-sm btn-info"><i class="fa fa-undo"></i></a>';
-            	my.parent().html(back+" "+btn);
-            	return false;
+            $('body').on('click', ".deactivate_button", function(){
+                var routename = $(this).data("routename");
+                var delurl = "{% url 'deactivate-route' 'route_placeholder'%}".replace('route_placeholder', routename.toString());
+                $("#confirmDialog").dialog({
+                        title: "Deactivate the route?",
+                        resizable: false,
+                        height: "auto",
+                        width: 400,
+                        modal: true,
+                        buttons: {
+                            "Deactivate": function() {
+                                $.ajax({
+                                    type: 'POST',
+                                    url: delurl,
+                                    cache: false,
+                                    success: function(data) {
+                                     oTable.fnReloadAjax(refreshUrl);
+                                    }
+                                });
+                                $( this ).dialog( "close" );
+                            },
+                            Cancel: function() {
+                                $( this ).dialog( "close" );
+                            }
+                        }
+                });
             });
-
-            $('body').on('click', ".del_button", function(){
-            	last_element = false;
-            	var my = $(this);
-            	my.html('Deactivating...')
-				var routename = $(this).data("routename");
-				var delurl = "{% url 'deactivate-route' 'route_placeholder'%}".replace('route_placeholder', routename.toString());
-				$.ajax({
-        			type: 'POST',
-        			url: delurl,
-        			cache: false,
-        			success: function(data) {
-            		 oTable.fnReloadAjax(refreshUrl);
-	        		}
-	    		});
-				return false;
-			});
+            $('body').on('click', ".delete_button", function(){
+                var routename = $(this).data("routename");
+                var delurl = "{% url 'delete-route' 'route_placeholder'%}".replace('route_placeholder', routename.toString());
+                $("#confirmDialog").dialog({
+                        title: "Delete the route completely?",
+                        resizable: false,
+                        height: "auto",
+                        width: 400,
+                        modal: true,
+                        buttons: {
+                            "Delete": function() {
+                                $.ajax({
+                                    type: 'POST',
+                                    url: delurl,
+                                    cache: false,
+                                    success: function(data) {
+                                     oTable.fnReloadAjax(refreshUrl);
+                                    }
+                                });
+                                $( this ).dialog( "close" );
+                            },
+                            Cancel: function() {
+                                $( this ).dialog( "close" );
+                            }
+                        }
+                });
+            });
           },
         "aoColumns":[
                      {"mData":"id", "bSearchable": false,"bSortable": false, "bvisible":false},
@@ -351,17 +375,20 @@ $(document).ready( function(){
                      btn = '';
                      editurl = "{% url 'edit-route' 'routename'  %}".replace('routename', full.name.toString());
                      if (status == "ACTIVE" ){
-                     	btn = '<a href="'+editurl+'" class="btn-info btn btn-sm btn-outline">{% trans "Edit" %}</a>';
-        				btn = btn + ' <button class="del_buttonpre btn-warning btn btn-sm btn-outline" id="'+full.name+'" data-routename="'+full.name+'">{% trans "Deactivate" %}</button>';
+                         btn = '<a href="'+editurl+'" class="btn-info btn btn-sm btn-outline">{% trans "Edit" %}</a>';
+                         btn = btn + ' <button class="deactivate_button btn-warning btn btn-sm btn-outline" id="'+full.name+'" data-routename="'+full.name+'">{% trans "Deactivate" %}</button>';
                      }
                      if (status == 'EXPIRED' || status == 'ADMININACTIVE' || status == 'INACTIVE' ){
-                     	btn = '<a href="'+editurl+'" class="btn-info btn btn-sm btn-outline" id="edit_button_{{route.pk}}">{% trans "Reactivate" %}</a>';
+                         btn = ' <a href="'+editurl+'" class="btn-info btn btn-sm btn-outline" id="edit_button_{{route.pk}}">{% trans "Reactivate" %}</a>';
+                         {% if user.userprofile.is_delete_allowed %}
+                         btn = btn + '  <button class="delete_button btn-warning btn btn-sm btn-outline" id="'+full.name+'" data-routename="'+full.name+'">{% trans "Delete" %}</button>';
+                         {% endif %}
                      }
                      if (status == "OUTOFSYNC" ){
-                     	btn = '<a href="'+editurl+'" class="btn-info btn btn-sm btn-outline" id="edit_button_{{route.pk}}">{% trans "Resync" %}</a>';
+                         btn = '<a href="'+editurl+'" class="btn-info btn btn-sm btn-outline" id="edit_button_{{route.pk}}">{% trans "Resync" %}</a>';
                      }
                      if (status == "ERROR" ){
-                     	btn = '<a href="'+editurl+'" class="btn-info btn btn-sm btn-outline" id="edit_button_{{route.pk}}">{% trans "Fix it!" %}</a>';
+                         btn = '<a href="'+editurl+'" class="btn-info btn btn-sm btn-outline" id="edit_button_{{route.pk}}">{% trans "Fix it!" %}</a>';
                      }
                      return btn;
                      },
