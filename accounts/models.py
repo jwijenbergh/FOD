@@ -18,6 +18,7 @@
 #
 
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, User, BaseUserManager
 from peers.models import Peer
 
@@ -44,3 +45,9 @@ class UserProfile(models.Model):
         if not networks:
             return False
         return networks
+
+    def is_delete_allowed(self):
+        user_is_admin = self.user.is_superuser
+        username = self.username
+        return (user_is_admin and settings.ALLOW_DELETE_FULL_FOR_ADMIN) or settings.ALLOW_DELETE_FULL_FOR_USER_ALL or (username in settings.ALLOW_DELETE_FULL_FOR_USER_LIST)
+

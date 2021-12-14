@@ -339,7 +339,7 @@ class Route(models.Model):
             }
             logger.info(mail_body, extra=d)
 
-    def commit_delete(self, *args, **kwargs):
+    def commit_deactivate(self, *args, **kwargs):
         username = None
         reason_text = ''
         reason = ''
@@ -366,8 +366,6 @@ class Route(models.Model):
                 reason_text
             ), peer
         )
-        response = delete.delay(self.pk, reason=reason)
-        logger.info('Got delete job id: %s' % response)
         if not settings.DISABLE_EMAIL_NOTIFICATION:
             fqdn = Site.objects.get_current().domain
             admin_url = 'https://%s%s' % (
