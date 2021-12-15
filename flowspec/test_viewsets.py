@@ -6,7 +6,18 @@ from accounts.models import *
 from rest_framework.authtoken.models import Token
 
 @pytest.fixture
-def api_client():
+def test_settings(settings):
+    settings.DEBUG = True
+    settings.LOG_FILE_LOCATION = "/srv/flowspy/log/testing"
+
+pytestmark = pytest.mark.django_db
+
+@pytest.fixture(scope='session')
+def api_client(django_db_blocker):
+  with django_db_blocker.unblock():
+    settings.DEBUG = True
+    settings.LOG_FILE_LOCATION = "/srv/flowspy/log/testing"
+
     from rest_framework.test import APIClient
 
     #token = Token.objects.get(user__username='admin').key
@@ -67,7 +78,6 @@ def api_client():
     api_client.credentials(HTTP_AUTHORIZATION='Token ' + token)
     return api_client
 
-pytestmark = pytest.mark.django_db
 
 @pytest.fixture(scope='session')
 def django_db_setup():
@@ -222,49 +232,79 @@ class TestRoute:
         resp_data = json.loads(response.content)
         print(resp_data)
 
-    def test_add_check(self, api_client):
+    def test_add_check(self, api_client, settings):
+        settings.DEBUG = True
+        settings.LOG_FILE_LOCATION = "/srv/flowspy/log/testing"
+
         endpoint = '/api/routes/'
+
+        name = "testcreate"
+        comments = "test route"
+        destination = "1.0.0.2/32"
+        destinationport = "123"
+        source = "0.0.0.0/0"
+        sourceport = "123"
+        protocol = [ "tcp" ]
+        then = ["discard"]
+
         data = {
-            "comments": "test route",
-            "destination": "1.0.0.2/32",
-            "destinationport": "123",
-            "name": "testcreate",
-            "protocol": [
-                "tcp"
-            ],
-            "source": "0.0.0.0/0",
-            "sourceport": "123",
-            "then": ["discard"],
+            "name": name,
+            "comments": comments,
+            "destination": destination,
+            "destinationport": destinationport,
+            "protocol": protocol,
+            "source": source,
+            "sourceport": sourceport,
+            "then": then,
             "status": "ACTIVE"
         }
 
         response = api_client.post(endpoint, json.dumps(data), content_type='application/json')
+
         assert response.status_code == 201
 
+
         resp_data = json.loads(response.content)
+        print("myresp_data="+str(resp_data))
+
         route_id = resp_data["id"]
+        print("myroute_id="+str(route_id))
+
+        #assert "comments" in resp_data and resp_data.comments == comments
+        assert resp_data["comments"] == comments
+        assert resp_data["destination"] == destination
+        assert resp_data["destinationport"] == destinationport
+        assert resp_data["protocol"] == protocol
+        assert resp_data["source"] == source
+        assert resp_data["sourceport"] == sourceport
+        assert resp_data["then"] == then
         
         # lookup created object
         Route.objects.get(id=route_id)
+        print("myroute "+str(route_id)+" added")
 
         #
 
-        endpoint = '/api/routes/' + route_id
+        endpoint = '/api/routes/' + str(route_id) + '/'
         response = api_client.get(endpoint)
+        print("response="+str(response))
+        print("route "+str(route_id)+" verified")
+
         assert response.status_code == 200
         resp_data = json.loads(response.content)
         print(resp_data)
 
         #
 
-        response = api_client.delete(f"{endpoint}{route_id}/")
+        #response = api_client.delete(f"{endpoint}{route_id}/")
+        response = api_client.delete(f"{endpoint}")
+        print("route "+str(route_id)+" deleted")
+        
+        assert response.status_code == 204
 
         try:
             Route.objects.get(id=route_id)
         except:
             # should be deleted by now
             pass
-
-
-
 
