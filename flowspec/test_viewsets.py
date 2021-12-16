@@ -1,9 +1,12 @@
 import sys
+from os import environ
 import pytest
 from viewsets import *
 from flowspec.models import *
 from accounts.models import *
 from rest_framework.authtoken.models import Token
+
+import requests
 
 @pytest.fixture
 def test_settings(settings):
@@ -131,7 +134,7 @@ pytestmark = pytest.mark.django_db
 #	django_setup2()
  
 class TestFragmenttypes:
-    def test_list(self, api_client):
+    def test_list(self, api_client, test_settings):
         endpoint = '/api/matchprotocol/'
         response = api_client.get(endpoint)
         assert response.status_code == 200
@@ -307,4 +310,90 @@ class TestRoute:
         except:
             # should be deleted by now
             pass
+
+class TestRouteOuter:
+    #def test_add_outer(self, api_client):
+    def test_add_outer(self):
+
+        endpoint = 'http://localhost:8000/api/routes/'
+        print(endpoint)
+
+        if environ.get('FOD_TOKEN') != None:
+          token1 = environ.get('FOD_TOKEN')
+        else:
+          f = open("/srv/flowspy/.admin_token1", "r")
+          token1 = f.read().rstrip() 
+          f.close()
+        print("outer token="+str(type(token1)))
+
+        fod_api_headers = {
+          "Authorization" : "Token " + token1,
+          "Content-Type" : "application/json",
+        }
+
+        name = "testcreate"
+        comments = "test route"
+        destination = "1.0.0.2/32"
+        destinationport = "123"
+        source = "0.0.0.0/0"
+        sourceport = "123"
+        protocol = [ "tcp" ]
+        then = [ "discard" ]
+        #then = [ "https://fod.example.com/api/thenactions/3/" ]
+
+        data = {
+            "name": name,
+            "comments": comments,
+            "destination": destination,
+            "destinationport": destinationport,
+            "protocol": protocol,
+            "source": source,
+            "sourceport": sourceport,
+            "then": then,
+            "status": "ACTIVE"
+        }
+
+        #response = api_client.post(endpoint, json.dumps(data), content_type='application/json')
+        #assert response.status_code == 201
+
+        #resp_data = json.loads(response.content)
+        #route_id = resp_data["id"]
+        #response = api_client.delete(f"{endpoint}{route_id}/")
+        #print(response.content)
+
+        #response = requests.get(endpoint, headers=fod_api_headers)
+        #response = requests.post(endpoint, headers=fod_api_headers, data=data)
+        response = requests.post(endpoint, headers=fod_api_headers, data=json.dumps(data))
+        print("response.content"+str(response.content))
+    
+        # Validate response headers and body contents, e.g. status code.
+        assert response.status_code == 201 or response.status_code == 204
+
+        resp_data = json.loads(response.content)
+        print("myresp_data="+str(resp_data))
+
+        route_id = resp_data["id"]
+        print("myroute_id="+str(route_id))
+
+        #assert "comments" in resp_data and resp_data.comments == comments
+        assert resp_data["comments"] == comments
+        assert resp_data["destination"] == destination
+        assert resp_data["destinationport"] == destinationport
+        assert resp_data["protocol"] == protocol
+        assert resp_data["source"] == source
+        assert resp_data["sourceport"] == sourceport
+        assert resp_data["then"] == then
+
+        #
+
+        endpoint = 'http://localhost:8000/api/routes/' + str(route_id)
+        response = requests.get(endpoint, headers=fod_api_headers)
+        print("response.content"+str(response.content))
+ 
+        #
+ 
+        response = requests.delete(endpoint, headers=fod_api_headers)
+
+        assert response.status_code == 204
+
 
