@@ -443,7 +443,62 @@ def edit_route(request, route_slug):
 
 @login_required
 @never_cache
-def delete_route(request, route_slug):
+def delete_route_view(request, route_slug):
+    if request.is_ajax():
+        route = get_object_or_404(Route, name=route_slug)
+        peers = route.applier.userprofile.peers.all()
+        username = None
+        if route.status == "ACTIVE":
+            html = "<html><body>Cannot delete active Route! Deactivate at first</body></html>"
+            return HttpResponse(html)
+            
+        for peer in peers:
+            if username:
+                break
+            for network in peer.networks.all():
+                net = ip_network(network)
+                if ip_network(route.destination) in net:
+                    username = peer
+                    break
+        applier_peer = username
+        peers = request.user.userprofile.peers.all()
+        username = None
+        for peer in peers:
+            if username:
+                break
+            for network in peer.networks.all():
+                net = ip_network(network)
+                if ip_network(route.destination) in net:
+                    username = peer
+                    break
+        requester_peer = username
+        if applier_peer == requester_peer or request.user.is_superuser:
+            route.expires = datetime.date.today()
+            if not request.user.is_superuser:
+                route.applier = request.user
+            route.response = "Deactivating"
+            try:
+                route.requesters_address = request.META['HTTP_X_FORWARDED_FOR']
+            except:
+                # in case the header is not provided
+                route.requesters_address = 'unknown'
+
+            username_request = request.user.username
+            user_is_admin = request.user.is_superuser
+            full_delete_is_allowed = request.user.userprofile.is_delete_allowed()
+            logger.info("views.delete(): username_request="+str(username_request)+" user_is_admin="+str(user_is_admin)+" => full_delete_is_allowed="+str(full_delete_is_allowed)+", but will not be used in views::delete")
+            if full_delete_is_allowed:
+                delete_route.delay(route.pk)
+                html = "<html><body>Processing delete operation...</body></html>"
+            else:
+                html = "<html><body>Not enough permissions to delete Route.</body></html>"
+        return HttpResponse(html)
+    else:
+        return HttpResponseRedirect(reverse("group-routes"))
+
+@login_required
+@never_cache
+def deactivate_route_view(request, route_slug):
     if request.is_ajax():
         route = get_object_or_404(Route, name=route_slug)
         peers = route.applier.userprofile.peers.all()
@@ -479,17 +534,8 @@ def delete_route(request, route_slug):
             except:
                 # in case the header is not provided
                 route.requesters_address = 'unknown'
-
-            username_request = request.user.username
-            user_is_admin = request.user.is_superuser
-            full_delete_is_allowed = (user_is_admin and settings.ALLOW_DELETE_FULL_FOR_ADMIN) or settings.ALLOW_DELETE_FULL_FOR_USER_ALL or (username_request in settings.ALLOW_DELETE_FULL_FOR_USER_LIST)
-            logger.info("views.delete(): username_request="+str(username_request)+" user_is_admin="+str(user_is_admin)+" => full_delete_is_allowed="+str(full_delete_is_allowed)+", but will not be used in views::delete")
-            #if full_delete_is_allowed:
-            #  route.status = "PENDING_TODELETE"; 
-            #  logger.info("tasks.delete(): => status="+str(route.status))
-
             route.save()
-            route.commit_delete()
+            deactivate_route.delay(route.pk)
         html = "<html><body>Done</body></html>"
         return HttpResponse(html)
     else:

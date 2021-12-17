@@ -17,6 +17,8 @@ from flowspec.serializers import (
 from flowspec.validators import check_if_rule_exists
 from rest_framework.response import Response
 
+from flowspec.tasks import *
+
 import os
 import logging
 FORMAT = '%(asctime)s %(levelname)s: %(message)s'
@@ -166,7 +168,7 @@ class RouteViewSet(viewsets.ModelViewSet):
 
             Cases:
             * `ACTIVE` ~> `INACTIVE`: The `Route` must be deleted from the
-                flowspec device (`commit_delete`)
+                flowspec device (`commit_deactivate`)
             * `ACTIVE` ~> `ACTIVE`: The `Route` is present, so it must be
                 edited (`commit_edit`)
 
@@ -177,7 +179,7 @@ class RouteViewSet(viewsets.ModelViewSet):
             """
             set_object_pending(obj)
             if new_status == 'INACTIVE':
-                obj.commit_delete()
+                deactivate_route.delay(obj.pk)
             else:
                 obj.commit_edit()
 
@@ -234,74 +236,27 @@ class RouteViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=400)
 
-    def pre_save(self, obj):
-        # DEBUG
-        if settings.DEBUG:
-            if self.request.user.is_anonymous():
-                from django.contrib.auth.models import User
-                obj.applier = User.objects.all()[0]
-            elif self.request.user.is_authenticated():
-                obj.applier = self.request.user
-            else:
-                raise PermissionDenied('User is not Authenticated')
-        else:
-            obj.applier = self.request.user
-
-    def post_save(self, obj, created):
-        if created:
-            obj.commit_add()
-
-    def pre_delete(self, obj):
-        logger.info("RouteViewSet::pre delete(): start")
-        if True or not self.request.user.is_superuser:
-           raise PermissionDenied('Permission Denied')
-        logger.info("RouteViewSet::pre delete: pre commit_delete")
-        obj.commit_delete()
-
-    def delete(self, request, pk=None, partial=False):
+    def destroy(self, request, pk=None, partial=False):
+        """ HTTTP DELETE Method """
         obj = get_object_or_404(self.queryset, pk=pk)
         logger.info("RouteViewSet::delete(): pk="+str(pk)+" obj="+str(obj))
 
         username_request = request.user.username
         user_is_admin = request.user.is_superuser
-        full_delete_is_allowed = (user_is_admin and settings.ALLOW_DELETE_FULL_FOR_ADMIN) or settings.ALLOW_DELETE_FULL_FOR_USER_ALL or (username_request in settings.ALLOW_DELETE_FULL_FOR_USER_LIST)
+        full_delete_is_allowed = request.user.userprofile.is_delete_allowed()
         logger.info("RouteViewSet::delete(): username_request="+str(username_request)+" user_is_admin="+str(user_is_admin)+" => full_delete_is_allowed="+str(full_delete_is_allowed))
+        obj.status = "PENDING"
+        obj.save()
 
         #if True or not self.request.user.is_superuser():
-        if not full_delete_is_allowed:
-           raise PermissionDenied('Permission Denied')
-        logger.info("RouteViewSet::delete(): pre commit_delete")
-        obj.commit_delete()
-
-    def destroy(self, request, pk=None):
-        obj = get_object_or_404(self.queryset, pk=pk)
-        logger.info("RouteViewSet::destroy(): pk="+str(pk)+" obj="+str(obj))
-        logger.info("RouteViewSet::destroy(): pre commit_delete")
-
-        username_request = request.user.username
-        user_is_admin = request.user.is_superuser
-        full_delete_is_allowed = (user_is_admin and settings.ALLOW_DELETE_FULL_FOR_ADMIN) or settings.ALLOW_DELETE_FULL_FOR_USER_ALL or settings.ALLOW_DELETE_FULL_FOR_USER_LIST.contains(username_request)
-        logger.info("RouteViewSet::destroy(): username_request="+str(username_request)+" user_is_admin="+str(user_is_admin)+" => full_delete_is_allowed="+str(full_delete_is_allowed))
-
-        if obj.status == 'ACTIVE':
-          if full_delete_is_allowed:
-            obj.status = "PENDING_TODELETE"
-          else:
-            obj.status = "PENDING"
-          obj.response = "N/A"
-          obj.save()
-          obj.commit_delete()
-          serializer = RouteSerializer(obj, context={'request': request})
-          return Response(serializer.data)
+        if full_delete_is_allowed:
+            job = delete_route.delay(obj.pk)
+            return Response({"status": "Received task to delete route.", "job_id": str(job)}, 202)
         else:
-          try:
-            #if not settings.ALLOW_ADMIN__FULL_RULEDEL or not self.request.user.is_superuser:
-            if not full_delete_is_allowed:
-              raise PermissionDenied('Permission Denied')
-          except Exception as e:
-              raise PermissionDenied('Permission Denied')
-          # this will delete the rule from DB
-          return super(RouteViewSet, self).destroy(self, request, pk=pk)
+            if obj.status == "INACTIVE":
+                return Response({"status": "Cannot deactivate route that is inactive already."}, 406)
+            job = deactivate_route.delay(obj.pk)
+            return Response({"status": "Received task to deactivate route.", "job_id": str(job)}, 202)
 
 class ThenActionViewSet(viewsets.ModelViewSet):
     queryset = ThenAction.objects.all()

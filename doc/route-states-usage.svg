@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="51cm" height="29cm" viewBox="-10 -132 1002 573" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="60" y="-115.961" width="810.473" height="555.961"/>
+  <g>
+    <rect style="fill: #ffffff" x="180" y="-60" width="190" height="280"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="180" y="-60" width="190" height="280"/>
+  </g>
+  <g>
+    <rect style="fill: #6fdea2" x="210.176" y="61" width="136.05" height="54"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="210.176" y="61" width="136.05" height="54"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="278.201" y="83.8813">
+      <tspan x="278.201" y="83.8813">ACTIVE</tspan>
+      <tspan x="278.201" y="99.8813">(status = ACTIVE)</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #6fdea2" x="643.9" y="56" width="149.45" height="54"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="643.9" y="56" width="149.45" height="54"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="718.625" y="78.8813">
+      <tspan x="718.625" y="78.8813">DEACTIVATED</tspan>
+      <tspan x="718.625" y="94.8813">(status = INACTIVE)</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="449.925" y="180" width="80.55" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="449.925" y="180" width="80.55" height="38"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="490.2" y="202.881">
+      <tspan x="490.2" y="202.881">PENDING</tspan>
+    </text>
+  </g>
+  <ellipse style="fill: #000000" cx="10" cy="20" rx="10" ry="10"/>
+  <g>
+    <ellipse style="fill: #ffffff" cx="945" cy="75" rx="15" ry="15"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="945" cy="75" rx="15" ry="15"/>
+    <ellipse style="fill: #000000" cx="945" cy="75" rx="10" ry="10"/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="884.274" y="46.198">
+    <tspan x="884.274" y="46.198">Deleted from DB</tspan>
+  </text>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="80" y="-120">
+    <tspan x="80" y="-120">Created in DB</tspan>
+  </text>
+  <ellipse style="fill: #000000" cx="10" cy="80" rx="10" ry="10"/>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="0" y="0">
+    <tspan x="0" y="0">UI</tspan>
+  </text>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="-10" y="110">
+    <tspan x="-10" y="110">RESTAPI</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="20.9717" y1="19.8433" x2="70.2649" y2="19.1391"/>
+    <polygon style="fill: #000000" points="77.7642,19.0319 67.8366,24.1743 70.2649,19.1391 67.6938,14.1753 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="77.7642,19.0319 67.8366,24.1743 70.2649,19.1391 67.6938,14.1753 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="20.9904" y1="79.9003" x2="69.1864" y2="79.4629"/>
+    <polygon style="fill: #000000" points="76.6861,79.3949 66.7319,84.4854 69.1864,79.4629 66.6411,74.4858 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="76.6861,79.3949 66.7319,84.4854 69.1864,79.4629 66.6411,74.4858 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="108.813" y="140.474">
+    <tspan x="108.813" y="140.474">&lt;POST&gt;</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="352" y1="64" x2="618.264" y2="64"/>
+    <polygon style="fill: #000000" points="625.764,64 615.764,69 618.264,64 615.764,59 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="625.764,64 615.764,69 618.264,64 615.764,59 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="444" y="59.7028">
+    <tspan x="444" y="59.7028">UI (deactivate)</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="352" y1="87.624" x2="618.264" y2="87.624"/>
+    <polygon style="fill: #000000" points="625.764,87.624 615.764,92.624 618.264,87.624 615.764,82.624 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="625.764,87.624 615.764,92.624 618.264,87.624 615.764,82.624 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="380" y="82.6536">
+    <tspan x="380" y="82.6536">&lt;PATCH&gt; status=INACTIVE</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="352" y1="115.585" x2="466.264" y2="115.585"/>
+    <polygon style="fill: #000000" points="473.764,115.585 463.764,120.585 466.264,115.585 463.764,110.585 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="473.764,115.585 463.764,120.585 466.264,115.585 463.764,110.585 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="380" y="110.278">
+    <tspan x="380" y="110.278">&lt;DELETE&gt;</tspan>
+  </text>
+  <g>
+    <polygon style="fill: #ffffff" points="476,116 496,96 516,116 496,136 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="476,116 496,96 516,116 496,136 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="452" y="156">
+    <tspan x="452" y="156">Is privileged?</tspan>
+    <tspan x="452" y="172">or is admin?</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="516" y1="116" x2="618.264" y2="116"/>
+    <polygon style="fill: #000000" points="625.764,116 615.764,121 618.264,116 615.764,111 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="625.764,116 615.764,121 618.264,116 615.764,111 "/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="639.9" y="150" width="149.45" height="54"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="639.9" y="150" width="149.45" height="54"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="714.625" y="172.881">
+      <tspan x="714.625" y="172.881">DEACTIVATED</tspan>
+      <tspan x="714.625" y="188.881">(status = INACTIVE)</tspan>
+    </text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="516" y1="116" x2="631.292" y2="173.646"/>
+    <polygon style="fill: #000000" points="638,177 626.82,177 631.292,173.646 631.292,168.056 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="638,177 626.82,177 631.292,173.646 631.292,168.056 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="789.25" y1="177" x2="920.866" y2="90.8055"/>
+    <polygon style="fill: #000000" points="927.14,86.6965 921.514,96.358 920.866,90.8055 916.035,87.9923 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="927.14,86.6965 921.514,96.358 920.866,90.8055 916.035,87.9923 "/>
+  </g>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 793.25,56 A 36.9411,36.9411 0 0 0 722.923,40.9679"/>
+    <polygon style="fill: #000000" points="720.409,47.8017 717.325,37.0553 721.782,40.4285 727.156,38.8861 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="720.409,47.8017 717.325,37.0553 721.782,40.4285 727.156,38.8861 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="670" y="10">
+    <tspan x="670" y="10">&lt;DELETE&gt; (unprivileged user)</tspan>
+  </text>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 699.14,55.0132 A 245.372,245.372 0 0 0 318.205,53.3529"/>
+    <polygon style="fill: #000000" points="313.536,59.2156 315.572,48.2222 318.055,53.2305 323.552,54.2486 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="313.536,59.2156 315.572,48.2222 318.055,53.2305 323.552,54.2486 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="410.566" y="-59.6238">
+    <tspan x="410.566" y="-59.6238">&lt;PATCH&gt; status=ACTIVE</tspan>
+    <tspan x="410.566" y="-43.6238">or UI Reactivate</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="79.925" y="60" width="80.55" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="79.925" y="60" width="80.55" height="38"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="120.2" y="82.8813">
+      <tspan x="120.2" y="82.8813">PENDING</tspan>
+    </text>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="200" y="-62.8562">
+    <tspan x="200" y="-62.8562">in Router</tspan>
+  </text>
+  <g>
+    <rect style="fill: #6fdea2" x="80" y="340" width="180.8" height="54"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="80" y="340" width="180.8" height="54"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="170.4" y="362.881">
+      <tspan x="170.4" y="362.881">ERROR</tspan>
+      <tspan x="170.4" y="378.881">(status = ERROR)</tspan>
+    </text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="123.684" y1="98.9863" x2="163.847" y2="329.407"/>
+    <polygon style="fill: #000000" points="165.135,336.795 158.492,327.802 163.847,329.407 168.344,326.085 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="165.135,336.795 158.492,327.802 163.847,329.407 168.344,326.085 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="181.22" y1="338.996" x2="263.872" y2="125.086"/>
+    <polygon style="fill: #000000" points="266.575,118.09 267.635,129.22 263.872,125.086 258.307,125.616 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="266.575,118.09 267.635,129.22 263.872,125.086 258.307,125.616 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="200" y="320">
+    <tspan x="200" y="320">UI Fix it!</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="199.925" y="240" width="80.55" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="199.925" y="240" width="80.55" height="38"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="240.2" y="262.881">
+      <tspan x="240.2" y="262.881">PENDING</tspan>
+    </text>
+  </g>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 270.327,341.019 A 46.6036,46.6036 0 0 0 281.478,249.125"/>
+    <polygon style="fill: #000000" points="262.987,340.465 273.808,337.654 270.323,342.025 271.729,347.436 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="262.987,340.465 273.808,337.654 270.323,342.025 271.729,347.436 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="464.927" y1="218.996" x2="268.435" y2="374.459"/>
+    <polygon style="fill: #000000" points="262.554,379.113 267.293,368.987 268.435,374.459 273.498,376.829 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="262.554,379.113 267.293,368.987 268.435,374.459 273.498,376.829 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="802" y1="75.3072" x2="916.264" y2="75.3072"/>
+    <polygon style="fill: #000000" points="923.764,75.3072 913.764,80.3072 916.264,75.3072 913.764,70.3072 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="923.764,75.3072 913.764,80.3072 916.264,75.3072 913.764,70.3072 "/>
+  </g>
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="810" y="70">
+    <tspan x="810" y="70">&lt;DELETE&gt;</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="79.925" y="0" width="80.55" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="79.925" y="0" width="80.55" height="38"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="120.2" y="22.8813">
+      <tspan x="120.2" y="22.8813">PENDING</tspan>
+    </text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="161.484" y1="37.0291" x2="205.149" y2="56.0976"/>
+    <polygon style="fill: #000000" points="212.022,59.0991 200.856,59.6792 205.149,56.0976 204.859,50.5149 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="212.022,59.0991 200.856,59.6792 205.149,56.0976 204.859,50.5149 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="161.484" y1="81.3516" x2="199.461" y2="83.5149"/>
+    <polygon style="fill: #000000" points="206.949,83.9414 196.681,88.3646 199.461,83.5149 197.25,78.3808 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="206.949,83.9414 196.681,88.3646 199.461,83.5149 197.25,78.3808 "/>
+  </g>
+</svg>
