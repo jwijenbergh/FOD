@@ -99,18 +99,19 @@ def deactivate_route(routepk, **kwargs):
     if initial_status not in ("ACTIVE", "PENDING", "ERROR"):
         logger.error("tasks::deactivate(): Cannot deactivate route that is not in ACTIVE or potential ACTIVE status.")
         return
+    logger.info("tasks::deactivate_route(): initial_status="+str(initial_status))
 
     applier = PR.Applier(route_object=route)
     # Delete from router via NETCONF
     commit, response = applier.apply(operation="delete")
     reason_text = ''
-    logger.info("tasks::delete(): initial_status="+str(initial_status))
+    logger.info("tasks::deactivate_route(): commit="+str(commit))
     if commit:
         route.status="INACTIVE"
         try:
             snmp_add_initial_zero_value(str(route.id), False)
         except Exception as e:
-            logger.error("edit(): route="+str(route)+", INACTIVE, add_null_value failed: "+str(e))
+            logger.error("tasks::deactivate_route(): route="+str(route)+", INACTIVE, add_null_value failed: "+str(e))
 
         announce("[%s] Suspending rule : %s%s- Result %s" % (route.applier_username_nice, route.name, reason_text, response), route.applier, route)
         route.status = "INACTIVE"
@@ -146,6 +147,9 @@ def delete_route(routepk, **kwargs):
             deactivate_route(routepk)
         except TimeoutError:
             pass
+        except Exception as e:
+            logger.info("tasks::delete_route(): exception during deactivate_route: "+str(e))
+        logger.info("tasks::delete_route(): deactivate_route done => route.status="+str(route.status))
         if route.status != "INACTIVE" and delete_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
             # Repeat due to error in deactivation
             route.status = "PENDING"
