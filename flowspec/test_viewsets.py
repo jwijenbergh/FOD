@@ -343,7 +343,7 @@ class TestRouteOuter:
         }
         return fod_api_headers
 
-    def add_route(self, endpoint, name="testcreate", comments="test route", source="0.0.0.0/0", sourceport="123", destination="1.0.0.2/32", destinationport="123", protocol=[ "tcp" ], then=[ "discard" ]):
+    def add_route(self, endpoint_base, name="testcreate", comments="test route", source="0.0.0.0/0", sourceport="123", destination="1.0.0.2/32", destinationport="123", protocol=[ "tcp" ], then=[ "discard" ], status="ACTIVE"):
 
         fod_api_headers = self.get_headers()
 
@@ -356,11 +356,11 @@ class TestRouteOuter:
             "source": source,
             "sourceport": sourceport,
             "then": then,
-            "status": "ACTIVE"
+            "status": status,
         }
         print("add_route(): data="+str(data))
 
-        response = requests.post(endpoint, headers=fod_api_headers, data=json.dumps(data))
+        response = requests.post(endpoint_base, headers=fod_api_headers, data=json.dumps(data))
         print("response.content"+str(response.content))
     
         # Validate response headers and body contents, e.g. status code.
@@ -394,6 +394,8 @@ class TestRouteOuter:
             print("waiting "+str(wait_time))
             time.sleep(wait_time)
 
+        assert resp_data["status"] == status
+
         return route_id
 
     def delete_route(self, endpoint_base, route_id):
@@ -425,10 +427,40 @@ class TestRouteOuter:
         #then = [ "discard" ]
         then = [ "rate-limit:10000k" ]
 
+        #
+
+        print("\nphase 0")
+        response = requests.get(endpoint_base, headers=fod_api_headers)
+        assert response.status_code // 100 == 2
+        resp_data = json.loads(response.content)
+        print("get.response.data="+str(resp_data))
+
+        #
+
+        print("\nphase 0a")
+        response = requests.get(endpoint_base+"?scope=applier", headers=fod_api_headers)
+        assert response.status_code // 100 == 2
+        resp_data = json.loads(response.content)
+        print("get.response.data="+str(resp_data))
+
+        #
+
         print("\nphase 1")
-        route_id1 = self.add_route(endpoint_base, name="testrule_1", comments=comments, source="0.0.0.0/0", sourceport="1000-2000", destination=ip1, destinationport="3000-4000,5000-6000", protocol=["tcp"], then=then)
+        route_id1 = self.add_route(endpoint_base, name="testrule_1", comments=comments, source="0.0.0.0/0", sourceport="1000-2000", destination=ip1, destinationport="3000-4000,5000-6000", protocol=["tcp"], then=then, status="INACTIVE")
         print("created route: route_id1="+str(route_id1))
         self.delete_route(endpoint_base, route_id1)
+
+        #
+
+        print("\nphase 1a")
+        data = {
+            "status": "ACTIVE",
+        }
+        response = requests.patch(endpoint_base+str(route_id1), headers=fod_api_headers, data=json.dumps(data))
+        print("response.content"+str(response.content))
+        assert response.status_code // 100 == 2
+        resp_data = json.loads(response.content)
+        print("get.response.data="+str(resp_data))
 
         #
 
