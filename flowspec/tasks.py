@@ -145,6 +145,7 @@ def delete_route(routepk, **kwargs):
         # call deactivate_route() directly since we are already on background (celery task)
         try:
             deactivate_route(routepk)
+            route = Route.objects.get(pk=routepk)
         except TimeoutError:
             pass
         except Exception as e:
