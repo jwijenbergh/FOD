@@ -245,8 +245,9 @@ class RouteViewSet(viewsets.ModelViewSet):
         user_is_admin = request.user.is_superuser
         full_delete_is_allowed = request.user.userprofile.is_delete_allowed()
         logger.info("RouteViewSet::delete(): username_request="+str(username_request)+" user_is_admin="+str(user_is_admin)+" => full_delete_is_allowed="+str(full_delete_is_allowed))
-        obj.status = "PENDING"
-        obj.save()
+        if obj.status!="INACTIVE":
+          obj.status = "PENDING"
+          obj.save()
 
         #if True or not self.request.user.is_superuser():
         if full_delete_is_allowed:
