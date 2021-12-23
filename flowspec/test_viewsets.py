@@ -303,7 +303,7 @@ class TestRoute:
         response = api_client.delete(f"{endpoint}")
         print("route "+str(route_id)+" deleted")
         
-        assert response.status_code == 204
+        assert response.status_code == 202
 
         try:
             Route.objects.get(id=route_id)
@@ -367,7 +367,7 @@ class TestRouteOuter:
         print("response.content"+str(response.content))
     
         # Validate response headers and body contents, e.g. status code.
-        assert response.status_code == 201 or response.status_code == 204
+        assert response.status_code == 201 or response.status_code == 202
 
         resp_data = json.loads(response.content)
         print("myresp_data="+str(resp_data))
@@ -394,6 +394,6 @@ class TestRouteOuter:
  
         response = requests.delete(endpoint, headers=fod_api_headers)
 
-        assert response.status_code == 204
+        assert response.status_code == 202
 
 

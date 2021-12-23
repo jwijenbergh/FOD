@@ -140,6 +140,7 @@ def delete_route(routepk, **kwargs):
     """For Route in ACTIVE state, deactivate it at first. Finally, delete the Route from the DB. Permissions must be checked before this call."""
     from flowspec.models import Route
     route = Route.objects.get(pk=routepk)
+    logger.info("tasks::delete_route(): initial route.status="+str(route.status))
     if route.status != "INACTIVE":
         logger.info("Deactivating active route...")
         # call deactivate_route() directly since we are already on background (celery task)
@@ -155,8 +156,9 @@ def delete_route(routepk, **kwargs):
             # Repeat due to error in deactivation
             route.status = "PENDING"
             route.save()
-            logger.error("Deactivation failed, repeat the deletion process.")
-            raise TimeoutError()
+            if True:
+              logger.error("Deactivation failed, repeat the deletion process.")
+              raise TimeoutError()
             
     if route.status == "INACTIVE":
         logger.info("Deleting inactive route...")
