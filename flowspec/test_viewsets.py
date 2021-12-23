@@ -487,6 +487,16 @@ class TestRouteOuter:
           resp_data = json.loads(response.content)
           print("get.response.data="+str(resp_data))
 
+          print("\nphase 1b")
+          data = {
+              "status": "INACTIVE",
+          }
+          response = requests.patch(endpoint_base+str(route_id1)+"/", headers=fod_api_headers, data=json.dumps(data))
+          print("response.content"+str(response.content))
+          assert response.status_code // 100 == 2
+          resp_data = json.loads(response.content)
+          print("get.response.data="+str(resp_data))
+
         #
 
         self.delete_route(endpoint_base, route_id1)
