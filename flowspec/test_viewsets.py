@@ -7,7 +7,7 @@ from accounts.models import *
 from rest_framework.authtoken.models import Token
 
 import requests
-from time import sleep
+#import list
 
 @pytest.fixture
 def test_settings(settings):
@@ -407,7 +407,32 @@ class TestRouteOuter:
         assert response.status_code == 202
         print("rule "+str(route_id)+" deleted")
  
-    def test_add_outer(self):
+    def test_add_outer_single(self):
+
+        ip1="10.0.0.1/32"
+
+        #
+
+        endpoint_base = 'http://localhost:8000/api/routes/'
+        print("endpoint_base="+str(endpoint_base))
+
+        fod_api_headers = self.get_headers()
+
+        comments = "test route"
+        protocol = [ "tcp" ]
+
+        #then = [ "https://fod.example.com/api/thenactions/3/" ]
+        #then = [ "discard" ]
+        then = [ "rate-limit:10000k" ]
+
+        #
+
+        route_id1 = self.add_route(endpoint_base, name="testrule_1", comments=comments, source="0.0.0.0/0", sourceport="1000-2000", destination=ip1, destinationport="3000-4000,5000-6000", protocol=["tcp"], then=then, status="INACTIVE")
+        print("created route: route_id1="+str(route_id1))
+        self.delete_route(endpoint_base, route_id1)
+
+
+    def test_add_outer_multi(self):
 
         ip1="10.0.0.1/32"
         ip2="10.0.0.2/32"
@@ -448,19 +473,23 @@ class TestRouteOuter:
         print("\nphase 1")
         route_id1 = self.add_route(endpoint_base, name="testrule_1", comments=comments, source="0.0.0.0/0", sourceport="1000-2000", destination=ip1, destinationport="3000-4000,5000-6000", protocol=["tcp"], then=then, status="INACTIVE")
         print("created route: route_id1="+str(route_id1))
-        self.delete_route(endpoint_base, route_id1)
 
         #
 
-        print("\nphase 1a")
-        data = {
-            "status": "ACTIVE",
-        }
-        response = requests.patch(endpoint_base+str(route_id1), headers=fod_api_headers, data=json.dumps(data))
-        print("response.content"+str(response.content))
-        assert response.status_code // 100 == 2
-        resp_data = json.loads(response.content)
-        print("get.response.data="+str(resp_data))
+        if True:
+          print("\nphase 1a")
+          data = {
+              "status": "ACTIVE",
+          }
+          response = requests.patch(endpoint_base+str(route_id1)+"/", headers=fod_api_headers, data=json.dumps(data))
+          print("response.content"+str(response.content))
+          assert response.status_code // 100 == 2
+          resp_data = json.loads(response.content)
+          print("get.response.data="+str(resp_data))
+
+        #
+
+        self.delete_route(endpoint_base, route_id1)
 
         #
 
