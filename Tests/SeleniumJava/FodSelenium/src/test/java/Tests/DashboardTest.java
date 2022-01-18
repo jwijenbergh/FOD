@@ -230,12 +230,12 @@ public class DashboardTest {
         				try {
         					if(driver.getPageSource().contains(configFileReader.getRuleName()))
         					{
-        						buffer.append("Find on dashboard button rule: " + configFileReader.getRuleName());
+        						buffer.append("Find on dashboard rule: " + configFileReader.getRuleName());
             					buffer.newLine();
         					}
         					else {
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        						buffer.append("Can't Find on dashboard button rule: " + configFileReader.getRuleName());
+        						buffer.append("Can't Find on dashboard rule: " + configFileReader.getRuleName());
             					buffer.newLine();
         					}
         					
