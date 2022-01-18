@@ -981,7 +981,1220 @@ public class MyRulesTest {
         			}	         
         		}	
     	}
+    	
+    	@Test
+    	static void ActiveDeactivatedRulesFromMyRulesTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\MyRulesReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("ActiveDeactivatedRulesFromMyRulesTable");
+        		buffer.newLine();
+        				
+        				try {
+        					driver.findElement(By.id("show_deactivated")).click();
+        					buffer.append("Find and click on deactivated button: show_deactivated");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_active")).click();
+        					buffer.append("Find and click on active button: show_active");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-danger")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-info")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-warning")))
+        					{
+        						
+        						buffer.append("Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				try {
+        					if(driver.findElement(By.className("label label-success")))
+        					{
+        						
+        						buffer.append("Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void ErrorDeactivatedRulesFromMyRulesTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\MyRulesReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("ErrorDeactivatedRulesFromMyRulesTable");
+        		buffer.newLine();
+        				
+        				try {
+        					driver.findElement(By.id("show_deactivated")).click();
+        					buffer.append("Find and click on deactivated button: show_deactivated");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_error")).click();
+        					buffer.append("Find and click on error button: show_error");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-danger")))
+        					{
+        						
+        						buffer.append("Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-info")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-warning")))
+        					{
+        						
+        						buffer.append("Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				try {
+        					if(driver.findElement(By.className("label label-success")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void PendingDeactivatedRulesFromMyRulesTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\MyRulesReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("PendingDeactivatedRulesFromMyRulesTable");
+        		buffer.newLine();
+        				
+        				try {
+        					driver.findElement(By.id("show_deactivated")).click();
+        					buffer.append("Find and click on deactivated button: show_deactivated");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_pending")).click();
+        					buffer.append("Find and click on pending button: show_pending");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-danger")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-info")))
+        					{
+        						
+        						buffer.append("Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-warning")))
+        					{
+        						
+        						buffer.append("Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				try {
+        					if(driver.findElement(By.className("label label-success")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void PendingActiveRulesFromMyRulesTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\MyRulesReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("PendingActiveRulesFromMyRulesTable");
+        		buffer.newLine();
+        				
+        				try {
+        					driver.findElement(By.id("show_active")).click();
+        					buffer.append("Find and click on active button: show_active");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_pending")).click();
+        					buffer.append("Find and click on pending button: show_pending");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-danger")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-info")))
+        					{
+        						
+        						buffer.append("Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-warning")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				try {
+        					if(driver.findElement(By.className("label label-success")))
+        					{
+        						
+        						buffer.append("Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void ErrorActiveRulesFromMyRulesTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\MyRulesReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("ErrorActiveRulesFromMyRulesTable");
+        		buffer.newLine();
+        				
+        				try {
+        					driver.findElement(By.id("show_active")).click();
+        					buffer.append("Find and click on active button: show_active");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_error")).click();
+        					buffer.append("Find and click on error button: show_error");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-danger")))
+        					{
+        						
+        						buffer.append("Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-info")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-warning")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				try {
+        					if(driver.findElement(By.className("label label-success")))
+        					{
+        						
+        						buffer.append("Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void ErrorPendingRulesFromMyRulesTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\MyRulesReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("ErrorPendingRulesFromMyRulesTable");
+        		buffer.newLine();
+        				
+        				try {
+        					driver.findElement(By.id("show_pending")).click();
+        					buffer.append("Find and click on pending button: show_pending");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_error")).click();
+        					buffer.append("Find and click on error button: show_error");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-danger")))
+        					{
+        						
+        						buffer.append("Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-info")))
+        					{
+        						
+        						buffer.append("Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-warning")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				try {
+        					if(driver.findElement(By.className("label label-success")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	@Test
+    	static void ErrorPendingActiveRulesFromMyRulesTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\MyRulesReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("ErrorPendingRulesFromMyRulesTable");
+        		buffer.newLine();
+        				
+        				try {
+        					driver.findElement(By.id("show_pending")).click();
+        					buffer.append("Find and click on pending button: show_pending");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_error")).click();
+        					buffer.append("Find and click on error button: show_error");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_active")).click();
+        					buffer.append("Find and click on active button: show_active");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-danger")))
+        					{
+        						
+        						buffer.append("Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-info")))
+        					{
+        						
+        						buffer.append("Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-warning")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				try {
+        					if(driver.findElement(By.className("label label-success")))
+        					{
+        						
+        						buffer.append("Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void ErrorPendingDeActivatedRulesFromMyRulesTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\MyRulesReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("ErrorPendingDeActivatedRulesFromMyRulesTable");
+        		buffer.newLine();
+        				
+        				try {
+        					driver.findElement(By.id("show_pending")).click();
+        					buffer.append("Find and click on pending button: show_pending");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_error")).click();
+        					buffer.append("Find and click on error button: show_error");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_deactivated")).click();
+        					buffer.append("Find and click on deactivated button: show_deactivated");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-danger")))
+        					{
+        						
+        						buffer.append("Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-info")))
+        					{
+        						
+        						buffer.append("Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-warning")))
+        					{
+        						
+        						buffer.append("Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				try {
+        					if(driver.findElement(By.className("label label-success")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void ErrorActiveDeActivatedRulesFromMyRulesTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\MyRulesReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("ErrorActiveDeActivatedRulesFromMyRulesTable");
+        		buffer.newLine();
+        				
+        				try {
+        					driver.findElement(By.id("show_error")).click();
+        					buffer.append("Find and click on error button: show_error");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_active")).click();
+        					buffer.append("Find and click on active button: show_active");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_deactivated")).click();
+        					buffer.append("Find and click on deactivated button: show_deactivated");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-danger")))
+        					{
+        						
+        						buffer.append("Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-info")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-warning")))
+        					{
+        						
+        						buffer.append("Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				try {
+        					if(driver.findElement(By.className("label label-success")))
+        					{
+        						
+        						buffer.append("Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
 	
+    	@Test
+    	static void ActivePendingDeActivatedRulesFromMyRulesTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\MyRulesReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("ActivePendingDeActivatedRulesFromMyRulesTable");
+        		buffer.newLine();
+        				
+        				try {
+        					driver.findElement(By.id("show_pending")).click();
+        					buffer.append("Find and click on pending button: show_pending");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_active")).click();
+        					buffer.append("Find and click on active button: show_active");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_deactivated")).click();
+        					buffer.append("Find and click on deactivated button: show_deactivated");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-danger")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-info")))
+        					{
+        						
+        						buffer.append("Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-warning")))
+        					{
+        						
+        						buffer.append("Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				try {
+        					if(driver.findElement(By.className("label label-success")))
+        					{
+        						
+        						buffer.append("Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void ActivePendingDeActivatedErrorRulesFromMyRulesTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\MyRulesReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("ActivePendingDeActivatedRulesFromMyRulesTable");
+        		buffer.newLine();
+        				
+        				try {
+        					driver.findElement(By.id("show_pending")).click();
+        					buffer.append("Find and click on pending button: show_pending");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_error")).click();
+        					buffer.append("Find and click on error button: show_error");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_active")).click();
+        					buffer.append("Find and click on error button: show_error");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("show_deactivated")).click();
+        					buffer.append("Find and click on deactivated button: show_deactivated");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-danger")))
+        					{
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					else {
+        						
+        						buffer.append("Can't Find in my rules table error rule: label label-danger");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-info")))
+        					{
+        						
+        						buffer.append("Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table pending rule: label label-info");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					if(driver.findElement(By.className("label label-warning")))
+        					{
+        						
+        						buffer.append("Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table deactivated rule: label label-warning");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				try {
+        					if(driver.findElement(By.className("label label-success")))
+        					{
+        						
+        						buffer.append("Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					else {
+        						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        						buffer.append("Can't Find in my rules table active rule: label label-success");
+            					buffer.newLine();
+        					}
+        					
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}	
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
       @BeforeClass
       static void testSetUp() {
     	  
