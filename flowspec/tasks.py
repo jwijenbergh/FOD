@@ -46,103 +46,85 @@ handler = logging.FileHandler(LOG_FILENAME)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-@shared_task(ignore_result=True, autoretry_for=(TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True)
+@shared_task(ignore_result=True, autoretry_for=(TimeoutError, TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True, retry_kwargs={'max_retries': settings.NETCONF_MAX_RETRY_BEFORE_ERROR})
 def add(routepk, callback=None):
     from flowspec.models import Route
     route = Route.objects.get(pk=routepk)
-    try:
-        applier = PR.Applier(route_object=route)
-        commit, response = applier.apply()
-        if commit:
-            status = "ACTIVE"
-            #snmp_add_initial_zero_value.delay(str(route.id), True)
-            snmp_add_initial_zero_value(str(route.id), True)
-        else:
-            status = "ERROR"
-        route.status = status
-        route.response = response
-        route.save()
-        announce("[%s] Rule add: %s - Result: %s" % (route.applier_username_nice, route.name, response), route.applier, route)
-    except TimeLimitExceeded:
+    applier = PR.Applier(route_object=route)
+    commit, response = applier.apply()
+    if commit:
+        route.status = "ACTIVE"
+        #snmp_add_initial_zero_value.delay(str(route.id), True)
+        snmp_add_initial_zero_value(str(route.id), True)
+    else:
+        if deactivate_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
+            # repeat the action
+            raise TimeoutError()
         route.status = "ERROR"
-        route.response = "Task timeout"
-        route.save()
-        announce("[%s] Rule add: %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
-    except SoftTimeLimitExceeded:
-        route.status = "ERROR"
-        route.response = "Task timeout"
-        route.save()
-        announce("[%s] Rule add: %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
-    except Exception:
-        route.status = "ERROR"
-        route.response = "Error"
-        route.save()
-        announce("[%s] Rule add: %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
+    route.response = response
+    route.save()
+    announce("[%s] Rule add: %s - Result: %s" % (route.applier_username_nice, route.name, response), route.applier, route)
 
 
-@shared_task(ignore_result=True, autoretry_for=(TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True)
+@shared_task(ignore_result=True, autoretry_for=(TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True, retry_kwargs={'max_retries': settings.NETCONF_MAX_RETRY_BEFORE_ERROR})
 def edit(routepk, callback=None):
     from flowspec.models import Route
     route = Route.objects.get(pk=routepk)
-    try:
-        status_pre = route.status
-        logger.info("tasks::edit(): route="+str(route)+", status_pre="+str(status_pre))
-        applier = PR.Applier(route_object=route)
-        commit, response = applier.apply(operation="replace")
-        if commit:
-            status = "ACTIVE"
-            try:
-              #snmp_add_initial_zero_value.delay(str(route.id), True)
-              snmp_add_initial_zero_value(str(route.id), True)
-            except Exception as e:
-              logger.error("tasks::edit(): route="+str(route)+", ACTIVE, add_initial_zero_value failed: "+str(e))
-        else:
-            status = "ERROR"
-        route.status = status
-        route.response = response
-        route.save()
-        announce("[%s] Rule edit: %s - Result: %s" % (route.applier_username_nice, route.name, response), route.applier, route)
-    except TimeLimitExceeded:
+    status_pre = route.status
+    logger.info("tasks::edit(): route="+str(route)+", status_pre="+str(status_pre))
+    applier = PR.Applier(route_object=route)
+    commit, response = applier.apply(operation="replace")
+    if commit:
+        route.status = "ACTIVE"
+        try:
+          #snmp_add_initial_zero_value.delay(str(route.id), True)
+          snmp_add_initial_zero_value(str(route.id), True)
+        except Exception as e:
+          logger.error("tasks::edit(): route="+str(route)+", ACTIVE, add_initial_zero_value failed: "+str(e))
+    else:
+        if deactivate_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
+            # repeat the action
+            raise TimeoutError()
         route.status = "ERROR"
-        route.response = "Task timeout"
-        route.save()
-        announce("[%s] Rule edit: %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
-    except SoftTimeLimitExceeded:
-        route.status = "ERROR"
-        route.response = "Task timeout"
-        route.save()
-        announce("[%s] Rule edit: %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
-    except Exception as e:
-        route.status = "ERROR"
-        route.response = "Error"
-        route.save()
-        logger.error(str(e))
-        announce("[%s] Rule edit: %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
+    route.response = response
+    route.save()
+    announce("[%s] Rule edit: %s - Result: %s" % (route.applier_username_nice, route.name, response), route.applier, route)
 
-
-@shared_task(ignore_result=True, autoretry_for=(TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True)
-def delete(routepk, **kwargs):
+@shared_task(ignore_result=True, autoretry_for=(TimeoutError, TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True, retry_kwargs={'max_retries': settings.NETCONF_MAX_RETRY_BEFORE_ERROR})
+def deactivate_route(routepk, **kwargs):
+    """Deactivate the Route in ACTIVE state. Permissions must be checked before this call."""
     from flowspec.models import Route
     route = Route.objects.get(pk=routepk)
     initial_status = route.status
-    try:
-        applier = PR.Applier(route_object=route)
-        commit, response = applier.apply(operation="delete")
-        reason_text = ''
-        logger.info("tasks::delete(): initial_status="+str(initial_status))
-        if commit:
-            route.status="INACTIVE"
-            msg1 = "[%s] Fully deleted route : %s%s- Result %s" % (route.applier, route.name, reason_text, response)
-            logger.info("tasks::delete(): DELETED msg="+msg1)
-            announce(msg1, route.applier, route)
-            try:
-                snmp_add_initial_zero_value(str(route.id), False)
-            except Exception as e:
-                logger.error("edit(): route="+str(route)+", INACTIVE, add_null_value failed: "+str(e))
-            route.delete()
-            return
+    if initial_status not in ("ACTIVE", "PENDING", "ERROR"):
+        logger.error("tasks::deactivate(): Cannot deactivate route that is not in ACTIVE or potential ACTIVE status.")
+        return
+    logger.info("tasks::deactivate_route(): initial_status="+str(initial_status))
+
+    applier = PR.Applier(route_object=route)
+    # Delete from router via NETCONF
+    commit, response = applier.apply(operation="delete")
+    reason_text = ''
+    logger.info("tasks::deactivate_route(): commit="+str(commit))
+    if commit:
+        route.status="INACTIVE"
+        try:
+            snmp_add_initial_zero_value(str(route.id), False)
+        except Exception as e:
+            logger.error("tasks::deactivate_route(): route="+str(route)+", INACTIVE, add_null_value failed: "+str(e))
+
+        announce("[%s] Suspending rule : %s%s- Result %s" % (route.applier_username_nice, route.name, reason_text, response), route.applier, route)
+        route.status = "INACTIVE"
+        route.response = response
+        route.save()
+        route.commit_deactivate()
+        return
+    else: # removing rule in NETCONF failed, it is still ACTIVE and also collects statistics
+        # NETCONF "delete" operation failed, keep the object in DB
+        if deactivate_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
+            # repeat the action
+            raise TimeoutError()
         else:
-            # NETCONF "delete" operation failed, keep the object in DB
             if "reason" in kwargs and kwargs['reason'] == 'EXPIRED':
                 status = 'EXPIRED'
                 reason_text = " Reason: %s " % status
@@ -152,23 +134,41 @@ def delete(routepk, **kwargs):
             route.response = response
             route.save()
             announce("[%s] Suspending rule : %s%s- Result %s" % (route.applier_username_nice, route.name, reason_text, response), route.applier, route)
-    except TimeLimitExceeded:
-        route.status = "ERROR"
-        route.response = "Task timeout"
-        route.save()
-        announce("[%s] Suspending rule : %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
-    except SoftTimeLimitExceeded:
-        route.status = "ERROR"
-        route.response = "Task timeout"
-        route.save()
-        announce("[%s] Suspending rule : %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
-    except Exception as e:
-        logger.error("tasks::edit(): route="+str(route)+", got unexpected exception="+str(e))
-        route.status = "ERROR"
-        route.response = "Error"
-        route.save()
-        announce("[%s] Suspending rule : %s - Result: %s" % (route.applier_username_nice, route.name, route.response), route.applier, route)
 
+@shared_task(ignore_result=True, autoretry_for=(TimeoutError, TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True, retry_kwargs={'max_retries': settings.NETCONF_MAX_RETRY_BEFORE_ERROR})
+def delete_route(routepk, **kwargs):
+    """For Route in ACTIVE state, deactivate it at first. Finally, delete the Route from the DB. Permissions must be checked before this call."""
+    from flowspec.models import Route
+    route = Route.objects.get(pk=routepk)
+    logger.info("tasks::delete_route(): initial route.status="+str(route.status))
+    if route.status != "INACTIVE":
+        logger.info("Deactivating active route...")
+        # call deactivate_route() directly since we are already on background (celery task)
+        try:
+            deactivate_route(routepk)
+            route = Route.objects.get(pk=routepk)
+        except TimeoutError:
+            pass
+        except Exception as e:
+            logger.info("tasks::delete_route(): exception during deactivate_route: "+str(e))
+        logger.info("tasks::delete_route(): deactivate_route done => route.status="+str(route.status))
+        if route.status != "INACTIVE" and delete_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
+            # Repeat due to error in deactivation
+            route.status = "PENDING"
+            route.save()
+            if True:
+              logger.error("Deactivation failed, repeat the deletion process.")
+              raise TimeoutError()
+            
+    if route.status == "INACTIVE":
+        logger.info("Deleting inactive route...")
+        route.delete()
+        logger.info("Deleting finished.")
+    else:
+        route.status = "ERROR"
+        route.save()
+        logger.error("Deleting Route failed, it could not be deactivated - remaining in DB.")
+    return
 
 # May not work in the first place... proxy is not aware of Route models
 @shared_task

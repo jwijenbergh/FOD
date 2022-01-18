@@ -592,4 +592,7 @@ ENABLE_SETUP_VIEW = False
 ##############################################################################
 ##############################################################################
 
+# Number of retries when NECONF fails before it ends in the ERROR state
+NETCONF_MAX_RETRY_BEFORE_ERROR = 5
+
 from flowspy.settings_local import *
