@@ -24,7 +24,7 @@ public class OverviewTest {
 	//TODO: test cases
         public static void Login() 
         {
-        	try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+        	try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
         		buffer.append("Login");
@@ -108,7 +108,7 @@ public class OverviewTest {
     	public static void AddRule() 
             {
     		Login();
-    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
         		buffer.append("AddRule");
@@ -215,7 +215,7 @@ public class OverviewTest {
     	@Test
     	static void GoToSideDashboardFromOverview() {
     		Login();
-    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
         		buffer.append("GoToSideDashboardFromOverview");
@@ -261,7 +261,7 @@ public class OverviewTest {
     	@Test
     	static void GoToSideRulesFromOverview() {
     		Login();
-    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
         		buffer.append("GoToSideRulesFromOverview");
@@ -307,7 +307,7 @@ public class OverviewTest {
     	@Test
     	static void GoToSideAddRuleFromOverview() {
     		Login();
-    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
         		buffer.append("GoToSideAddRuleFromOverview");
@@ -353,7 +353,7 @@ public class OverviewTest {
     	@Test
     	static void GoToSideOverviewFromOverview() {
     		Login();
-    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
         		buffer.append("GoToSideOverviewFromOverview");
@@ -399,7 +399,7 @@ public class OverviewTest {
     	@Test
     	static void GoToSideAdminFromOverview() {
     		Login();
-    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
         		buffer.append("GoToSideAdminFromOverview");
@@ -438,7 +438,7 @@ public class OverviewTest {
     	@Test
     	static void GoToSideMyProfileFromOverview() {
     		Login();
-    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
         		BufferedWriter buffer = new BufferedWriter(fileWriter);  
         		buffer.newLine();
         		buffer.append("GoToSideMyProfileFromOverview");
@@ -462,6 +462,98 @@ public class OverviewTest {
         				try {
         					driver.findElement(By.id("my_profile_header_id"));
         					buffer.append("Find edir my profile header: my_profile_header_id");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        					
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void UserButtonFromOverviewTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("UserButtonFromOverviewTable");
+        		buffer.newLine();
+        				try {
+        					driver.findElement(By.id("navigation_overview_id")).click();
+        					buffer.append("Find and click on overview button: navigation_overview_id");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("overview_users_button")).click();
+        					buffer.append("Find and click on users button: overview_users_button");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("overview_user_table_username_header"));
+        					buffer.append("Find user table name: overview_user_table_username_header");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        					
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void RulesButtonFromOverviewTable() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("RulesButtonFromOverviewTable");
+        		buffer.newLine();
+        				try {
+        					driver.findElement(By.id("navigation_overview_id")).click();
+        					buffer.append("Find and click on overview button: navigation_overview_id");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("overview_rules_button")).click();
+        					buffer.append("Find and click on rules button: overview_rules_button");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("overview_rules_table_name_header"));
+        					buffer.append("Find rules table name: overview_rules_table_name_header");
         					buffer.newLine();
         				}catch(IOException exc) {
         					buffer.append(exc.getMessage() );

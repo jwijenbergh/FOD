@@ -2214,7 +2214,7 @@ public class MyRulesTest {
 		//maximize window
 		driver.manage().window().maximize();
 		
-		url = configFileReader.getApplicationUrl() + "/altlogin";;;
+		url = configFileReader.getApplicationUrl() + "/altlogin";
         }
 	
       public static void main(String[] args) {
