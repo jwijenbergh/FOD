@@ -608,7 +608,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -625,7 +625,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -642,7 +642,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -659,7 +659,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -706,7 +706,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -723,7 +723,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -740,7 +740,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -757,7 +757,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -804,7 +804,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -821,7 +821,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -838,7 +838,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -855,7 +855,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -902,7 +902,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -919,7 +919,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -936,7 +936,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -953,7 +953,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -1008,7 +1008,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -1025,7 +1025,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -1042,7 +1042,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -1059,7 +1059,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -1114,7 +1114,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -1131,7 +1131,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -1148,7 +1148,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -1165,7 +1165,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -1220,7 +1220,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -1237,7 +1237,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -1254,7 +1254,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -1271,7 +1271,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -1326,7 +1326,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -1343,7 +1343,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -1360,7 +1360,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -1377,7 +1377,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -1432,7 +1432,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -1449,7 +1449,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -1466,7 +1466,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -1483,7 +1483,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -1538,7 +1538,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -1555,7 +1555,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -1572,7 +1572,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -1589,7 +1589,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -1651,7 +1651,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -1668,7 +1668,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -1685,7 +1685,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -1702,7 +1702,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -1765,7 +1765,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -1782,7 +1782,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -1799,7 +1799,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -1816,7 +1816,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -1879,7 +1879,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -1896,7 +1896,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -1913,7 +1913,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -1930,7 +1930,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -1993,7 +1993,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -2010,7 +2010,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -2027,7 +2027,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -2044,7 +2044,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table active rule: label label-success");
@@ -2115,7 +2115,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-danger")))
+        					if(driver.findElements(By.className("label label-danger")).size() != 0)
         					{
         						buffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         						buffer.append("Find in my rules table error rule: label label-danger");
@@ -2132,7 +2132,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-info")))
+        					if(driver.findElements(By.className("label label-info")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table pending rule: label label-info");
@@ -2149,7 +2149,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}
         				try {
-        					if(driver.findElement(By.className("label label-warning")))
+        					if(driver.findElements(By.className("label label-warning")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table deactivated rule: label label-warning");
@@ -2166,7 +2166,7 @@ public class MyRulesTest {
         					buffer.newLine();
         				}	
         				try {
-        					if(driver.findElement(By.className("label label-success")))
+        					if(driver.findElements(By.className("label label-success")).size() != 0)
         					{
         						
         						buffer.append("Find in my rules table active rule: label label-success");
