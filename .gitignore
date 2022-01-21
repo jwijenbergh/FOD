@@ -20,6 +20,13 @@ static/rest_framework/
 *.new
 
 *.patch
+*.off
+old/
+
+local/
+.gitmy/
+
+##
 
 tags
 
