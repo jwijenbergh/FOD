@@ -442,6 +442,42 @@ def edit_route(request, route_slug):
 
 @login_required
 @never_cache
+def prolong_route(request, route_slug):
+    applier = request.user.pk
+    route_edit = get_object_or_404(Route, name=route_slug)
+
+    applier_peer_networks = []
+    if request.user.is_superuser:
+        applier_peer_networks = PeerRange.objects.all()
+    else:
+        user_peers = request.user.userprofile.peers.all()
+        for peer in user_peers:
+            applier_peer_networks.extend(peer.networks.all())
+    if not applier_peer_networks:
+        messages.add_message(
+            request,
+            messages.WARNING,
+            ('Insufficient rights on administrative networks. Cannot add rule. Contact your administrator')
+        )
+        return HttpResponseRedirect(reverse("group-routes"))
+    if route_edit.status == 'PENDING':
+        messages.add_message(
+            request,
+            messages.WARNING,
+            ('Cannot edit a pending rule: %s.') % (route_slug)
+        )
+        return HttpResponseRedirect(reverse("group-routes"))
+
+    route_edit.expires = datetime.date.today()+datetime.timedelta(30)
+    #route_edit.expires = route_edit.expires+datetime.timedelta(30)
+
+    if True:
+      #route_edit.commit_edit()
+      route_edit.save()
+      return HttpResponseRedirect(reverse("group-routes"))
+
+@login_required
+@never_cache
 def delete_route_view(request, route_slug):
     if request.is_ajax():
         route = get_object_or_404(Route, name=route_slug)
