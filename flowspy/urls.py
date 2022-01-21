@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^edit/(?P<route_slug>[\w\-]+)/$', flowspec_views.edit_route, name="edit-route"),
     url(r'^delete/(?P<route_slug>[\w\-]+)/$', flowspec_views.delete_route_view, name="delete-route"),
     url(r'^deactivate/(?P<route_slug>[\w\-]+)/$', flowspec_views.deactivate_route_view, name="deactivate-route"),
+    url(r'^prolong/(?P<route_slug>[\w\-]+)/$', flowspec_views.prolong_route, name="prolong-route"),
     url(r'^login/?', flowspec_views.user_login, name="login"),
     path('welcome/', flowspec_views.welcome, name="welcome"),
     url(r'^logout/?', flowspec_views.user_logout, name="logout"),
@@ -76,10 +77,17 @@ if 'graphs' in settings.INSTALLED_APPS:
 
 
 try:
-    if settings.DEBUG:
+    if settings.STATIC_FILES_ALWAYS:
+        from django.views.static import serve 
+        urlpatterns += url(r'^static/.*/$', flowspec_views.test_redirect, name='test_redirect'),
+        urlpatterns += url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
+        #urlpatterns += url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT, 'show_indexes':True}),
+    elif settings.DEBUG:
         # only for development / testing mode:
         from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+        urlpatterns += url(r'^static/.*/$', flowspec_views.test_redirect, name='test_redirect'),
         urlpatterns += staticfiles_urlpatterns()
+
 except:
     pass
 

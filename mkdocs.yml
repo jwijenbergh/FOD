@@ -3,6 +3,7 @@ site_name: Firewall On Demand
 repo_url: https://github.com/GEANT/FOD/
 #site_author: Stavros Kroustouris
 site_author: GÉANT4-3 WP8 T3
+site_dir: static/site
 docs_dir: doc
 #theme: readthedocs
 #pages:

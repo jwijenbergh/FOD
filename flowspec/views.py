@@ -440,7 +440,6 @@ def edit_route(request, route_slug):
                 'maxexpires': settings.MAX_RULE_EXPIRE_DAYS
             })
 
-
 @login_required
 @never_cache
 def delete_route_view(request, route_slug):
@@ -1010,4 +1009,12 @@ def setup(request):
             return render(request, 'flowspy/setup.html', {'form': form})
     else:
         raise PermissionDenied
+
+##
+
+from django.http import HttpResponse, HttpResponseNotFound, Http404,  HttpResponseRedirect
+
+def test_redirect(request):
+        logger.info('test_redirect: %s' % str(request))
+        return HttpResponseRedirect("index.html")
 

@@ -141,13 +141,32 @@ USE_L10N = True
 USE_TZ = True
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
-STATIC_ROOT = os.path.join(BASE_DIR)
-STATICFILES_DIRS = [ os.path.join(BASE_DIR, 'static'), ]
+
+##############################################################################
+##############################################################################
+
+STATIC_FILES_ALWAYS = False
+
 STATIC_URL = '/static/'
+
+#
+
+# additional dirs where static files are located:
+STATICFILES_DIRS = [ 
+  os.path.join(BASE_DIR, 'static'), 
+]
+
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
+
+# ./manage.py collectsstatic will copy all found static files to:
+#STATIC_ROOT = os.path.join(BASE_DIR)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+##############################################################################
+##############################################################################
 
 # Templates
 
@@ -473,6 +492,9 @@ PEER_MANAGED_TABLE = True
 PEER_RANGE_MANAGED_TABLE = True
 PEER_TECHC_MANAGED_TABLE = True
 
+# Number of retries when NECONF fails before it ends in the ERROR state
+NETCONF_MAX_RETRY_BEFORE_ERROR = 5
+
 # Actually apply the rules
 COMMIT = True
 
@@ -591,8 +613,5 @@ ENABLE_SETUP_VIEW = False
 
 ##############################################################################
 ##############################################################################
-
-# Number of retries when NECONF fails before it ends in the ERROR state
-NETCONF_MAX_RETRY_BEFORE_ERROR = 5
 
 from flowspy.settings_local import *
