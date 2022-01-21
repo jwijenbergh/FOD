@@ -1,0 +1,33 @@
+#!/bin/bash
+
+case "$1" in
+
+  setup)
+
+    ./manage.py dbshell <<EOF
+DELETE FROM route WHERE name LIKE "testui%";
+INSERT INTO ROUTE (name, destination, source, status, filed, last_updated, expires, applier_id) VALUES ("testui4", "1.0.0.4/32", "0.0.0.0", "INACTIVE",
+"2022-01-19 12:38:08.000", "2022-01-19 12:38:08.000", "2022-01-19", 1), ("testui3", "1.0.0.4/32", "0.0.0.0", "ACTIVE", "2022-01-19 12:38:08.000", "2022-01-19
+12:38:08.000", "2022-01-19", 1), ("testui1", "1.0.0.4/32", "0.0.0.0", "PENDING", "2022-01-19 12:38:08.000", "2022-01-19 12:38:08.000", "2022-01-19", 1),
+("testui1", "1.0.0.4/32", "0.0.0.0", "ERROR", "2022-01-19 12:38:08.000", "2022-01-19 12:38:08.000", "2022-01-19", 1);
+SELECT * FROM route WHERE name LIKE "testui%";
+EOF
+
+  ;;
+
+  teardown)
+
+    ./manage.py dbshell <<EOF
+DELETE FROM route WHERE name LIKE "testui%";
+SELECT * FROM route WHERE name LIKE "testui%";
+EOF
+
+  ;;
+
+  *)
+    echo "unknown mode: use 'setup' | 'teardown'" 1>&2
+    exit 2
+  ;;	 
+
+esac
+
