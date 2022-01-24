@@ -510,6 +510,13 @@ class TestRouteOuter:
 
         #
 
+        print("\nphase 3a")
+        route_id3a = self.add_route(endpoint_base, name="testrule_3a", comments=comments, source="::/0", sourceport="1000-2000,3000-4000", destination="::1/128", destinationport="3000-4000,5000-6000", protocol=["udp"], then=then)
+        print("created route: route_id3a="+str(route_id3a))
+        self.delete_route(endpoint_base, route_id3a)
+
+        #
+
         route_id_ary = { }
         for i in range(3, 10):
           print("\nphase "+str(i))
