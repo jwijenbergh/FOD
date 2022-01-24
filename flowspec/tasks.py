@@ -210,10 +210,13 @@ def announce(messg, user, route):
             net = ip_network(network)
             logger.info("ANNOUNCE check ip " + str(ip_network(route.destination)) + str(type(ip_network(route.destination))) + " in net " + str(net) + str(type(net)))
             # check if the target is a subnet of peer range (python3.6 doesn't have subnet_of())
-            if tgt_net.network_address >= net.network_address and tgt_net.broadcast_address <= net.broadcast_address:
+            try:
+              if tgt_net.network_address >= net.network_address and tgt_net.broadcast_address <= net.broadcast_address:
                 username = peer.peer_tag
                 logger.info("ANNOUNCE found peer " + str(username))
                 break
+            except TypeError:
+               pass
 
     messg = str(messg)
     logger.info("ANNOUNCE " + messg)
