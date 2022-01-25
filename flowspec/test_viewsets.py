@@ -343,6 +343,33 @@ class TestRouteOuter:
         }
         return fod_api_headers
 
+    def wait_route_nonpending(self, endpoint_base, route_id, response=None):
+        
+        fod_api_headers = self.get_headers()
+
+        endpoint = endpoint_base + str(route_id)
+
+        if response==None:
+          response = requests.get(endpoint, headers=fod_api_headers)
+          #print("response.content"+str(response.content))
+        
+        resp_data = json.loads(response.content)
+        while "status" in resp_data and resp_data["status"]=="PENDING":
+          print("loop to wait for NON-PENDING status")
+          response = requests.get(endpoint, headers=fod_api_headers)
+          print("response.content"+str(response.content))
+          resp_data = json.loads(response.content)
+          if "status" in resp_data and resp_data["status"]=="PENDING":
+            wait_time = 1
+            print("waiting "+str(wait_time))
+            time.sleep(wait_time)
+
+        print("wait_route_nonpending(): before returning")
+        if "status" in resp_data:
+          return resp_data["status"]
+        else:
+          return None
+
     def add_route(self, endpoint_base, name="testcreate", comments="test route", source="0.0.0.0/0", sourceport="123", destination="1.0.0.2/32", destinationport="123", protocol=[ "tcp" ], then=[ "discard" ], status="ACTIVE"):
 
         fod_api_headers = self.get_headers()
@@ -383,20 +410,23 @@ class TestRouteOuter:
 
         #
 
-        endpoint = 'http://localhost:8000/api/routes/' + str(route_id)
-        while resp_data["status"]=="PENDING":
-          print("loop to wait for NON-PENDING status")
-          response = requests.get(endpoint, headers=fod_api_headers)
-          print("response.content"+str(response.content))
-          resp_data = json.loads(response.content)
-          if resp_data["status"]=="PENDING":
-            wait_time = 1
-            print("waiting "+str(wait_time))
-            time.sleep(wait_time)
+        #endpoint = 'http://localhost:8000/api/routes/' + str(route_id)
+        #while resp_data["status"]=="PENDING":
+        #  print("loop to wait for NON-PENDING status")
+        #  response = requests.get(endpoint, headers=fod_api_headers)
+        #  print("response.content"+str(response.content))
+        #  resp_data = json.loads(response.content)
+        #  if resp_data["status"]=="PENDING":
+        #    wait_time = 1
+        #    print("waiting "+str(wait_time))
+        #    time.sleep(wait_time)
+        #assert resp_data["status"] == status
+        status_ret = self.wait_route_nonpending(endpoint_base, route_id, response)
 
-        assert resp_data["status"] == status
+        assert status_ret == status
 
         return route_id
+
 
     def delete_route(self, endpoint_base, route_id):
 
@@ -406,6 +436,15 @@ class TestRouteOuter:
         response = requests.delete(endpoint, headers=fod_api_headers)
         assert response.status_code == 202
         print("rule "+str(route_id)+" deleted")
+
+        status_ret = self.wait_route_nonpending(endpoint_base, route_id, None)
+
+        print("rule "+str(route_id)+" checking whether really deleted")
+        response = requests.get(endpoint, headers=fod_api_headers)
+        resp_data = json.loads(response.content)
+        print("get.response.data="+str(resp_data))
+        assert response.status_code == 404
+        print("rule "+str(route_id)+" really gone")
  
     def test_add_outer_single(self):
 
@@ -427,7 +466,7 @@ class TestRouteOuter:
 
         #
 
-        route_id1 = self.add_route(endpoint_base, name="testrule_1", comments=comments, source="0.0.0.0/0", sourceport="1000-2000", destination=ip1, destinationport="3000-4000,5000-6000", protocol=["tcp"], then=then, status="INACTIVE")
+        route_id1 = self.add_route(endpoint_base, name="testrule_1s", comments=comments, source="0.0.0.0/0", sourceport="1000-2000", destination=ip1, destinationport="3000-4000,5000-6000", protocol=["tcp"], then=then, status="INACTIVE")
         print("created route: route_id1="+str(route_id1))
         self.delete_route(endpoint_base, route_id1)
 
@@ -471,7 +510,7 @@ class TestRouteOuter:
         #
 
         print("\nphase 1")
-        route_id1 = self.add_route(endpoint_base, name="testrule_1", comments=comments, source="0.0.0.0/0", sourceport="1000-2000", destination=ip1, destinationport="3000-4000,5000-6000", protocol=["tcp"], then=then, status="INACTIVE")
+        route_id1 = self.add_route(endpoint_base, name="testrule_1m", comments=comments, source="0.0.0.0/0", sourceport="1000-2000", destination=ip1, destinationport="3000-4000,5000-6000", protocol=["tcp"], then=then, status="INACTIVE")
         print("created route: route_id1="+str(route_id1))
 
         #
@@ -486,6 +525,10 @@ class TestRouteOuter:
           assert response.status_code // 100 == 2
           resp_data = json.loads(response.content)
           print("get.response.data="+str(resp_data))
+          
+          status_ret = self.wait_route_nonpending(endpoint_base, route_id1, response)
+
+          ##
 
           print("\nphase 1b")
           data = {
@@ -496,6 +539,8 @@ class TestRouteOuter:
           assert response.status_code // 100 == 2
           resp_data = json.loads(response.content)
           print("get.response.data="+str(resp_data))
+          
+          status_ret = self.wait_route_nonpending(endpoint_base, route_id1, response)
 
         #
 
