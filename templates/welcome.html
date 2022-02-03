@@ -74,12 +74,21 @@
 				<h3>{% trans "How" %}?</h3><hr>
 				<p>{% blocktrans %}If you have properly set your Shibboleth attributes, you may proceed{% endblocktrans %}</p>
 				<div class="text-center">
+					{% if settings.SHIB_LOGIN_ENABLED %}
 					<p>
 						<img src="{% static 'shib_login.png' %}" style="border:none;">
 					</p>
 					<p>
 						<a href="{% url 'login' %}" type="button" class="btn btn-outline btn-primary">{% trans "Shibboleth Login" %}</a>
 					</p>
+					{% else %}
+					<p>
+						<img src="{% static 'shib_login.png' %}" style="border:none;">
+					</p>
+					<p>
+						<a href="{% url 'altlogin' %}" type="button" class="btn btn-outline btn-primary">{% trans "Local Login" %}</a>
+					</p>
+					{% endif %}
 				</div>
 			</div>
 		</div>
