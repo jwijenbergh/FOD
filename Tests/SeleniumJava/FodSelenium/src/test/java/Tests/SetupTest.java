@@ -1274,7 +1274,16 @@ public class SetupTest {
                 testSetUp();
 
 		OnlyPassword();
-	
+		OnlyNotSavePassword();
+		OnlyRouterHost();
+		OnlyWrongRouterHost();
+		OnlyRouterUser();
+		OnlyWrongRouterUser();
+		OnlyRouterPassword();
+		OnlyNotSaveRouterPassword();
+		OnlyTestIP();
+		OnlyWrongTestIP();
+		GoodData();
 			
 		testSetDown();
 
