@@ -247,6 +247,7 @@ SETTINGS_EXPORT = [
     'SW_VERSION',
     'LANGUAGES',
     'LANGUAGE_CODE',
+    'SHIB_LOGIN_ENABLED',
 ]
 
 AUTHENTICATION_BACKENDS = (
@@ -388,6 +389,11 @@ MAIL_NOTIFICATION_TO_ALL_MATCHING_PEERS = True
 ##############################################################################
 ##############################################################################
 # Shibboleth
+
+SHIB_LOGIN_ENABLED = False
+#SHIB_LOGIN_IS_DEFAULT = False
+
+#
 
 SHIB_AUTH_ENTITLEMENT = 'urn:mace:example.com:pki:user'
 SHIB_ADMIN_DOMAIN = 'example.com'

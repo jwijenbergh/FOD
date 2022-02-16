@@ -92,7 +92,11 @@
                     <!-- /.dropdown-user -->
                 </li>
                 {% else %}
+					{% if settings.SHIB_LOGIN_ENABLED %}
 				        <li><a href="{% url 'login' %}">{% trans "Shibboleth Login" %}</a></li>
+					{% else %}
+				        <li><a href="{% url 'altlogin' %}">{% trans "Local Login" %}</a></li>
+				        {% endif %}
 				        {% endif %}
                 <!-- /.dropdown -->
             </ul>
