@@ -599,8 +599,14 @@ public class OverviewTest {
 
                 testSetUp();
 		
-		//AddName(driver, url);
-		//AddName();
+                GoToSideDashboardFromOverview();
+                GoToSideRulesFromOverview();
+                GoToSideAddRuleFromOverview();
+                GoToSideOverviewFromOverview();
+                GoToSideAdminFromOverview();
+                GoToSideMyProfileFromOverview();
+                UserButtonFromOverviewTable();
+                RulesButtonFromOverviewTable();
 		
                 testSetDown();
       }

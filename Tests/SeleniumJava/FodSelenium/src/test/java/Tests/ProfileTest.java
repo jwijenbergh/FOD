@@ -539,8 +539,14 @@ public class ProfileTest {
 
                 testSetUp();
 		
-		//AddName(driver, url);
-		//AddName();
+                GoToAddRuleFromMyProfile();
+                GoToMyRulesFromMyProfile();
+                GoToDashboardFromMyProfile();
+                GoToSideRulesFromMyProfile();
+                GoToSideAddRuleFromMyProfile();
+                GoToSideOverviewFromMyProfile();
+                GoToSideAdminFromMyProfile();
+                GoToSideMyProfileFromMyProfile();
 		
                 testSetDown();
       }

@@ -735,8 +735,19 @@ public class DashboardTest {
 
                 testSetUp();
 		
-		//AddName(driver, url);
-		//AddName();
+		
+		AppearedRuleOnDashboard();
+		GoToAddRuleFromDashboard();
+		FixItButtonOnDashboard();
+		GoToMyRulesFromDashboard();
+		GoToMyProfileFromDashboard();
+		GoToSideDashboardFromDashboard();
+		GoToSideRulesFromDashboard();
+		GoToSideAddRuleFromDashboard();
+		GoToSideOverviewFromDashboard();
+		GoToSideAdminFromDashboard();
+		GoToSideMyProfileFromDashboard();
+		
 		
                 testSetDown();
       }
