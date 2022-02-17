@@ -1,0 +1,44 @@
+
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.centos.supervisord.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.centos.supervisord.step2 -t fodpy3 .
+
+##
+
+#docker_label: fodpy3
+
+##
+
+#FROM centos:7
+
+FROM fodpy3_base
+#dockerbase_dockerfile: Dockerfile.centos.supervisord.base
+
+##
+
+ENV LC_ALL en_US.utf8
+
+#RUN yum -y install procps
+
+RUN mkdir -p /var/log/fod /srv
+COPY . /srv/flowspy
+
+RUN useradd -m fod
+#RUN chown -R fod: /srv/flowspy
+
+RUN (cd /srv/flowspy; ./install-centos.sh --fodproper;)
+
+RUN chown -R fod: /srv/flowspy
+
+#  echo "To set environment to English, run: export LC_ALL=en_US"
+#  echo "To activate virualenv: source /srv/venv/bin/activate"
+#  echo "To create a user run: cd /srv/flowspy; ./manage.py createsuperuser"
+#  echo "To start flowspy server: cd /srv/flowspy; ./manage.py runserver 0.0.0.0:8000"
+#  echo "To start celeryd: cd /srv/flowspy; ./manage.py celeryd"
+
+EXPOSE 8000
+
+RUN yum -y install supervisor
+COPY supervisord.conf /etc/supervisord.conf
+
+#CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"
+CMD [ "/srv/flowspy/runfod-supervisord.sh" ]
+

@@ -69,21 +69,57 @@ cd "$(dirname "$0")"
 # hook to initiallize (without any user interaction admin user and its peer data)
 [ -x "$fod_dir/fodcli_insert_basic_data.sh" ] && "$fod_dir/fodcli_insert_basic_data.sh"
 
-mkdir -p /var/run/fod
+#echo "starting redis" 1>&2
+#/usr/bin/redis-server &
 
-echo "starting redis" 1>&2
-/usr/bin/redis-server &
+#echo "Starting FoD celeryd in background" 1>&2
+#celery worker -A flowspy -B --concurrency=2 --detach -l debug -f celery.log
 
-echo "Starting FoD celeryd in background" 1>&2
-celery worker -A flowspy -B --concurrency=2 --detach -l debug -f celery.log
-
-echo "Starting FoD gunicorn in foreground" 1>&2
+#echo "Starting FoD gunicorn in foreground" 1>&2
 #exec ./manage.py runserver 0.0.0.0:8000 
 #exec ./manage.py runserver 0.0.0.0:8000 --nothreading
 #exec gunicorn -w 1 --limit-request-fields 10000 --worker-class gevent --timeout 30
 #exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1 --limit-request-fields 10000 --timeout 30
 #exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1
 #exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1 -k gevent --limit-request-fields 10000 --timeout 30 #--preload
-exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi --reload -w 1 -k gevent --limit-request-fields 10000 --timeout 30 
+#exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1 -k gevent --limit-request-fields 10000 --timeout 30 
 
+##
+
+if ! which supervisord; then 
+  echo "supervisor not installed, trying to do this" 1>&2
+  if [ -f /etc/debian_version ]; then
+    apt-get install -qqy supervisor
+  else
+    yum install -y supervisor
+  fi
+fi
+
+#useradd -m fod
+(
+  set -x
+  #source /srv/venv/bin/activate
+  source "$venv_dir/bin/activate"
+  #cd /srv/flowspy && ./manage.py collectstatic --noinput
+  cd "$fod_dir" && ./manage.py collectstatic --noinput
+)
+
+# needed for redis
+sysctl vm.overcommit_memory=1
+
+# supervisord.conf
+cp -f supervisord.conf /etc
+
+
+mkdir -p /var/run/fod /var/log/fod
+chown -R fod /var/run/fod /var/log/fod
+mkdir -p log/fod
+mkdir -p logs 
+#chown fod /srv/flowspy /srv/flowspy/log /srv/flowspy/logs /srv/flowspy/log/* /srv/flowspy/logs/* /srv/flowspy/debug.log /srv/flowspy/example-data
+chown fod "$fod_dir" "$fod_dir/log" "$fod_dir/logs" "$fod_dir/log/"* "$fod_dir/logs/"* "$fod_dir/debug.log" "$fod_dir/example-data"
+
+##
+
+mkdir -p /var/run/supervisor
+exec /usr/bin/supervisord -n -c /etc/supervisord.conf
 

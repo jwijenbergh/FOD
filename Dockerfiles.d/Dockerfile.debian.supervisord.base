@@ -1,3 +1,8 @@
+
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.step2 -t fodpy3 .
+
+#docker_label: fodpy3_base-debian
+
 FROM debian:buster
 
 ENV LC_ALL en_US.utf8
@@ -16,6 +21,10 @@ RUN apt-get -qqy install patch
 
 #RUN (cd /srv/flowspy; ./install-debian.sh;)
 RUN (cd /srv/flowspy; ./install-debian.sh --basesw;)
+
+RUN apt-get -qqy install supervisor
+#RUN apt-get -qqy install net-utils lsof w3m links lynx curl wget
+RUN apt-get -qqy install lsof w3m links lynx curl wget
 
 #EXPOSE 8000
 

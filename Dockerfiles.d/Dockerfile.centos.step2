@@ -1,5 +1,5 @@
 
-#use: cd /root/FOD && docker build -f Dockerfile.centos.base -t fodpy3_base . ; cd /root/FOD && docker build -f Dockerfile.centos.step2 -t fodpy3 .
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.centos.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.centos.step2 -t fodpy3 .
 
 #FROM centos:7
 FROM fodpy3_base

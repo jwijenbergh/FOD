@@ -1,5 +1,9 @@
+
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.step2 -t fodpy3 .
+
 #FROM debian:buster
 FROM fodpy3-debian_base
+#dockerbase_dockerfile: Dockerfile.debian.supervisord.base
 
 ENV LC_ALL en_US.utf8
 
@@ -22,5 +26,9 @@ EXPOSE 8000
 
 WORKDIR /srv/flowspy
 
-CMD [ "/srv/flowspy/runfod.sh" ]
+RUN apt-get -qqy install supervisor
+COPY supervisord.conf /etc/supervisord.conf
+
+#CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"
+CMD [ "/srv/flowspy/runfod-supervisord.sh" ]
 

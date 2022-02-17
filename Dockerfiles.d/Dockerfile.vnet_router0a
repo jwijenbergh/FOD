@@ -4,7 +4,7 @@
 # instructions:
 
 # 1. build container, e.g., by: 
-#> docker build -f Dockerfile.vnet_router0a -t vnet0a .
+#> docker build -f ./Dockerfiles.d/Dockerfile.vnet_router0a -t vnet0a . # run from main dir
 
 #> docker run -t -i vnet0a
 

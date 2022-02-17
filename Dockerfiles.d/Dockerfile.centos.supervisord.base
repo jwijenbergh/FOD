@@ -1,8 +1,14 @@
 
-#use: docker build -f Dockerfile.centos.base -t fodpy3_base .
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.centos.supervisord.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.centos.supervisord.step2 -t fodpy3 .
+
+##
+
+#docker_label: fodpy3_base
+#dockerbuild_sticky: 0
 
 FROM centos:7
 
+##
 
 ENV LC_ALL en_US.utf8
 
@@ -19,6 +25,9 @@ RUN (cd /srv/flowspy; ./install-centos.sh --basesw;)
 #  echo "To create a user run: cd /srv/flowspy; ./manage.py createsuperuser"
 #  echo "To start flowspy server: cd /srv/flowspy; ./manage.py runserver 0.0.0.0:8000"
 #  echo "To start celeryd: cd /srv/flowspy; ./manage.py celeryd"
+
+RUN yum install -y supervisor
+RUN yum install -y net-utils lsof w3m links lynx curl wget
 
 #EXPOSE 8000
 

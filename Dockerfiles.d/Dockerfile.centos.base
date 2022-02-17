@@ -1,14 +1,18 @@
 
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.centos.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.centos.step2 -t fodpy3 .
+
 FROM centos:7
+
 
 ENV LC_ALL en_US.utf8
 
 RUN yum -y install procps
 
 RUN mkdir -p /var/log/fod /srv
-COPY . /srv/flowspy
+#COPY . /srv/flowspy
+COPY install-centos.sh requirements.txt /srv/flowspy/
 
-RUN (cd /srv/flowspy; ./install-centos.sh;)
+RUN (cd /srv/flowspy; ./install-centos.sh --basesw;)
 
 #  echo "To set environment to English, run: export LC_ALL=en_US"
 #  echo "To activate virualenv: source /srv/venv/bin/activate"
@@ -16,7 +20,8 @@ RUN (cd /srv/flowspy; ./install-centos.sh;)
 #  echo "To start flowspy server: cd /srv/flowspy; ./manage.py runserver 0.0.0.0:8000"
 #  echo "To start celeryd: cd /srv/flowspy; ./manage.py celeryd"
 
-EXPOSE 8000
+#EXPOSE 8000
 
-CMD [ "/srv/flowspy/runfod.sh" ]
+#CMD [ "/srv/flowspy/runfod.sh" ]
+CMD [ "sleep" "10000000" ]
 
