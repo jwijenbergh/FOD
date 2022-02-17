@@ -118,13 +118,17 @@ elif [ "$1" = "--init.netconfserver.netopeer2" -o "$1" = "--init.netconfserver" 
 elif [ "$1" = "--init.sysstart.netconfd" -o "$1" = "--init.sysstart2" ]; then #arg
   shift 1
 
-  "$0" --init.netconfserver.netconfd &
+  "$0" --init.netconfserver.netconfd 1 &
   sleep 5
 
   exec "$0" --init "$@"
 
 elif [ "$1" = "--init.netconfserver.netconfd" ]; then #arg # alternative to netopeer2 netconf server
   shift 1
+  inbg="$1"
+  shift 1
+
+  #set -x
 
   apt-get -qqy update
   DEBIAN_FRONTEND="noninteractive" apt-get -qqy install netconfd yangcli socat openssh-server rsyslog
@@ -149,9 +153,17 @@ elif [ "$1" = "--init.netconfserver.netconfd" ]; then #arg # alternative to neto
   /etc/init.d/ssh start
   /etc/init.d/rsyslog start
 
-  #netconfd --module configuration --superuser=netconf --log-level=debug4
-  #nohup netconfd --modpath "/usr/share/yuma/modules/:." --module configuration --superuser=netconf --log-level=info &> netconfd.log &
-  nohup netconfd --module configuration --superuser=netconf --log-level=info &> netconfd.log &
+  if [ "$inbg" = 1 ]; then
+    #netconfd --module configuration --superuser=netconf --log-level=debug4
+    #nohup netconfd --modpath "/usr/share/yuma/modules/:." --module configuration --superuser=netconf --log-level=info &> netconfd.log &
+    ip -4 address show eth0 | grep inet 1>&2
+    echo 1>&2
+    nohup netconfd --module configuration --superuser=netconf --log-level=info &> netconfd.log &
+  else
+    ip -4 address show eth0 | grep inet 1>&2
+    echo 1>&2
+    exec netconfd --module configuration --superuser=netconf --log-level=info #&> netconfd.log
+  fi
 
 ##############################################################################
 ##############################################################################

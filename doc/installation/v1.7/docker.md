@@ -102,6 +102,10 @@ with NETCONF port 830, NETCONF_USER "netconf" and NETCONF_PASS "netconf"
 Now, FoD can submit FlowSpec rules which are actually only stored inside the NETCONF test server
 without an actual effect on any network, but FoD functionality of controlling rules can be tested. 
 
+### NETCONF test server docker container based on netconfd instead of netopeer
+
+similar to router-container/Dockerfile but will use netconfd (DEBIAN package) instead of CESNET's netopeer NETCONF server
+
 ### NETCONF test server docker container extended to virtual DDoS test network
 
 Based on an instance of the NETCONF test server docker container
@@ -114,7 +118,7 @@ SNMPd and a Perl SNMPd statistic collector script
 Yields a more complete simulation of a router for FoD.
 
 Dockerfile.vnet_router1 : 
-Dockerfile.vnet_router2 : similar to Dockerfile.vnet_router1, but will use netconf instead of CENSET's netopeer NETCONF server
+Dockerfile.vnet_router2 : similar to Dockerfile.vnet_router1, but will use netconfd (DEBIAN package) instead of CESNET's netopeer NETCONF server
 (instructions how to build and run inside the Dockerfiles)
 
 
