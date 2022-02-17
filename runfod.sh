@@ -8,7 +8,14 @@ export LC_ALL="C" # this will unfortunatelly break ./manage.py createsuperuser a
 #venv_dir="/srv/venv"
 
 fod_dir="$(dirname "$0")"
-venv_dir="$fod_dir/venv"
+
+if [ -d "$fod_dir/venv" ]; then
+  venv_dir="$fod_dir/venv"
+else
+  venv_dir="/srv/venv"
+fi
+
+##
 
 echo "$0: ini fod_dir=$fod_dir venv_dir=$venv_dir" 1>&2
 
