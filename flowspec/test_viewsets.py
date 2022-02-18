@@ -9,6 +9,8 @@ from rest_framework.authtoken.models import Token
 import requests
 #import list
 
+assert settings.ROUTES_DUPLICATES_CHECKING == False
+
 @pytest.fixture
 def test_settings(settings):
     settings.DEBUG = True
@@ -389,6 +391,7 @@ class TestRouteOuter:
 
         response = requests.post(endpoint_base, headers=fod_api_headers, data=json.dumps(data))
         print("response.content"+str(response.content))
+        print("response.status_code"+str(response.status_code))
     
         # Validate response headers and body contents, e.g. status code.
         assert response.status_code == 201 or response.status_code == 202

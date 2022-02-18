@@ -160,6 +160,11 @@ else
 		fi
 	)
 
+	cp -f requirements-centos.txt requirements.txt
+	cp -f supervisord-centos.conf supervisord.conf
+
+	##
+
         pip install 'setuptools<58'
 	pip install -r requirements.txt
 
@@ -173,6 +178,7 @@ else
 	./manage.py collectstatic --noinput
 	./manage.py migrate
 	./manage.py loaddata initial_data
+
 	sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/supervisord.conf"
   )
 
