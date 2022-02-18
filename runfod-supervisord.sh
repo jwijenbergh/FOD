@@ -95,6 +95,11 @@ if ! which supervisord; then
   fi
 fi
 
+# TODO
+systemctl disable supervisord
+systemctl disable redis
+
+
 #useradd -m fod
 (
   set -x
