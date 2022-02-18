@@ -158,14 +158,19 @@ else
 	cd "$fod_dir"
 	(
 		cd flowspy
-		cp -f settings.py.dist settings.py
-		patch settings.py < settings.py.patch
+
+		if [ ! -e settings.py ]; then
+  		  cp -f settings.py.dist settings.py
+		  patch settings.py < settings.py.patch
 	        
-		sed -i "s#/srv/flowspy#$fod_dir#" "settings.py"
+		  sed -i "s#/srv/flowspy#$fod_dir#" "settings.py"
+		fi
 	)
 	pip install -r requirements.txt
 
-	touch flowspy/settings_local.py
+        if [ ! -e "flowspy/settings_local.py" ]; then
+  	  touch flowspy/settings_local.py
+	fi
 
 	#./manage.py syncdb --noinput
 	#mkdir -p /srv/flowspy/static/
