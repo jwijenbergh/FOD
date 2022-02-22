@@ -1,5 +1,5 @@
 FROM debian:buster
-#dockerlabel: seleniumcli.debian.step2
+#dockerlabel: seleniumcli.debian.base
 
 ENV LC_ALL en_US.utf8
 
