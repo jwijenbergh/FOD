@@ -1,6 +1,6 @@
 #FROM debian:buster
 FROM seleniumcli.debian.base
-#dockerbase_dockerfile: Dockerfile.seleniumcli.debian.base
+#dockerbase_dockerfile: ./Dockerfiles.d/Dockerfile.seleniumcli.debian.base
 
 ENV LC_ALL en_US.utf8
 

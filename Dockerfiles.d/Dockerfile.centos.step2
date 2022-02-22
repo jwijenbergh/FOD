@@ -3,6 +3,7 @@
 
 #FROM centos:7
 FROM fodpy3_base
+#dockerbase_dockerfile: ./Dockerfiles.d/Dockerfile.centos.base
 
 ENV LC_ALL en_US.utf8
 

@@ -153,7 +153,8 @@ else
 		cd flowspy
 
 		if [ ! -e settings.py ]; then
-  		  cp -f settings.py.dist settings.py
+  		  #cp -f settings.py.dist settings.py
+  		  cp -f settings.py.centos.dist settings.py
 		  patch settings.py < settings.py.patch
 	        
 		  sed -i "s#/srv/flowspy#$fod_dir#" "settings.py"

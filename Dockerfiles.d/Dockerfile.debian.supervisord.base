@@ -19,6 +19,8 @@ COPY install-debian.sh requirements.txt /srv/flowspy/
 
 RUN apt-get -qqy install patch
 
+RUN useradd -m fod
+
 #RUN (cd /srv/flowspy; ./install-debian.sh;)
 RUN (cd /srv/flowspy; ./install-debian.sh --basesw;)
 

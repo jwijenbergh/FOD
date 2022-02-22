@@ -30,7 +30,7 @@ ENV LC_ALL en_US.utf8
 RUN mkdir -p /var/log/fod /srv
 COPY . /srv/flowspy
 
-RUN useradd -m fod
+RUN id fod || useradd -m fod
 #RUN chown -R fod: /srv/flowspy
 
 RUN (cd /srv/flowspy; ./install-centos.sh --fodproper;)

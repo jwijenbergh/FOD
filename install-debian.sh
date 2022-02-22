@@ -77,7 +77,7 @@ if [ "$install_basesw" = 1 ]; then
 
   echo "Install dependencies"
   apt-get -qqy update
-  apt-get -qqy install python3-virtualenv python3-venv python3-setuptools \
+  apt-get -qqy install virtualenv python3-venv python3-setuptools \
     python3-dev vim git build-essential libevent-dev libxml2-dev libxslt1-dev \
     mariadb-server libmariadb-dev patch redis-server \
     rustc libssl-dev \
@@ -98,12 +98,15 @@ if [ "$install_fodproper" = 0 ]; then
     pyvenv "$venv_dir"
   else
     #virtualenv /srv/venv
-    virtualenv "$venv_dir"
+    virtualenv --python=python3 "$venv_dir"
   fi
   ln -sf "$venv_dir" "$fod_dir/venv"
 
   #source /srv/venv/bin/activate
   source "$venv_dir/bin/activate"
+
+  # fix
+  pip install setuptools==57.5.0
 
   pip install wheel
   pip install -r requirements.txt
@@ -118,7 +121,7 @@ else
     pyvenv "$venv_dir"
   else
     #virtualenv /srv/venv
-    virtualenv "$venv_dir"
+    virtualenv --python=python3 "$venv_dir"
   fi
   ln -sf "$venv_dir" "$fod_dir/venv"
   (
