@@ -1,7 +1,8 @@
 
 #use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.step2 -t fodpy3 .
 
-#docker_label: fodpy3_base-debian
+#docker_label_old: fodpy3_base-debian
+#docker_label: fodpy3-debian_svzd_base
 
 FROM debian:buster
 
@@ -19,7 +20,7 @@ COPY install-debian.sh requirements.txt /srv/flowspy/
 
 RUN apt-get -qqy install patch
 
-RUN useradd -m fod
+RUN id fod || useradd -m fod
 
 #RUN (cd /srv/flowspy; ./install-debian.sh;)
 RUN (cd /srv/flowspy; ./install-debian.sh --basesw;)

@@ -98,6 +98,8 @@ fi
 
 if [ "$install_fodproper" = 0 ]; then
 
+  set -e
+
   echo "Setup partial python environment for FoD"
   #virtualenv-3 /srv/venv
   virtualenv-3 "$venv_dir"
@@ -107,6 +109,8 @@ if [ "$install_fodproper" = 0 ]; then
 
   #fix for broken anyjson and cl
   pip install 'setuptools<58'
+
+  cp -f requirements-centos.txt requirements.txt
   pip install -r requirements.txt
 
 else

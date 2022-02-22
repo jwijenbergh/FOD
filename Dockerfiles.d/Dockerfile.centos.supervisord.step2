@@ -9,8 +9,9 @@
 
 #FROM centos:7
 
-FROM fodpy3_base
-#dockerbase_dockerfile: Dockerfile.centos.supervisord.base
+#FROM fodpy3_base
+FROM fodpy3_base_centos_svzd
+#dockerbase_dockerfile: ./Dockerfiles.d/Dockerfile.centos.supervisord.base
 
 ##
 
@@ -21,7 +22,7 @@ ENV LC_ALL en_US.utf8
 RUN mkdir -p /var/log/fod /srv
 COPY . /srv/flowspy
 
-RUN useradd -m fod
+RUN id fod || useradd -m fod
 #RUN chown -R fod: /srv/flowspy
 
 RUN (cd /srv/flowspy; ./install-centos.sh --fodproper;)
