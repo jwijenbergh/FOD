@@ -1,5 +1,11 @@
-FROM debian:buster
+
+##
+
 #dockerlabel: seleniumcli.debian.base
+
+FROM debian:buster
+
+##
 
 ENV LC_ALL en_US.utf8
 

@@ -3,8 +3,9 @@
 
 ##
 
-#docker_label_old: fodpy3_base
-#docker_label: fodpy3_centos_svzd_base
+#dockerlabel_old: fodpy3_base
+#dockerlabel: fodpy3_centos_svzd_base
+
 #dockerbuild_sticky: 0
 
 FROM centos:7

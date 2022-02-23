@@ -1,7 +1,9 @@
 
 #use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.centos.supervisord.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.centos.supervisord.step2 -t fodpy3 .
 
-#docker_label: fodpy3
+##
+
+#dockerlabel: fodpy3_centos_svzd
 
 #FROM centos:7
 #FROM fodpy3_base

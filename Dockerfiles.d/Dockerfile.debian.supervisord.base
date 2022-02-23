@@ -1,10 +1,14 @@
 
 #use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.step2 -t fodpy3 .
 
-#docker_label_old: fodpy3_base-debian
-#docker_label: fodpy3-debian_svzd_base
+##
+
+#dockerlabel_old: fodpy3_base-debian
+#dockerlabel: fodpy3_debian_svzd_base
 
 FROM debian:buster
+
+##
 
 ENV LC_ALL en_US.utf8
 

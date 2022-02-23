@@ -1,5 +1,11 @@
-FROM ubuntu:latest
+
+##
+
 #dockerlabel: seleniumcli.ubuntu.base
+
+FROM ubuntu:latest
+
+##
 
 ENV LC_ALL en_US.utf8
 

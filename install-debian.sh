@@ -153,7 +153,8 @@ else
 
     	fi
 
-	find "$fod_dir/" -not -user fod -exec chown -v fod: {} \;
+	#find "$fod_dir/" -not -user fod -exec chown -v fod: {} \;
+	find "$fod_dir/" -not -user fod -exec chown fod: {} \;
 
 	set -e
 	
