@@ -1,0 +1,58 @@
+
+##############################################################################
+##############################################################################
+# instructions:
+
+# 1. build container, e.g., by: 
+#> docker build -f ./Dockerfiles.d/Dockerfile.vnet_router0a -t vnet0a . # run from main dir
+
+#> docker run -t -i vnet0a
+
+# ADDITIONAL INFOMATION:
+# Of course one needs to have a running working FoD container in parallel
+# and that one has to be configured
+# to use the vnet_router container for NETCONF:
+# flowspy/settings.py OR flowspy/settings_local.py (the latter will override settings of thee former):
+
+# ...
+# 'NETCONF_DEVICE': '172.17.0.3', # only an example, so change value to whatever is the IP address of the netconf db server container
+# 'NETCONF_PASS': 'netconf',
+# 'NETCONF_PORT': 830,
+# 'NETCONF_USER': 'netconf',
+# ...
+
+##############################################################################
+##############################################################################
+# Dockerfile proper:
+
+# 1.
+FROM ubuntu:18.04
+
+##
+
+# 2. install all dependencies in advance 
+RUN apt-get -qqy update
+RUN DEBIAN_FRONTEND="noninteractive" apt-get -qqy install mininet iptables iproute2 tcpdump tshark iputils-ping iputils-tracepath hping3 gawk sshpass lsof strace snmpd snmp
+  
+RUN DEBIAN_FRONTEND="noninteractive" apt-get -qqy install netconfd yangcli socat openssh-server rsyslog
+
+# 3. copy yang config
+RUN mkdir -p /opt/dev
+WORKDIR /opt/dev
+COPY vnet_router/configuration.yang /opt/dev/
+
+# 3. copy vnet_router management script 
+COPY vnet_router/fod_vnet_router /
+
+##
+
+# ./vnet_router/fod_vnet_router
+# 4. default start command:
+#CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+#CMD [ "bash", "-c", "set -x; nohup /usr/bin/supervisord -c /etc/supervisord.conf & sleep 5 ;/fod_vnet_router --init" ]
+#CMD [ "/fod_vnet_router", "--init.sysstart.netconfd" ]
+CMD [ "/fod_vnet_router", "--init.netconfserver.netconfd" ]
+
+##############################################################################
+##############################################################################
+

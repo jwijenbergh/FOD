@@ -1,0 +1,47 @@
+
+##
+
+#dockerlabel: seleniumcli.debian.base
+
+FROM debian:buster
+
+##
+
+ENV LC_ALL en_US.utf8
+
+RUN apt-get update
+
+RUN echo "Set up container's locales"
+RUN echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US"\n' > /etc/default/locale
+RUN echo "en_US.utf8 UTF-8" >> /etc/locale.gen
+RUN apt-get -qqy install locales
+
+##
+
+RUN apt-get update -qqy
+RUN apt-get upgrade -qqy
+
+##
+
+RUN apt-get update && apt-get install -qqy make git vim man less net-tools curl w3m links strace ltrace lsof sudo psutils procps
+
+RUN apt-get install -qqy gnupg2
+RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add
+RUN echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+RUN apt-get -y update
+
+RUN apt-get update && apt-get install -qqy tightvncserver xterm x11-utils maven chromium curl unzip openjdk-11-jre-headless xvfb libxi6 libgconf-2-4 google-chrome-stable 
+
+##
+
+#RUN mkdir -p /srv
+#COPY . /srv/flowspy
+##RUN chown -R test1: /srv/flowspy
+
+CMD bash
+
+##############################################################################
+##############################################################################
+##############################################################################
+##############################################################################
+

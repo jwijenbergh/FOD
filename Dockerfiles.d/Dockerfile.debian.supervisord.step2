@@ -1,5 +1,15 @@
+
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.step2 -t fodpy3 .
+
+##
+
+#dockerlabel: fodpy3_debian_svzd
+
 #FROM debian:buster
-FROM fodpy3-debian_base
+FROM fodpy3_debian_svzd_base
+#dockerbase_dockerfile: ./Dockerfiles.d/Dockerfile.debian.supervisord.base
+
+##
 
 ENV LC_ALL en_US.utf8
 
@@ -12,6 +22,8 @@ RUN apt-get -qqy install locales
 RUN mkdir -p /var/log/fod /srv
 COPY . /srv/flowspy
 
+RUN id fod || useradd -m fod
+
 RUN apt-get -qqy install patch
 RUN (cd /srv/flowspy/flowspy && cp -f settings.py.dist settings.py && patch settings.py < settings.py.patch && touch settings_local.py;)
 
@@ -22,5 +34,9 @@ EXPOSE 8000
 
 WORKDIR /srv/flowspy
 
-CMD [ "/srv/flowspy/runfod.sh" ]
+RUN apt-get -qqy install supervisor
+COPY supervisord.conf /etc/supervisord.conf
+
+#CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"
+CMD [ "/srv/flowspy/runfod-supervisord.sh" ]
 

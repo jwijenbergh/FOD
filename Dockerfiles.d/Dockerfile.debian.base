@@ -1,4 +1,13 @@
+
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.debian.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.step2 -t fodpy3 .
+
+##
+
+#docker_label: fodpy3_debian_base
+
 FROM debian:buster
+
+##
 
 ENV LC_ALL en_US.utf8
 

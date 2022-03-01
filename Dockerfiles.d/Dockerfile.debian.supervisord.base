@@ -1,0 +1,40 @@
+
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.step2 -t fodpy3 .
+
+##
+
+#dockerlabel_old: fodpy3_base-debian
+#dockerlabel: fodpy3_debian_svzd_base
+
+FROM debian:buster
+
+##
+
+ENV LC_ALL en_US.utf8
+
+RUN apt-get update
+RUN echo "Set up container's locales"
+RUN echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US"\n' > /etc/default/locale
+RUN echo "en_US.utf8 UTF-8" >> /etc/locale.gen
+RUN apt-get -qqy install locales
+
+RUN mkdir -p /var/log/fod /srv
+#COPY . /srv/flowspy
+COPY install-debian.sh requirements.txt /srv/flowspy/
+
+RUN apt-get -qqy install patch
+
+RUN id fod || useradd -m fod
+
+#RUN (cd /srv/flowspy; ./install-debian.sh;)
+RUN (cd /srv/flowspy; ./install-debian.sh --basesw;)
+
+RUN apt-get -qqy install supervisor
+#RUN apt-get -qqy install net-utils lsof w3m links lynx curl wget
+RUN apt-get -qqy install lsof w3m links lynx curl wget
+
+#EXPOSE 8000
+
+#CMD [ "/srv/flowspy/runfod.sh" ]
+CMD [ "sleep" "10000000" ]
+
