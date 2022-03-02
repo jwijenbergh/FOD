@@ -1,4 +1,6 @@
 
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.seleniumcli.ubuntu.base -t seleniumcli.ubuntu.base . && docker build -f ./Dockerfiles.d/Dockerfile.seleniumcli.ubuntu.step2 -t seleniumcli.ubuntu .
+
 ##
 
 #dockerlabel: seleniumcli.ubuntu

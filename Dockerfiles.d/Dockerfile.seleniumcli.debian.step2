@@ -1,4 +1,6 @@
 
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.seleniumcli.debian.base -t seleniumcli.debian.base . && docker build -f ./Dockerfiles.d/Dockerfile.seleniumcli.debian.step2 -t seleniumcli.debian .
+
 ##
 
 #dockerlabel: seleniumcli.debian
