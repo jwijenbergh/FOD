@@ -9,6 +9,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -560,6 +561,129 @@ public class OverviewTest {
         					buffer.newLine();
         				}
         					
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void RoutesTableLength5() {
+    		for(int i = 0; i < 5; i++)
+    			AddRule();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("RoutesTableLength5");
+        		buffer.newLine();
+        				
+        				try {
+        					Select drpRoutes = new Select(driver.findElement(By.name("routes_table_length")));
+        					drpRoutes.selectByVisibleText("5");
+        					buffer.append("Find and select on records per page button: routes_table_length");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement (By.xpath ("//*[contains(text(),'Showing 1 to 5 of')]"));
+        					buffer.append("Find and text: Showing 1 to 5 of");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void RoutesTableLength15() {
+    		for(int i = 0; i < 15; i++)
+    			AddRule();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("RoutesTableLength15");
+        		buffer.newLine();
+        				
+        				try {
+        					Select drpRoutes = new Select(driver.findElement(By.name("routes_table_length")));
+        					drpRoutes.selectByVisibleText("15");
+        					buffer.append("Find and select on records per page button: routes_table_length");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement (By.xpath ("//*[contains(text(),'Showing 1 to 15 of')]"));
+        					buffer.append("Find and text: Showing 1 to 15 of");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void RoutesTableLength20() {
+    		for(int i = 0; i < 20; i++)
+    			AddRule();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\OverviewReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("RoutesTableLength20");
+        		buffer.newLine();
+        				
+        				try {
+        					Select drpRoutes = new Select(driver.findElement(By.name("routes_table_length")));
+        					drpRoutes.selectByVisibleText("20");
+        					buffer.append("Find and select on records per page button: routes_table_length");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement (By.xpath ("//*[contains(text(),'Showing 1 to 20 of')]"));
+        					buffer.append("Find and text: Showing 1 to 20 of");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				
         				
         				 buffer.close(); 
         		}
