@@ -20,6 +20,7 @@
 from . import jncdevice as np
 from ncclient import manager
 from ncclient.transport.errors import AuthenticationError, SSHError
+from ncclient.operations.rpc import RPCError
 from lxml import etree as ET
 from django.conf import settings
 import logging
@@ -266,9 +267,14 @@ class Applier(object):
                         cause="Task timeout"
                         logger.error(cause)
                         return False, cause
+                    except RPCError as e:
+                        cause="NETCONF Error: "+str(e)
+                        logger.error(cause)
+                        m.discard_changes()
+                        return False, cause
                     except Exception as e:
                         traceback.print_exc()
-                        cause = "Caught edit exception: %s %s" % (str(e), reason)
+                        cause = "Caught edit exception: type='%s' str='%s' => reason='%s'" % (type(e), str(e), reason)
                         cause = cause.replace('\n', '')
                         logger.error(cause)
                         m.discard_changes()
@@ -300,8 +306,13 @@ class Applier(object):
                             cause="Task timeout"
                             logger.error(cause)
                             return False, cause
+                        except RPCError as e:
+                            cause="NETCONF Error: "+str(e)
+                            logger.error(cause)
+                            m.discard_changes()
+                            return False, cause
                         except Exception as e:
-                            cause="Caught commit confirmed exception: %s %s" %(e,reason)
+                            cause="Caught commit confirmed exception: type='%s' str='%s' => reason='%s'" %(type(e), str(e), reason)
                             cause=cause.replace('\n', '')
                             logger.error(cause)
                             return False, cause
@@ -330,8 +341,13 @@ class Applier(object):
                                     cause="Task timeout"
                                     logger.error(cause)
                                     return False, cause
+                                except RPCError as e:
+                                    cause="NETCONF Error: "+str(e)
+                                    logger.error(cause)
+                                    m.discard_changes()
+                                    return False, cause
                                 except Exception as e:
-                                    cause="Caught commit exception: %s %s" %(e,reason)
+                                    cause="Caught commit exception: type='%s' str='%s' => reason='%s'" %(type(e), str(e), reason)
                                     cause=cause.replace('\n', '')
                                     logger.error(cause)
                                     return False, cause
