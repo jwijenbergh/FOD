@@ -166,7 +166,6 @@ else
 	)
 
 	cp -f requirements-centos.txt requirements.txt
-	cp -f supervisord-centos.conf supervisord.conf
 
 	##
 
@@ -184,6 +183,7 @@ else
 	./manage.py migrate
 	./manage.py loaddata initial_data
 
+	cp -f supervisord-centos.conf supervisord.conf
 	sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/supervisord.conf"
   )
 

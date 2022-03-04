@@ -186,6 +186,7 @@ else
 	mkdir -p "$fod_dir/log" "$fod_dir/logs"
 	chown -R fod: "$fod_dir/log" "$fod_dir/logs"
 
+	cp -f "$fod_dir/supervisord.conf.dist" "$fod_dir/supervisord.conf"
 	sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/supervisord.conf"
   )
 
