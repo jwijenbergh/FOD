@@ -124,10 +124,10 @@ def deactivate_route(routepk, **kwargs):
         route.commit_deactivate()
         return
     
-    elif response=="Task timeout":
+    else:
         # removing rule in NETCONF failed, it is still ACTIVE and also collects statistics
         # NETCONF "delete" operation failed, keep the object in DB
-        if deactivate_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
+        if response=="Task timeout" and deactivate_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
             # repeat the action
             raise TimeoutError()
         else:
