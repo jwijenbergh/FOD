@@ -7,6 +7,7 @@ RUN yum -y install procps
 
 RUN mkdir -p /var/log/fod /srv
 COPY . /srv/flowspy
+RUN rm -rf /srv/flowspy/venv/
 
 RUN (cd /srv/flowspy; ./install-centos.sh;)
 

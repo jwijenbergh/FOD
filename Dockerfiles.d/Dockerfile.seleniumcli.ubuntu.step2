@@ -40,6 +40,8 @@ ENV LC_ALL en_US.utf8
 
 RUN mkdir -p /srv
 COPY . /srv/flowspy
+RUN rm -rf /srv/flowspy/venv/
+
 ##RUN chown -R test1: /srv/flowspy
 
 CMD bash

@@ -21,6 +21,7 @@ RUN apt-get -qqy install locales
 
 RUN mkdir -p /var/log/fod /srv
 COPY . /srv/flowspy
+RUN rm -rf /srv/flowspy/venv/
 
 RUN id fod || useradd -m fod
 
