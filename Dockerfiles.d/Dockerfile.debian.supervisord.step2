@@ -36,7 +36,7 @@ EXPOSE 8000
 WORKDIR /srv/flowspy
 
 RUN apt-get -qqy install supervisor
-COPY supervisord.conf /etc/supervisord.conf
+#COPY supervisord.conf /etc/supervisord.conf
 
 #CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"
 CMD [ "/srv/flowspy/runfod-supervisord.sh" ]
