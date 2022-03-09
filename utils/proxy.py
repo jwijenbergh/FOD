@@ -30,6 +30,8 @@ import redis
 from celery.exceptions import TimeLimitExceeded, SoftTimeLimitExceeded
 from .portrange import parse_portrange
 import traceback
+from ipaddress import ip_network
+import xml.etree.ElementTree as ET
 
 cwd = os.getcwd()
 
@@ -60,22 +62,32 @@ class Retriever(object):
         self.filter = filter
         self.xml = xml
         if route_name:
-            self.filter = settings.ROUTE_FILTER%route_name
+            #self.filter = settings.ROUTE_FILTER%route_name
+            self.filter = settings.ROUTE_FILTER.replace("%s", route_name) # allow for varying number-of, multiple instances of %s
 
     def fetch_xml(self):
         with manager.connect(host=self.device, port=self.port, username=self.username, password=self.password, hostkey_verify=False) as m:
             xmlconfig = m.get_config(source='running', filter=('subtree',self.filter)).data_xml
         return xmlconfig
 
-    def proccess_xml(self):
+    def get_xml(self):
         if self.xml:
             xmlconfig = self.xml
         else:
             xmlconfig = self.fetch_xml()
+        return xmlconfig
+
+    def proccess_xml(self):
+        xmlconfig = self.get_xml();
         parser = np.Parser()
         parser.confile = xmlconfig
         device = parser.export()
         return device
+
+    def proccess_xml_generic(self):
+        xmlconfig = self.get_xml();
+        root = ET.fromstring(xmlconfig)
+        return root
 
     def fetch_device(self):
         device = cache.get("device")
@@ -101,30 +113,77 @@ class Applier(object):
         self.password = password
         self.port = port
 
+    def helper_is_ipv4(self):
+            
+        route_obj = self.route_object
+
+        source_is_ipv4 = True
+        destination_is_ipv4 = True
+        try:
+          source_is_ipv4 = ip_network(route_obj.source).version==4
+          destination_is_ipv4 = ip_network(route_obj.destination).version==4
+        except Exception as e:
+          logger.info("exception in trying to determine ipv4 or ipv6"+str(e))
+        pass
+
+        logger.info("source_is_ipv4="+str(source_is_ipv4)+" destination_is_ipv4="+str(destination_is_ipv4))
+        if source_is_ipv4 != destination_is_ipv4:
+          logger.error("source_is_ipv4="+str(source_is_ipv4)+" != destination_is_ipv4="+str(destination_is_ipv4))
+          return False
+
+        is_ipv4 = source_is_ipv4 and destination_is_ipv4
+
+        return is_ipv4
+
+    def helper_fill_source_and_destination_to_xml(self, route_obj, route, is_ipv4):
+
+       if route_obj.source:
+           if is_ipv4:
+             logger.info("source ipv4")
+             route.match['source'].append(route_obj.source)
+           else:
+             logger.info("source ipv6")
+             route.match['source-v6'].append(route_obj.source)
+
+       if route_obj.destination:
+           if is_ipv4:
+             logger.info("destination ipv4")
+             route.match['destination'].append(route_obj.destination)
+           else:
+             logger.info("destination ipv6")
+             route.match['destination-v6'].append(route_obj.destination)
+
     def to_xml(self, operation=None):
         logger.info("Operation: %s"%operation)
+
         if self.route_object:
+
             try:
                 settings.PORTRANGE_LIMIT
             except:
                 settings.PORTRANGE_LIMIT = 100
             logger.info("Generating XML config")
+
             route_obj = self.route_object
+
+            is_ipv4 = self.helper_is_ipv4()
+            logger.info("to_xml is_ipv4="+str(is_ipv4))
+
             device = np.Device()
-            flow = np.Flow()
+            flow = np.Flow(is_ipv4)
             route = np.Route()
             flow.routes.append(route)
             device.routing_options.append(flow)
             route.name = route_obj.name
+
             if operation == "delete":
                 logger.info("Requesting a delete operation")
                 route.operation = operation
                 device = device.export(netconf_config=True)
                 return ET.tostring(device)
-            if route_obj.source:
-                route.match['source'].append(route_obj.source)
-            if route_obj.destination:
-                route.match['destination'].append(route_obj.destination)
+
+            self.helper_fill_source_and_destination_to_xml(route_obj, route, is_ipv4)
+
             try:
                 if route_obj.protocol:
                     for protocol in route_obj.protocol.all():
@@ -206,25 +265,53 @@ class Applier(object):
         else:
             return False
 
+    def get_route_name(self): 
+        route_name=None
+        if self.route_object:
+            # support for dummy route_object as dicts 
+            if isinstance(self.route_object, dict):
+              route_name = self.route_object["name"] 
+            else:
+              route_name = self.route_object.name
+
+        return route_name
+
     def get_existing_config_xml(self):
-        retriever0 = Retriever(xml=None)
+        route_name = self.get_route_name()
+        logger.info("get_existing_config_xml(): route_name="+str(route_name))
+        retriever0 = Retriever(xml=None, route_name=route_name)
         config_xml_running = retriever0.fetch_xml()
         #logger.info("proxy::get_existing_config(): config_xml_running="+str(config_xml_running))
         return config_xml_running
 
+    def get_existing_config_xml_generic(self):
+        route_name = self.get_route_name()
+        logger.info("get_existing_config_xml_generic(): route_name="+str(route_name))
+        retriever0 = Retriever(xml=None, route_name=route_name)
+        config_xml_running = retriever0.proccess_xml_generic()
+        #logger.info("proxy::get_existing_config(): config_xml_running="+str(config_xml_running))
+        return config_xml_running
+
     def get_existing_config(self):
+        route_name = self.get_route_name()
+        logger.info("get_existing_config_xml(): route_name="+str(route_name))
         retriever0 = Retriever(xml=None)
         config_parsed = retriever0.proccess_xml()
         #logger.info("proxy::get_existing_config(): config_parsed="+str(config_parsed))
         return config_parsed
 
     def get_existing_routes(self):
-        config_parsed = self.get_existing_config()
-        if config_parsed.routing_options and config_parsed.routing_options.__len__()>0:
-          flow = config_parsed.routing_options[0]
-          logger.info("proxy::get_existing_routes(): config_parsed.flow="+str(flow))
-          routes_existing = flow.routes
-          logger.info("proxy::get_existing_routes(): config_parsed.flow.routes="+str(routes_existing))
+        #config_parsed = self.get_existing_config_xml()
+        config_parsed = self.get_existing_config_xml_generic()
+        if True:
+          routes_existing = []
+          logger.info("config_parsed="+str(config_parsed))
+          #logger.info("config_parsed="+str(ET.dump(config_parsed)))
+          #flow = config_parsed.routing_options[0]
+          #for route in config_parsed.iter('ns1:route'):
+          for route in config_parsed.findall(".//{http://xml.juniper.net/xnm/1.1/xnm}route"):
+              logger.info("proxy::get_existing_routes(): found route="+str(route))
+              routes_existing.append(route)
           return routes_existing
         else:
           logger.info("proxy::get_existing_routes(): no routing_options or is empty")
@@ -232,7 +319,9 @@ class Applier(object):
 
     def get_existing_route_names(self):
       routes_existing = self.get_existing_routes()
-      route_ids_existing = [route.name for route in routes_existing]
+      #route_ids_existing = [route.name for route in routes_existing]
+      #route_ids_existing = [ET.SubElement(route, './/{http://xml.juniper.net/xnm/1.1/xnm}name') for route in routes_existing]
+      route_ids_existing = [route.find('.//{http://xml.juniper.net/xnm/1.1/xnm}name').text for route in routes_existing]
       logger.info("proxy::get_existing_route_names(): config_parsed.flow.routes.ids="+str(route_ids_existing))
       return route_ids_existing
 
@@ -268,7 +357,7 @@ class Applier(object):
                         logger.error(cause)
                         return False, cause
                     except RPCError as e:
-                        cause="NETCONF Error: "+str(e)
+                        cause="NETCONF RPC Error: "+str(e)
                         logger.error(cause)
                         m.discard_changes()
                         return False, cause
@@ -307,7 +396,7 @@ class Applier(object):
                             logger.error(cause)
                             return False, cause
                         except RPCError as e:
-                            cause="NETCONF Error: "+str(e)
+                            cause="NETCONF RPC Error: "+str(e)
                             logger.error(cause)
                             m.discard_changes()
                             return False, cause
@@ -342,7 +431,7 @@ class Applier(object):
                                     logger.error(cause)
                                     return False, cause
                                 except RPCError as e:
-                                    cause="NETCONF Error: "+str(e)
+                                    cause="NETCONF RPC Error: "+str(e)
                                     logger.error(cause)
                                     m.discard_changes()
                                     return False, cause

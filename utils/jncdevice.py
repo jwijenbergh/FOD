@@ -377,15 +377,25 @@ class Unit:
                     self.family.append(family_dict)
 
 class Flow(object):
-    def __init__(self):
-        self.routes = []        
+    def __init__(self, is_ipv4 = True):
+        self.routes = []      
+        self.is_ipv4 = is_ipv4
         
     def export(self):
+        
         flow = new_ele('flow')
+
+        if self.is_ipv4:
+          flow0 = flow
+        else:
+          flow0 = new_ele('rib')
+          sub_ele(flow0, 'name').text = 'inet6.0'
+          flow0.append(flow)
+
         if len(self.routes):
             for route in self.routes:
                 flow.append(route.export()) 
-            return flow
+            return flow0
         else:
             return False
 
@@ -406,7 +416,9 @@ class Route(object):
         self.operation = None
         self.match = {
             "destination": [],
+            "destination-v6": [],
             "source": [],
+            "source-v6": [],
             "protocol": [],
             "port": [],
             "destination-port": [],
@@ -470,8 +482,17 @@ class Route(object):
         match = new_ele("match")
         for key in self.match:
             if self.match[key]:
-                for value in self.match[key]:
-                    sub_ele(match,key).text = value
+                if key=="destination-v6":
+                    for value in self.match[key]:
+                        newsub = sub_ele(match, "destination")
+                        sub_ele(newsub, "prefix").text = value
+                elif key=="source-v6":
+                    for value in self.match[key]:
+                        newsub = sub_ele(match, "source")
+                        sub_ele(newsub, "prefix").text = value
+                else:
+                    for value in self.match[key]:
+                        sub_ele(match,key).text = value
         if match.getchildren():
             ro.append(match)
         then = new_ele("then")

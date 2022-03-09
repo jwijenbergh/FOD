@@ -487,8 +487,12 @@ UI_USER_PROTOCOLS = ['icmp', 'tcp', 'udp']
 # netconf low-level
 
 # The filter applied in the device in order to find the flowspec routes
-ROUTES_FILTER = "<configuration><routing-options><flow/></routing-options></configuration>"
-ROUTE_FILTER = "<configuration><routing-options><flow><route><name>%s</name></route></flow></routing-options></configuration>"
+#ROUTES_FILTER = "<configuration><routing-options><flow/></routing-options></configuration>"
+#ROUTES_FILTER = "<configuration><routing-options><rib><name>inet6.0</name><flow/></rib></routing-options></configuration>"
+ROUTES_FILTER = "<configuration><routing-options><rib><name>inet6.0</name><flow/></rib><flow/></routing-options></configuration>"
+#ROUTE_FILTER = "<configuration><routing-options><flow><route><name>%s</name></route></flow></routing-options></configuration>"
+#ROUTE_FILTER = "<configuration><routing-options><rib><name>inet6.0</name><flow><route><name>%s</name></route></flow></rib></routing-options></configuration>"
+ROUTE_FILTER = "<configuration><routing-options><rib><name>inet6.0</name><flow><route><name>%s</name></route></flow></rib><flow><route><name>%s</name></route></flow></routing-options></configuration>"
 COMMIT_CONFIRMED_TIMEOUT = "120"
 
 # Change the following values only if you know what you are doing!!!
