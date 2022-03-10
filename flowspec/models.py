@@ -157,9 +157,9 @@ class ThenAction(models.Model):
 class Route(models.Model):
     name = models.SlugField(max_length=128, verbose_name=_("Name"))
     applier = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
-    source = models.CharField(max_length=32, help_text=_("Network address. Use address/CIDR notation"), verbose_name=_("Source Address"))
+    source = models.CharField(max_length=45+4, help_text=_("Network address. Use address/CIDR notation"), verbose_name=_("Source Address"))
     sourceport = models.TextField(blank=True, null=True, verbose_name=_("Source Port"))
-    destination = models.CharField(max_length=32, help_text=_("Network address. Use address/CIDR notation"), verbose_name=_("Destination Address"))
+    destination = models.CharField(max_length=45+4, help_text=_("Network address. Use address/CIDR notation"), verbose_name=_("Destination Address"))
     destinationport = models.TextField(blank=True, null=True, verbose_name=_("Destination Port"))
     port = models.TextField(blank=True, null=True, verbose_name=_("Port"))
     dscp = models.ManyToManyField(MatchDscp, blank=True, verbose_name="DSCP")
