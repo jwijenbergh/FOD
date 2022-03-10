@@ -203,6 +203,33 @@ class Route(models.Model):
         else:
             return None
 
+    def ip_version(self):
+            
+        route_obj = self
+
+        source_ip_version = 4
+        destination_ip_version = 4
+        try:
+          source_ip_version = ip_network(route_obj.source).version
+          destination_ip_version = ip_network(route_obj.destination).version
+        except Exception as e:
+            logger.info("model::route::ip_version(): exception in trying to determine ip_version: "+str(e))
+        pass
+
+        logger.info("model::route::ip_version(): source_ip_version="+str(source_ip_version)+" destination_ip_version="+str(destination_ip_version))
+        if source_ip_version != destination_ip_version:
+          logger.error("model::route::ip_version(): source_ip_version="+str(source_ip_version)+" != destination_ip_version="+str(destination_ip_version))
+          return -1
+
+        ip_version = source_ip_version and destination_ip_version
+        logger.info("model::route::ip_version(): ip_version="+str(ip_version))
+
+        return ip_version
+    
+    def is_ipv4(self):
+        return self.ip_version()==4
+
+
     def __unicode__(self):
         return self.name
 

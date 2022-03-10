@@ -113,28 +113,6 @@ class Applier(object):
         self.password = password
         self.port = port
 
-    def helper_is_ipv4(self):
-            
-        route_obj = self.route_object
-
-        source_is_ipv4 = True
-        destination_is_ipv4 = True
-        try:
-          source_is_ipv4 = ip_network(route_obj.source).version==4
-          destination_is_ipv4 = ip_network(route_obj.destination).version==4
-        except Exception as e:
-          logger.info("exception in trying to determine ipv4 or ipv6"+str(e))
-        pass
-
-        logger.info("source_is_ipv4="+str(source_is_ipv4)+" destination_is_ipv4="+str(destination_is_ipv4))
-        if source_is_ipv4 != destination_is_ipv4:
-          logger.error("source_is_ipv4="+str(source_is_ipv4)+" != destination_is_ipv4="+str(destination_is_ipv4))
-          return False
-
-        is_ipv4 = source_is_ipv4 and destination_is_ipv4
-
-        return is_ipv4
-
     def helper_fill_source_and_destination_to_xml(self, route_obj, route, is_ipv4):
 
        if route_obj.source:
@@ -166,8 +144,8 @@ class Applier(object):
 
             route_obj = self.route_object
 
-            is_ipv4 = self.helper_is_ipv4()
-            logger.info("to_xml is_ipv4="+str(is_ipv4))
+            is_ipv4 = self.route_object.is_ipv4()
+            logger.info("proxy::to_xml(): is_ipv4="+str(is_ipv4))
 
             device = np.Device()
             flow = np.Flow(is_ipv4)
