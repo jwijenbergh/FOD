@@ -104,6 +104,8 @@ var filterbtns = '<div class="btn-group col-centered">\
 
 $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallback, bStandingRedraw )
 {
+    bStandingRedraw = true
+
     // DataTables 1.10 compatibility - if 1.10 then versionCheck exists.
     // 1.10s API has ajax reloading built in, so we use those abilities
     // directly.
