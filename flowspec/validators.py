@@ -22,7 +22,11 @@ logger.addHandler(handler)
 def get_network(ip):
     try:
         address = ip_network(ip)
-    except Exception:
+    except ValueError as e:
+        logger.info("validators::get_network(): ip="+str(ip)+" got exception type="+str(type(e))+" :"+str(e))
+        return (False, _('Invalid network address format: '+str(e)))
+    except Exception as e:
+        logger.info("validators::get_network(): ip="+str(ip)+" got exception type="+str(type(e))+" :"+str(e))
         return (False, _('Invalid network address format'))
     else:
         return (True, address)
@@ -92,9 +96,15 @@ def clean_destination(user, destination):
                 fail_silently=True
             )
             return _('You have no authority on this subnet')
+
     # make sure its a network prefix that
     # can be used, depending on settings.PREFIX_LENGTH
-    if address.prefixlen < settings.PREFIX_LENGTH:
+
+    if ip_network(address).version>4:
+      if address.prefixlen < settings.PREFIX_LENGTH_IPV6:
+        return _("Currently no IPv6 prefix lengths < %s are allowed") % settings.PREFIX_LENGTH_IPV6
+    else:
+      if address.prefixlen < settings.PREFIX_LENGTH:
         return _("Currently no prefix lengths < %s are allowed") % settings.PREFIX_LENGTH
 
     # make sure its a valid ip

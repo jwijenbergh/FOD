@@ -473,6 +473,7 @@ ALTERNATE_WHOIS = 'whois.example.net'
 #ALTERNATE_WHOIS = 'whois.example.net'
 
 PREFIX_LENGTH = 29
+PREFIX_LENGTH_IPV6 = 64 - (32 - 29)
 
 # Limit of ports in 'ports' / 'SrcPorts' / 'DstPorts' of a rule:
 #PORTRANGE_LIMIT = 100
