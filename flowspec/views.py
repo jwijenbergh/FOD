@@ -403,6 +403,10 @@ def edit_route(request, route_slug):
                 except:
                     # in case the header is not provided
                     route.requesters_address = 'unknown'
+            else:
+                # without this compressed IPv6 addresses end up extened (from above's attribute validation)
+                route.source = ip_network('%s/%s' % (ip_network(route.source).network_address.compressed, ip_network(route.source).prefixlen)).compressed
+                route.destination = ip_network('%s/%s' % (ip_network(route.destination).network_address.compressed, ip_network(route.destination).prefixlen)).compressed
 
             route.save()
             if bool(set(changed_data) & set(critical_changed_values)) or (not route_original.status == 'ACTIVE'):
