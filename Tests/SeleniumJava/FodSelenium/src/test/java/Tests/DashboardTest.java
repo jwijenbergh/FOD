@@ -708,6 +708,172 @@ public class DashboardTest {
         			}	         
         		}	
     	}
+    	
+    	@Test
+    	static void LiveStatusAdd() {
+    		for(int i = 0; i < 20; i++)
+    			AddRuleWithName("testingLiveStatus");
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("LiveStatusAdd");
+        		buffer.newLine();
+		        		try {
+							driver.findElement(By.id("navigation_dashboard_id")).click();
+							buffer.append("Find and click on dashboard button: navigation_dashboard_id");
+							buffer.newLine();
+						}catch(IOException exc) {
+							buffer.append(exc.getMessage() );
+							buffer.newLine();
+						}
+        				try {
+        					driver.findElement (By.xpath ("//*[contains(text(),'Rule add: testingLiveStatus')]"));
+        					buffer.append("Find and text: Rule add: testingLiveStatus");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void LiveStatusUpdate() {
+    		for(int i = 0; i < 20; i++)
+    			AddRuleWithName("testingLiveStatus");
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("LiveStatusUpdate");
+        		buffer.newLine();
+		        		try {
+		        			driver.findElement (By.xpath ("//*[contains(name(),'edit_button_testingLiveStatus')]"));
+							buffer.append("Find and click on pending button: show_pending");
+							buffer.newLine();
+						}catch(IOException exc) {
+							buffer.append(exc.getMessage() );
+							buffer.newLine();
+						}
+		        		try {
+	    					driver.findElement(By.id("id_comments")).sendKeys("1");
+	    					buffer.append("Put 1 into comments input: id_comments");
+	    					buffer.newLine();
+	    				}catch(IOException exc) {
+	    					buffer.append(exc.getMessage());
+	    					buffer.newLine();
+	    				}
+	    				try {
+	    					driver.findElement(By.id("applybutton")).click();
+	    					buffer.append("Find and click Apply button: applybutton");
+	    					buffer.newLine();
+	    				}catch(IOException exc) {
+	    					buffer.append(exc.getMessage());
+	    					buffer.newLine();
+	    				}
+	    				try {
+							driver.findElement(By.id("navigation_dashboard_id")).click();
+							buffer.append("Find and click on dashboard button: navigation_dashboard_id");
+							buffer.newLine();
+						}catch(IOException exc) {
+							buffer.append(exc.getMessage() );
+							buffer.newLine();
+						}
+        				try {
+        					driver.findElement (By.xpath ("//*[contains(text(),'Rule edit: testingLiveStatus')]"));
+        					buffer.append("Find and text: Rule edit: testingLiveStatus");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
+    	
+    	@Test
+    	static void LiveStatusUpdateFromDashboard() {
+    		for(int i = 0; i < 20; i++)
+    			AddRuleWithName("testingLiveStatus");
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("LiveStatusUpdateFromDashboard");
+        		buffer.newLine();
+		        		try {
+							driver.findElement(By.id("navigation_dashboard_id")).click();
+							buffer.append("Find and click on dashboard button: navigation_dashboard_id");
+							buffer.newLine();
+						}catch(IOException exc) {
+							buffer.append(exc.getMessage() );
+							buffer.newLine();
+						}
+		        		try {
+		        			driver.findElement (By.xpath ("//*[contains(name(),'edit_button_testingLiveStatus')]"));
+							buffer.append("Find and click on pending button: show_pending");
+							buffer.newLine();
+						}catch(IOException exc) {
+							buffer.append(exc.getMessage() );
+							buffer.newLine();
+						}
+		        		try {
+	    					driver.findElement(By.id("id_comments")).sendKeys("1");
+	    					buffer.append("Put 1 into comments input: id_comments");
+	    					buffer.newLine();
+	    				}catch(IOException exc) {
+	    					buffer.append(exc.getMessage());
+	    					buffer.newLine();
+	    				}
+	    				try {
+	    					driver.findElement(By.id("applybutton")).click();
+	    					buffer.append("Find and click Apply button: applybutton");
+	    					buffer.newLine();
+	    				}catch(IOException exc) {
+	    					buffer.append(exc.getMessage());
+	    					buffer.newLine();
+	    				}
+	    				
+        				try {
+        					driver.findElement (By.xpath ("//*[contains(text(),'Rule edit: testingLiveStatus')]"));
+        					buffer.append("Find and text: Rule edit: testingLiveStatus");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
 	
       @BeforeClass
       static void testSetUp() {

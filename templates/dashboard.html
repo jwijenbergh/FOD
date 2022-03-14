@@ -117,7 +117,7 @@
 													<a href="{% url 'edit-route' route.name %}" class="btn-info btn btn-xs btn-outline" id="edit_button_{{route.pk}}">{% trans "ReSync" %}</a>
 												{% else %}
 													{% ifequal route.status 'ERROR' %}
-														<a href="{% url 'edit-route' route.name %}" class="btn-info btn btn-xs btn-outline" id="edit_button_{{route.pk}}">{% trans "Fix it!" %}</a>
+														<a href="{% url 'edit-route' route.name %}" class="btn-info btn btn-xs btn-outline" name="edit_button_{{routename}}" id="edit_button_{{route.pk}}">{% trans "Fix it!" %}</a>
 													{% else %}
 													-
 													{% endifequal %}

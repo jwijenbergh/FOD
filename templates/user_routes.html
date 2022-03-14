@@ -394,7 +394,7 @@ $(document).ready( function(){
                          btn = '<a href="'+editurl+'" class="btn-info btn btn-sm btn-outline" id="edit_button_{{route.pk}}">{% trans "Resync" %}</a>';
                      }
                      if (status == "ERROR" ){
-                         btn = '<a href="'+editurl+'" class="btn-info btn btn-sm btn-outline" id="edit_button_{{route.pk}}">{% trans "Fix it!" %}</a>';
+                         btn = '<a href="'+editurl+'" class="btn-info btn btn-sm btn-outline" name="edit_button_{{routename}}" id="edit_button_{{route.pk}}">{% trans "Fix it!" %}</a>';
                      }
                      return btn;
                      },
