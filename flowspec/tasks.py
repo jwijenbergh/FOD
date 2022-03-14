@@ -56,10 +56,12 @@ def add(routepk, callback=None):
         route.status = "ACTIVE"
         #snmp_add_initial_zero_value.delay(str(route.id), True)
         snmp_add_initial_zero_value(str(route.id), True)
-    else:
+    elif response=="Task timeout":
         if deactivate_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
             # repeat the action
             raise TimeoutError()
+        route.status = "ERROR"
+    else:
         route.status = "ERROR"
     route.response = response
     route.save()
@@ -81,10 +83,12 @@ def edit(routepk, callback=None):
           snmp_add_initial_zero_value(str(route.id), True)
         except Exception as e:
           logger.error("tasks::edit(): route="+str(route)+", ACTIVE, add_initial_zero_value failed: "+str(e))
-    else:
+    elif response=="Task timeout":
         if deactivate_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
             # repeat the action
             raise TimeoutError()
+        route.status = "ERROR"
+    else:
         route.status = "ERROR"
     route.response = response
     route.save()
@@ -119,9 +123,11 @@ def deactivate_route(routepk, **kwargs):
         route.save()
         route.commit_deactivate()
         return
-    else: # removing rule in NETCONF failed, it is still ACTIVE and also collects statistics
+    
+    else:
+        # removing rule in NETCONF failed, it is still ACTIVE and also collects statistics
         # NETCONF "delete" operation failed, keep the object in DB
-        if deactivate_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
+        if response=="Task timeout" and deactivate_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
             # repeat the action
             raise TimeoutError()
         else:

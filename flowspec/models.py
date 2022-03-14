@@ -157,9 +157,9 @@ class ThenAction(models.Model):
 class Route(models.Model):
     name = models.SlugField(max_length=128, verbose_name=_("Name"))
     applier = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
-    source = models.CharField(max_length=32, help_text=_("Network address. Use address/CIDR notation"), verbose_name=_("Source Address"))
+    source = models.CharField(max_length=45+4, help_text=_("Network address. Use address/CIDR notation"), verbose_name=_("Source Address"))
     sourceport = models.TextField(blank=True, null=True, verbose_name=_("Source Port"))
-    destination = models.CharField(max_length=32, help_text=_("Network address. Use address/CIDR notation"), verbose_name=_("Destination Address"))
+    destination = models.CharField(max_length=45+4, help_text=_("Network address. Use address/CIDR notation"), verbose_name=_("Destination Address"))
     destinationport = models.TextField(blank=True, null=True, verbose_name=_("Destination Port"))
     port = models.TextField(blank=True, null=True, verbose_name=_("Port"))
     dscp = models.ManyToManyField(MatchDscp, blank=True, verbose_name="DSCP")
@@ -202,6 +202,33 @@ class Route(models.Model):
             return ret
         else:
             return None
+
+    def ip_version(self):
+            
+        route_obj = self
+
+        source_ip_version = 4
+        destination_ip_version = 4
+        try:
+          source_ip_version = ip_network(route_obj.source).version
+          destination_ip_version = ip_network(route_obj.destination).version
+        except Exception as e:
+            logger.info("model::route::ip_version(): exception in trying to determine ip_version: "+str(e))
+        pass
+
+        logger.info("model::route::ip_version(): source_ip_version="+str(source_ip_version)+" destination_ip_version="+str(destination_ip_version))
+        if source_ip_version != destination_ip_version:
+          logger.error("model::route::ip_version(): source_ip_version="+str(source_ip_version)+" != destination_ip_version="+str(destination_ip_version))
+          return -1
+
+        ip_version = source_ip_version and destination_ip_version
+        logger.info("model::route::ip_version(): ip_version="+str(ip_version))
+
+        return ip_version
+    
+    def is_ipv4(self):
+        return self.ip_version()==4
+
 
     def __unicode__(self):
         return self.name

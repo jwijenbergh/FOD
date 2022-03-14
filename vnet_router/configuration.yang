@@ -265,7 +265,28 @@ module configuration {
   }
 
   grouping juniper-routing-options {
-    uses apply-advanced;
+     uses apply-advanced;
+     list rib {
+       key name;
+       ordered-by user;
+       description "Routing table options";
+       leaf name {
+         description "Routing table name";
+         type string;
+       }
+       uses apply-advanced;
+       container flow {
+         description "Locally defined flow routing information for IPv6";
+         uses apply-advanced;
+         list route {
+           key name;
+           ordered-by user;
+           description "Flow route";
+           uses flow-route-inet6;
+         }
+       }
+     }
+
 
     container flow {
       description
@@ -333,7 +354,7 @@ module configuration {
   }
 
   grouping flow-route-inet6 {
-    leaf route_name {
+    leaf name {
       type string;
       description
         "(null)";

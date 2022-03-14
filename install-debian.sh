@@ -79,9 +79,9 @@ if [ "$install_basesw" = 1 ]; then
   apt-get -qqy update
   apt-get -qqy install virtualenv python3-venv python3-setuptools \
     python3-dev vim git build-essential libevent-dev libxml2-dev libxslt1-dev \
-    mariadb-server libmariadb-dev patch redis-server \
+    mariadb-server libmariadb-dev patch redis-server sqlite3 \
     rustc libssl-dev \
-    procps
+    procps 
 
   set +e
 
@@ -186,6 +186,7 @@ else
 	mkdir -p "$fod_dir/log" "$fod_dir/logs"
 	chown -R fod: "$fod_dir/log" "$fod_dir/logs"
 
+	cp -f "$fod_dir/supervisord.conf.dist" "$fod_dir/supervisord.conf"
 	sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/supervisord.conf"
   )
 

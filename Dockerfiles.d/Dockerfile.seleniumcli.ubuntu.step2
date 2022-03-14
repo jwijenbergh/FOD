@@ -1,4 +1,6 @@
 
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.seleniumcli.ubuntu.base -t seleniumcli.ubuntu.base . && docker build -f ./Dockerfiles.d/Dockerfile.seleniumcli.ubuntu.step2 -t seleniumcli.ubuntu .
+
 ##
 
 #dockerlabel: seleniumcli.ubuntu
@@ -38,6 +40,8 @@ ENV LC_ALL en_US.utf8
 
 RUN mkdir -p /srv
 COPY . /srv/flowspy
+RUN rm -rf /srv/flowspy/venv/
+
 ##RUN chown -R test1: /srv/flowspy
 
 CMD bash

@@ -257,21 +257,23 @@ elif [ "$1" = "--parse_netconf_to_ruleinfo" -o "$1" = "--parse" ]; then #arg
   }
 
   function output_entry() {
-    #for (key in param) {
-    #  if (key) {
-    #    printf "%s", key"="param[key] " "
-    #  }
-    #}
-    #print "then=" thenaction
+    if (0) {
+      for (key in param) {
+        if (key) {
+          printf "%s", key"="param[key] " " > "/dev/stderr"
+        }
+      }
+      print "then=" thenaction > "/dev/stderr"
+    }
 
-    str = esc1(name) " "
+    str = esc1(name) " " (isv6 ? 6 : 4) " "
     str = str esc1(param["source"]) " " esc1(param["destination"]) " " esc1(param["protocol"]) " " esc1(param["source-port"]) " " esc1(param["destination-port"]) " " esc1(param["fragment"])
     str = str " " thenaction
 
     print str
   }
 
-  /<route>/ { start=1; name=""; match1=0; then1=0; delete param; param[""]=""; delete frag; frag[""]=""; thenaction=""; next; }
+  /<route>/ { start=1; isv6=0; name=""; match1=0; then1=0; delete param; param[""]=""; delete frag; frag[""]=""; thenaction=""; next; }
   /<\/route>/ { if (start) { output_entry(); } start=0; next; }
 
   /<name>/ { name=$3; }
@@ -296,8 +298,20 @@ elif [ "$1" = "--parse_netconf_to_ruleinfo" -o "$1" = "--parse" ]; then #arg
      param[$2]=all
      next
   }
+
   match1==1 && /<[a-z]+/ { 
-    param[$2] = (param[$2]=="") ? $3 : (param[$2] "," $3); 
+    if ($2=="prefix") {
+      if (last_parameter_key=="source" || last_parameter_key=="destination") {
+	isv6=1
+        #param[last_parameter_key] = (param[last_parameter_key]=="") ? $3 : (param[last_parameter_key] "," $3);     
+        param[last_parameter_key] = $3 
+      } else {
+	print "error last_parameter_key=" last_parameter_key  > "/dev/stderr"
+      }
+    } else {
+      param[$2] = (param[$2]=="") ? $3 : (param[$2] "," $3); 
+      last_parameter_key = $2
+    }
     next; 
   }
 
@@ -308,6 +322,24 @@ elif [ "$1" = "--parse_netconf_to_ruleinfo" -o "$1" = "--parse" ]; then #arg
   END { if (start) { print "#not found"; } }
 
   ' FS='[<>]'
+
+elif [ "$1" = "--filter-ruleinfo-unique" ]; then
+  shift 1
+
+  exec awk '
+    {
+      line=$0
+      name=$1
+      $1=""
+      key=$0
+      if (!seen[key]) {
+        print line
+	seen[key]=name
+      } else {
+        print "skipping duplicate rule (already_existing_name=" seen[key] "): " line > "/dev/stderr"
+      }
+    }
+  ' 
 
 elif [ "$1" = "--process_ruleinfo" ]; then #arg
   shift 1
@@ -321,29 +353,45 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
   #  (set -x; ovs-ofctl del-flows "$bridge")
   #done
 
-  while read -r name source destination protocol source_ports destination_ports fragment_options then rest; do
+  "$0" --filter-ruleinfo-unique | \
+  while read -r name ipversion source destination protocol source_ports destination_ports fragment_options then rest; do
 
     md5sum="$(printf "%s" "$name" | md5sum)"
     cookie="${md5sum:0:16}"
 
-    echo "name=$name cookie=$cookie source=$source destination=$destination protocol=$protocol source_ports=$source_ports destination_ports=$destination_ports fragment_options=$fragment_options then=$then" 1>&2
+    proto="ip"
+    address_pre="nw_"
+    proto_add=""
+    if [ "$ipversion" = "6" ]; then 
+      proto="ipv6"
+      address_pre="ipv6_"
+      proto_add="6"
+    fi
+
+    echo "name=$name ipversion=$ipversion cookie=$cookie source=$source destination=$destination protocol=$protocol source_ports=$source_ports destination_ports=$destination_ports fragment_options=$fragment_options then=$then" 1>&2
+
+    if [ "$protocol" = "icmp" -a "$ipversion" = "6" ]; then
+       protocol="ipv6-icmp"
+    fi
 
     if [ "$protocol" = "${protocol#[0-9]}" ]; then
       protocol_num="$(getent protocols "$protocol" | awk '{ print $2; }')"
-      echo "protocol=$protocol => protocol_num=$protocol_num" 1>&2
+      echo "name=$name protocol=$protocol => protocol_num=$protocol_num" 1>&2
       [ -n "$protocol_num" ] || protocol_num="-"
     else
       protocol_num="$protocol"
     fi
-    echo "=> protocol=$protocol protocol_num=$protocol_num" 1>&2
+    echo "name=$name => protocol=$protocol protocol_num=$protocol_num" 1>&2
 
     ovs-vsctl list-br | tr " " "\n" | while read bridge; do
       
       #ovs-ofctl add-flow s1 cookie=1,actions=normal
       #ovs-ofctl mod-flows s1 cookie=1/-1,nw_src=10.0.0.1/32,nw_dst=10.0.0.2/32,actions=drop
   
-      ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "0x$cookie" | grep -q .
+      #ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "0x$cookie" | grep -q .
+      (set -x; ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "cookie=" | grep -q .)
       flow_exists=$(( 1 - $? ))
+      echo "name=$name cookie=$cookie => flow_exists=$flow_exist" 1>&2
 
       add1=""
       if [ "$protocol_num" != "-" ]; then
@@ -368,15 +416,19 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
       fi
 
       if [ "$flow_exists" = 0 ]; then
-        (set -x; ovs-ofctl add-flow "$bridge" "cookie=0x$cookie,priority=1,table=0,ip,nw_src=$source,nw_dst=$destination${add1},actions=drop")
+        (set -x; ovs-ofctl add-flow "$bridge" "cookie=0x$cookie,priority=1,table=0,$proto,${address_pre}src=$source,${address_pre}dst=$destination${add1},actions=drop")
+	echo "name=$name add-flow (1) status=$?" 1>&2
+	ovs-ofctl dump-flows "$bridge" 1>&2
       else 
-        (set -x; ovs-ofctl mod-flows "$bridge" "cookie=0x$cookie/-1,priority=1,table=0,ip,nw_src=$source,nw_dst=$destination${add1},actions=drop")
+        (set -x; ovs-ofctl mod-flows "$bridge" "cookie=0x$cookie/-1,priority=1,table=0,$proto,${address_pre}src=$source,${address_pre}dst=$destination${add1},actions=drop")
+        echo "name=$name mod-flow status=$?" 1>&2
+	ovs-ofctl dump-flows "$bridge" 1>&2
       fi
    
     done
 
     counter_values="$("$0" --get_counters_for_rule "$cookie")";
-    echo "counter_values=$counter_values" 1>&2
+    echo "name=$name counter_values=$counter_values" 1>&2
 
     echo "0x$cookie bgpflowspec $counter_values $name $source $destination $protocol $protocol_num $source_ports $destination_ports $fragment_options $then" >> "$state_file"
 
@@ -390,13 +442,17 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
 
   ovs-vsctl list-br | tr " " "\n" | while read bridge; do
 
-    ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "0x$cookie" | grep -q .
+    #ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "0x$cookie" | grep -q .
+    #ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "0x$cookie" | grep -q .
+    (set -x; ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "cookie=" | grep -q .)
     flow_exists=$(( 1 - $? ))
+    echo "loop2: cookie=$cookie => flow_exists=$flow_exist" 1>&2
 
     if [ "$flow_exists" = 0 ]; then
       #ovs-ofctl add-flow "$bridge" in_port="${bridge}-eth1",actions=output:"${bridge}-eth2" # allow any other traficc passthru
       #ovs-ofctl add-flow "$bridge" in_port="${bridge}-eth2",actions=output:"${bridge}-eth1" # allow any other traficc passthru
       ovs-ofctl add-flow "$bridge" "cookie=0x$cookie,priority=0,table=0,actions=normal"
+      echo "loop2: add-flow status=$?" 1>&2
     fi
 
     ovs-ofctl dump-flows "$bridge"
@@ -408,13 +464,16 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
   ##
 
   ovs-vsctl list-br | tr " " "\n" | while read bridge; do
-    ovs-ofctl dump-flows "$bridge" | grep -Eo cookie=0x[0-9a-f]+ | sed -e 's/^cookie=//' | while read -r cookie; do
+    ovs-ofctl dump-flows "$bridge" | grep -Eo cookie=0x[0-9a-f]+ | sed -e 's/^cookie=//' | while read -r cookie0; do
+      cookie="$(printf "0x%016x" "$cookie0")"
+      #echo "loop over all existing of rules (bridge $bridge) cookie0=$cookie0 => cookie=$cookie" 1>&2
       if ! grep -q -E "^$cookie" "$state_file"; then 
-        echo "outdated cookie $cookie" 1>&2
+        echo "clean-loop: outdated cookie $cookie" 1>&2
         ovs-ofctl del-flows "$bridge" "cookie=$cookie/-1"
+        echo "clean-loop: del-flow status=$?" 1>&2
       fi
     done
-    ovs-ofctl dump-flows "$bridge"
+    ovs-ofctl dump-flows "$bridge" 1>&2
   done
 
   ##
@@ -427,7 +486,8 @@ elif [ "$1" = "--get_counters_for_rule" ]; then #arg
   shift 1
 
   ovs-vsctl list-br | tr " " "\n" | while read bridge; do
-     line1="$(ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "0x$cookie" | head -1)"
+     #line1="$(ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "0x$cookie" | head -1)"
+     line1="$(ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "cookie=" | head -1)"
      npkts="$(printf "%s" "$line1" | grep -Eo "n_packets=[0-9]+" | sed -e 's/^n_packets=//')"
      nbytes="$(printf "%s" "$line1" | grep -Eo "n_bytes=[0-9]+" | sed -e 's/^n_bytes=//')"
     [ -n "$npkts" ] || npkts="0"

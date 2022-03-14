@@ -82,7 +82,7 @@ echo "starting redis" 1>&2
 /usr/bin/redis-server &
 
 echo "Starting FoD celeryd in background" 1>&2
-celery -A flowspy worker -B --concurrency=2 --detach -l debug -f celery.log
+celery worker -A flowspy -B --concurrency=2 --detach -l debug -f celery.log
 
 echo "Starting FoD gunicorn in foreground" 1>&2
 #exec ./manage.py runserver 0.0.0.0:8000 

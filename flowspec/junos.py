@@ -1,3 +1,12 @@
+
+import logging
+
+FORMAT = '%(asctime)s %(levelname)s: %(message)s'
+logging.basicConfig(format=FORMAT)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+
 PROTOCOL_NUMBERS = {
     'HOPOPT': '0',
     'ICMP': '1',
@@ -140,12 +149,14 @@ PROTOCOL_NUMBERS = {
     'ROHC': '142'
 }
 
-def get_protocols_numbers(protocols_set):
+def get_protocols_numbers(protocols_set, ip_version):
     if protocols_set:
         protocols = 'proto'
         for protocol in protocols_set:
             protoNo = PROTOCOL_NUMBERS.get(protocol.protocol.upper())
-            if protoNo:
+            if ip_version==6 and (protoNo==1 or protocol.protocol=="icmp"):
+                protocols += '=%s,' % PROTOCOL_NUMBERS.get("IPv6-ICMP")
+            elif protoNo:
                 protocols += '=%s,' % PROTOCOL_NUMBERS.get(protocol.protocol.upper())
             else:
                 protocols += '=%s,' % protocol.protocol
@@ -242,17 +253,31 @@ def get_frag(rule):
     return result
 
 def create_junos_name(rule):
+
+    ip_version = rule.ip_version()
+
     name = ''
+
     # destination
     name += get_range(rule.destination)
+
     # source
     name += get_range(rule.source)
+
     # protocols
-    name += get_protocols_numbers(rule.protocol.all())
+    protocol_spec = rule.protocol.all()
+    protocol_num = get_protocols_numbers(protocol_spec, ip_version)
+    logger.info("junos::create_junos_name(): protocol_spec="+str(protocol_spec)+" protocol_num="+str(protocol_num))
+
+    name += protocol_num
+
     # ports
     name += get_ports(rule)
+
     #frag = ''
     name += get_frag(rule)
+
     if name[-1] == ',':
         name = name[:-1]
+
     return name
