@@ -170,6 +170,12 @@ else
 		  sed -i "s#/srv/flowspy#$fod_dir#" "settings.py"
 		fi
 	)
+
+	if [ "$install_basesw" = 1 ]; then #are we running in --both mode, i.e. for the venv init is run for the first time, i.e. the problematic package having issues with to new setuptools is not yet installed?
+          # fix
+          pip install setuptools==57.5.0
+	fi
+
 	pip install -r requirements.txt
 
         if [ ! -e "flowspy/settings_local.py" ]; then
