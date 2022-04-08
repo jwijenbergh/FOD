@@ -187,6 +187,9 @@ else
 	sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/supervisord.conf"
 	
 	cp -f runfod.centos.sh runfod.sh
+
+	mkdir -p /var/run/fod 
+	#chown fod /var/run/fod
   )
 
   set +e

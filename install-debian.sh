@@ -174,6 +174,7 @@ else
 	if [ "$install_basesw" = 1 ]; then #are we running in --both mode, i.e. for the venv init is run for the first time, i.e. the problematic package having issues with to new setuptools is not yet installed?
           # fix
           pip install setuptools==57.5.0
+	  :
 	fi
 
 	pip install -r requirements.txt
@@ -182,6 +183,9 @@ else
   	  touch flowspy/settings_local.py
 	fi
 
+	mkdir -p "$fod_dir/log" "$fod_dir/logs"
+	chown -R fod: "$fod_dir/log" "$fod_dir/logs"
+
 	#./manage.py syncdb --noinput
 	#mkdir -p /srv/flowspy/static/
 	mkdir -p "$static_dir"
@@ -189,11 +193,11 @@ else
 	./manage.py migrate
 	./manage.py loaddata initial_data
 
-	mkdir -p "$fod_dir/log" "$fod_dir/logs"
-	chown -R fod: "$fod_dir/log" "$fod_dir/logs"
-
 	cp -f "$fod_dir/supervisord.conf.dist" "$fod_dir/supervisord.conf"
 	sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/supervisord.conf"
+
+	mkdir -p /var/run/fod
+	chown fod: /var/run/fod 
   )
 
   set +e
