@@ -205,7 +205,6 @@ def overview_routes_ajax(request):
     jresp['aaData'] = routes
     return HttpResponse(json.dumps(jresp), content_type='application/json')
 
-
 def build_routes_json(groutes, is_superuser):
     routes = []
     for r in groutes.prefetch_related(

@@ -65,7 +65,7 @@ def add(routepk, callback=None):
         route.status = "ERROR"
     route.response = response
     route.save()
-    announce("[%s] Rule add: %s - Result: %s" % (route.applier_username_nice, route.name, response), route.applier, route)
+    announce("[%s] Rule add: %s - Result: %s" % (route.applier_username_nice, route.name_visible, response), route.applier, route)
 
 
 @shared_task(ignore_result=True, autoretry_for=(TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True, retry_kwargs={'max_retries': settings.NETCONF_MAX_RETRY_BEFORE_ERROR})
@@ -92,7 +92,7 @@ def edit(routepk, callback=None):
         route.status = "ERROR"
     route.response = response
     route.save()
-    announce("[%s] Rule edit: %s - Result: %s" % (route.applier_username_nice, route.name, response), route.applier, route)
+    announce("[%s] Rule edit: %s - Result: %s" % (route.applier_username_nice, route.name_visible, response), route.applier, route)
 
 @shared_task(ignore_result=True, autoretry_for=(TimeoutError, TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True, retry_kwargs={'max_retries': settings.NETCONF_MAX_RETRY_BEFORE_ERROR})
 def deactivate_route(routepk, **kwargs):
@@ -117,7 +117,7 @@ def deactivate_route(routepk, **kwargs):
         except Exception as e:
             logger.error("tasks::deactivate_route(): route="+str(route)+", INACTIVE, add_null_value failed: "+str(e))
 
-        announce("[%s] Suspending rule : %s%s- Result %s" % (route.applier_username_nice, route.name, reason_text, response), route.applier, route)
+        announce("[%s] Suspending rule : %s%s- Result %s" % (route.applier_username_nice, route.name_visible, reason_text, response), route.applier, route)
         route.status = "INACTIVE"
         route.response = response
         route.save()
@@ -139,7 +139,7 @@ def deactivate_route(routepk, **kwargs):
             route.status = status
             route.response = response
             route.save()
-            announce("[%s] Suspending rule : %s%s- Result %s" % (route.applier_username_nice, route.name, reason_text, response), route.applier, route)
+            announce("[%s] Suspending rule : %s%s- Result %s" % (route.applier_username_nice, route.name_visible, reason_text, response), route.applier, route)
 
 @shared_task(ignore_result=True, autoretry_for=(TimeoutError, TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True, retry_kwargs={'max_retries': settings.NETCONF_MAX_RETRY_BEFORE_ERROR})
 def delete_route(routepk, **kwargs):
@@ -201,7 +201,7 @@ def batch_delete(routes, **kwargs):
             route.response = response
             route.expires = datetime.date.today()
             route.save()
-            announce("[%s] Rule removal: %s%s- Result %s" % (route.applier_username_nice, route.name, reason_text, response), route.applier, route)
+            announce("[%s] Rule removal: %s%s- Result %s" % (route.applier_username_nice, route.name_visible, reason_text, response), route.applier, route)
     else:
         return False
 
