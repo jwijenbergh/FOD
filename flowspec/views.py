@@ -221,7 +221,9 @@ def build_routes_json(groutes, is_superuser):
         rd['destinationport'] = r.destinationport
         # name with link to rule details
         rd['name'] = r.name
-        rd['details'] = '<a href="%s">%s</a>' % (r.get_absolute_url(), r.name)
+        #rd['name'] = r.name_visible
+        #rd['details'] = '<a href="%s">%s</a>' % (r.get_absolute_url(), r.name)
+        rd['details'] = '<a href="%s">%s</a>' % (r.get_absolute_url(), r.name_visible)
         if not r.comments:
             rd['comments'] = 'Not Any'
         else:
@@ -428,6 +430,7 @@ def edit_route(request, route_slug):
         if (not route_original.status == 'ACTIVE'):
             route_edit.expires = datetime.date.today() + datetime.timedelta(days=settings.EXPIRATION_DAYS_OFFSET-1)
         dictionary = model_to_dict(route_edit, fields=[], exclude=[])
+        dictionary["name"] = route_edit.name_visible
         if request.user.is_superuser:
             dictionary['issuperuser'] = request.user.username
         else:
