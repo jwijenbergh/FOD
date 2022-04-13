@@ -512,6 +512,52 @@ public class ProfileTest {
         			}	         
         		}	
     	}
+    	
+    	@Test
+    	static void GenerateTokenMyProfile() {
+    		Login();
+    		try(FileWriter fileWriter = new FileWriter(".\\logs\\DashboardReport.txt", true)) {
+        		BufferedWriter buffer = new BufferedWriter(fileWriter);  
+        		buffer.newLine();
+        		buffer.append("GenerateTokenMyProfile");
+        		buffer.newLine();
+        				try {
+        					driver.findElement(By.id("navigation_user_profile_id")).click();
+        					buffer.append("Find and click on my profile button: navigation_user_profile_id");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("generate_token")).click();
+        					buffer.append("Find and click on token button: generate_token");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        				try {
+        					driver.findElement(By.id("my_profile_header_id"));
+        					buffer.append("Find edir my profile header: my_profile_header_id");
+        					buffer.newLine();
+        				}catch(IOException exc) {
+        					buffer.append(exc.getMessage() );
+        					buffer.newLine();
+        				}
+        					
+        				
+        				 buffer.close(); 
+        		}
+        		catch(Exception e) {
+        			try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+        			    fileWriter.write(e.getMessage());
+        			    fileWriter.close();
+        			} catch (IOException ex) {
+        			    // Cxception handling
+        			}	         
+        		}	
+    	}
 	
       @BeforeClass
       static void testSetUp() {
