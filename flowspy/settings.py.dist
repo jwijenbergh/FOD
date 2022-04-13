@@ -460,6 +460,14 @@ SHIB_LASTNAME_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:sn or urn:oid:2.5.4.
 
 ##############################################################################
 ##############################################################################
+# rule specific settings
+
+#RULE_NAME_PREFIX = '' # for backward compability set prefix to ''
+#RULE_NAME_PREFIX = 'FoD_GEANT_'
+RULE_NAME_PREFIX = 'FoD_'
+
+##############################################################################
+##############################################################################
 # net data specific settings
 
 # Define subnets that should not have any rules applied whatsoever

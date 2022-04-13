@@ -48,6 +48,15 @@ Subnets for which source or destination address will prevent rule creation and n
 
 	PROTECTED_SUBNETS = ['10.10.0.0/16']
 
+### Minimum Prefix Length for submitted FlowSpec rules
+
+IPv4 rules:
+
+	PREFIX_LENGTH = 29
+
+IPv6 rules:
+
+	PREFIX_LENGTH_IPV6 = 64 - (32 - 29)
 
 ### Database
 `DATABASES` should contain the database credentials:
@@ -104,7 +113,7 @@ We have to inform django about the device we set up earlier.
 
 	SNMP_CNTBYTES =     "1.3.6.1.4.1.2636.3.5.2.1.5" # OID of bytes counter (currently unused)
 	SNMP_CNTPACKETS =   "1.3.6.1.4.1.2636.3.5.2.1.4" # OID of packet counter
-	SNMP_RULESFILTER = ["__flowspec_default_inet__", "__flowspec_IAS_inet__"] # get only statistics of specified tables$
+	SNMP_RULESFILTER = ["__flowspec_default_inet__", "__flowspec_IAS_inet__", "__flowspec_default_inet6__", "__flowspec_IAS_inet6__"] # get only statistics of specified tables$
 	SNMP_POLL_INTERVAL = 8 #seconds # load new data into cache if it is older that a specified number of seconds
 	SNMP_TEMP_FILE = "/srv/flowspy/snmp_temp_data"
 	SNMP_POLL_LOCK = "/var/run/fod/snmppoll.lock"
@@ -199,6 +208,16 @@ attribute configuration:
 	SHIB_ENTITLEMENT = ['HTTP_SHIB_EP_ENTITLEMENT'] # not essential, if SHIB_AUTH_ENTITLEMENT='', otherwise essential
 	SHIB_ENTITLEMENT_DISPLAY_NAME = "eduPersonEntitlement" # only needed for displaying the error message of missing attribute
 	SHIB_ENTITLEMENT_DISPLAY_ADDINFO = "urn:oid:1.3.6.1.4.1.5923.1.1.1.7; the value of this attribute also has to include 'urn:mace:example.com:pki:user'" # only needed for displaying the error message of missing attribute
+
+### Various Settings
+
+	TIME_ZONE = 'UTC'
+	LANGUAGE_CODE = 'en'
+	LANGUAGES = (
+		('el', _('Greek')),
+		('en', _('English')),
+	)
+
 
 ### Syncing the database
 To create all the tables needed by FoD we have to run the following commands:

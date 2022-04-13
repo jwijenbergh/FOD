@@ -459,6 +459,14 @@ SHIB_LASTNAME_DISPLAY_ADDINFO = "urn:mace:dir:attribute-def:sn or urn:oid:2.5.4.
 
 ##############################################################################
 ##############################################################################
+# rule specific settings
+
+#RULE_NAME_PREFIX = '' # for backward compability set prefix to ''
+#RULE_NAME_PREFIX = 'FoD_GEANT_'
+RULE_NAME_PREFIX = 'FoD_'
+
+##############################################################################
+##############################################################################
 # net data specific settings
 
 # Define subnets that should not have any rules applied whatsoever
@@ -472,6 +480,7 @@ ALTERNATE_WHOIS = 'whois.example.net'
 #ALTERNATE_WHOIS = 'whois.example.net'
 
 PREFIX_LENGTH = 29
+PREFIX_LENGTH_IPV6 = 64 - (32 - 29)
 
 # Limit of ports in 'ports' / 'SrcPorts' / 'DstPorts' of a rule:
 #PORTRANGE_LIMIT = 100
@@ -486,8 +495,12 @@ UI_USER_PROTOCOLS = ['icmp', 'tcp', 'udp']
 # netconf low-level
 
 # The filter applied in the device in order to find the flowspec routes
-ROUTES_FILTER = "<configuration><routing-options><flow/></routing-options></configuration>"
-ROUTE_FILTER = "<configuration><routing-options><flow><route><name>%s</name></route></flow></routing-options></configuration>"
+#ROUTES_FILTER = "<configuration><routing-options><flow/></routing-options></configuration>"
+#ROUTES_FILTER = "<configuration><routing-options><rib><name>inet6.0</name><flow/></rib></routing-options></configuration>"
+ROUTES_FILTER = "<configuration><routing-options><rib><name>inet6.0</name><flow/></rib><flow/></routing-options></configuration>"
+#ROUTE_FILTER = "<configuration><routing-options><flow><route><name>%s</name></route></flow></routing-options></configuration>"
+#ROUTE_FILTER = "<configuration><routing-options><rib><name>inet6.0</name><flow><route><name>%s</name></route></flow></rib></routing-options></configuration>"
+ROUTE_FILTER = "<configuration><routing-options><rib><name>inet6.0</name><flow><route><name>%s</name></route></flow></rib><flow><route><name>%s</name></route></flow></routing-options></configuration>"
 COMMIT_CONFIRMED_TIMEOUT = "120"
 
 # Change the following values only if you know what you are doing!!!
@@ -542,7 +555,7 @@ SNMP_CNTBYTES =     "1.3.6.1.4.1.2636.3.5.2.1.5"
 SNMP_CNTPACKETS =   "1.3.6.1.4.1.2636.3.5.2.1.4"
 
 # get only statistics of specified tables
-SNMP_RULESFILTER = ["__flowspec_default_inet__", "__flowspec_IAS_inet__"]
+SNMP_RULESFILTER = ["__flowspec_default_inet__", "__flowspec_IAS_inet__", "__flowspec_default_inet6__", "__flowspec_IAS_inet6__" ]
 # load new data into cache if it is older that a specified number of seconds
 SNMP_POLL_INTERVAL = 8 #seconds
 # cache file for data

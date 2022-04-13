@@ -182,6 +182,15 @@ class Route(models.Model):
     requesters_address = models.CharField(max_length=255, blank=True, null=True)
 
     @property
+    def name_visible(self):
+        l = len(settings.RULE_NAME_PREFIX)
+        prefix = self.name[0:l]
+        if prefix==settings.RULE_NAME_PREFIX:
+          return self.name[l:-1]
+        else:
+          return self.name
+
+    @property
     def applier_username(self):
         if self.applier:
             return self.applier.username
@@ -244,7 +253,8 @@ class Route(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk:
             suff = id_gen()
-            self.name = "%s_%s" % (self.name, suff)
+            #self.name = "%s_%s" % (self.name, suff)
+            self.name = "%s%s_%s" % (settings.RULE_NAME_PREFIX, self.name, suff)
         super(Route, self).save(*args, **kwargs)
 
     def clean(self, *args, **kwargs):
