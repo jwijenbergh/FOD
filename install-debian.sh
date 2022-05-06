@@ -10,6 +10,16 @@ venv_dir="/srv/venv"
 install_basesw=1
 install_fodproper=1
 
+install_systemd_services=0
+
+if grep -q -E '^systemd$' /proc/1/comm; then 
+  echo "system is running systemd as init process, setting default install_systemd_services=1" 1>&2
+  install_systemd_services=1
+elif [ -e "/.dockenv" ]; then 
+  echo "running inside docker assummed, setting default install_systemd_services=0" 1>&2
+  install_systemd_services=0
+fi
+
 #
 
 while [ $# -gt 0 ]; do
@@ -44,6 +54,12 @@ while [ $# -gt 0 ]; do
     shift 1
     install_basesw=0
     install_fodproper=1
+  elif [ $# -ge 1 -a "$1" = "--systemd" ]; then
+    shift 1
+    install_systemd_services=1
+  elif [ $# -ge 1 -a "$1" = "--no_systemd" ]; then
+    shift 1
+    install_systemd_services=0
   else
     break
   fi
@@ -55,7 +71,7 @@ done
 venv_dir_base="$(dirname "$venv_dir")"
 
 static_dir="$fod_dir/static"
-	
+        
 inst_dir="$(dirname "$0")"
 
 mkdir -p "$fod_dir" || exit
@@ -126,78 +142,105 @@ else
   ln -sf "$venv_dir" "$fod_dir/venv"
   (
         set +e
-	#source /srv/venv/bin/activate
-	source "$venv_dir/bin/activate"
-	#mkdir -p /srv/flowspy/
-	mkdir -p "$fod_dir"
+        #source /srv/venv/bin/activate
+        source "$venv_dir/bin/activate"
+        #mkdir -p /srv/flowspy/
+        mkdir -p "$fod_dir"
 
-	if [ "$inst_dir_is_fod_dir" = 0 ]; then
+        if [ "$inst_dir_is_fod_dir" = 0 ]; then
 
-    	  # Select source dir and copy FoD into /srv/flowspy/
-    	  if [ "`basename "$0"`" = install-debian.sh ]; then
-    		# this script is in the source directory
-    		#cp -f -r "`dirname $0`"/* /srv/flowspy/
-     		cp -f -r "$inst_dir"/* "$fod_dir"
-      	  elif [ -e /vagrant ]; then
-    		# vagrant's copy in /vagrant/
-    		#cp -f -r /vagrant/* /srv/flowspy/
-    		cp -f -r /vagrant/* "$fod_dir"
-    	  elif [ -e ./install-centos.sh ]; then
-    		# current directory is with the sourcecode
-    		#cp -f -r ./* /srv/flowspy/
-    		cp -f -r ./* "$fod_dir"
-    	  else
-    		echo "Could not find FoD src directory tried `dirname $0`, /vagrant/, ./"
-    		exit 1
-    	  fi
+          # Select source dir and copy FoD into /srv/flowspy/
+          if [ "`basename "$0"`" = install-debian.sh ]; then
+                # this script is in the source directory
+                #cp -f -r "`dirname $0`"/* /srv/flowspy/
+                cp -f -r "$inst_dir"/* "$fod_dir"
+          elif [ -e /vagrant ]; then
+                # vagrant's copy in /vagrant/
+                #cp -f -r /vagrant/* /srv/flowspy/
+                cp -f -r /vagrant/* "$fod_dir"
+          elif [ -e ./install-centos.sh ]; then
+                # current directory is with the sourcecode
+                #cp -f -r ./* /srv/flowspy/
+                cp -f -r ./* "$fod_dir"
+          else
+                echo "Could not find FoD src directory tried `dirname $0`, /vagrant/, ./"
+                exit 1
+          fi
 
-    	fi
+        fi
 
-	#find "$fod_dir/" -not -user fod -exec chown -v fod: {} \;
-	find "$fod_dir/" -not -user fod -exec chown fod: {} \;
+        #find "$fod_dir/" -not -user fod -exec chown -v fod: {} \;
+        find "$fod_dir/" -not -user fod -exec chown fod: {} \;
 
-	set -e
-	
-	#cd /srv/flowspy/
-	cd "$fod_dir"
-	(
-		cd flowspy
+        set -e
+        
+        #cd /srv/flowspy/
+        cd "$fod_dir"
+        (
+                cd flowspy
 
-		if [ ! -e settings.py ]; then
-  		  cp -f settings.py.dist settings.py
-		  patch settings.py < settings.py.patch
-	        
-		  sed -i "s#/srv/flowspy#$fod_dir#" "settings.py"
-		fi
-	)
+                if [ ! -e settings.py ]; then
+                  cp -f settings.py.dist settings.py
+                  patch settings.py < settings.py.patch
+                
+                  sed -i "s#/srv/flowspy#$fod_dir#" "settings.py"
+                fi
+        )
 
-	if [ "$install_basesw" = 1 ]; then #are we running in --both mode, i.e. for the venv init is run for the first time, i.e. the problematic package having issues with to new setuptools is not yet installed?
+        if [ "$install_basesw" = 1 ]; then #are we running in --both mode, i.e. for the venv init is run for the first time, i.e. the problematic package having issues with to new setuptools is not yet installed?
           # fix
           pip install setuptools==57.5.0
-	  :
-	fi
+          :
+        fi
 
-	pip install -r requirements.txt
+        pip install -r requirements.txt
 
         if [ ! -e "flowspy/settings_local.py" ]; then
-  	  touch flowspy/settings_local.py
-	fi
+          touch flowspy/settings_local.py
+        fi
 
-	mkdir -p "$fod_dir/log" "$fod_dir/logs"
-	chown -R fod: "$fod_dir/log" "$fod_dir/logs"
+        mkdir -p "$fod_dir/log" "$fod_dir/logs"
+        chown -R fod: "$fod_dir/log" "$fod_dir/logs"
 
-	#./manage.py syncdb --noinput
-	#mkdir -p /srv/flowspy/static/
-	mkdir -p "$static_dir"
-	./manage.py collectstatic --noinput
-	./manage.py migrate
-	./manage.py loaddata initial_data
+        #./manage.py syncdb --noinput
+        #mkdir -p /srv/flowspy/static/
+        mkdir -p "$static_dir"
+        ./manage.py collectstatic --noinput
+        ./manage.py migrate
+        ./manage.py loaddata initial_data
 
-	cp -f "$fod_dir/supervisord.conf.dist" "$fod_dir/supervisord.conf"
-	sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/supervisord.conf"
+        #
 
-	mkdir -p /var/run/fod
-	chown fod: /var/run/fod 
+        cp -f "$fod_dir/supervisord.conf.dist" "$fod_dir/supervisord.conf"
+        sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/supervisord.conf"
+
+        #
+
+        mkdir -p /var/run/fod
+        chown fod: /var/run/fod 
+
+        #
+
+        cp -f "$fod_dir/fod-gunicorn.service.dist" "$fod_dir/fod-gunicorn.service"
+        sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/fod-gunicorn.service"
+
+        cp -f "$fod_dir/fod-celeryd.service.dist" "$fod_dir/fod-celeryd.service"
+        sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/fod-celeryd.service"
+
+        if [ "$install_systemd_services" = 1 ]; then
+          echo 1>&2
+          echo "Install_systemd_services" 1>&2
+          echo 1>&2
+          cp -f "$fod_dir/fod-gunicorn.service.dist" "$fod_dir/fod-celeryd.service.dist" "/etc/systemd/system/"
+
+          sleep 5
+          SYSTEMD_COLORS=1 systemctl status fod-gunicorn | cat
+          echo
+          SYSTEMD_COLORS=1 systemctl status fod-celeryd | cat
+          echo
+
+        fi
+
   )
 
   set +e

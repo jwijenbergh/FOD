@@ -1,0 +1,34 @@
+
+[Unit]
+Description=Firewall-On-Demand (FoD) gunicorn (front-end)
+
+After=network.target auditd.service
+Requires=fod-celeryd.service redis-server.service
+
+[Service]
+
+#Type=forking
+Type=simple
+
+User=fod
+WorkingDirectory=/srv/flowspy
+#RuntimeDirectory=yourservice
+#RuntimeDirectoryMode=0755
+
+ExecStart=/srv/flowspy/pythonenv gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1 -k gevent --limit-request-fields 10000 --timeout 30
+#PIDFile=/tmp/yourservice.pid
+
+#StandardOutput=./log/gunicorn-stderr.log
+#StandardError=./log/gunicorn-stderr.log
+
+#StandardOutput=syslog
+#StandardError=syslog
+#SyslogIdentifier=test1
+
+Restart=on-failure
+
+###
+
+[Install]
+WantedBy=multi-user.target
+
