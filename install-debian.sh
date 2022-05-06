@@ -240,6 +240,9 @@ else
           cp -v -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "$fod_systemd_dir/fod-status-email-user@.service" "/etc/systemd/system/" 1>&2
 	  systemctl daemon-reload
 
+	  systemctl enable fod-gunicorn
+	  systemctl enable fod-celeryd
+
           sleep 5
           SYSTEMD_COLORS=1 systemctl status fod-gunicorn | cat
           echo
