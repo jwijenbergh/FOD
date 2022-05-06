@@ -73,8 +73,9 @@ Dockerfile*
 runfod-*.sh
 supervisord.conf
 
-fod-gunicorn.service
-fod-celeryd.service
+systemd/fod-gunicorn.service
+systemd/fod-celeryd.service
+systemd/fod-status-email-user@.service
 
 #############################################################################
 #############################################################################

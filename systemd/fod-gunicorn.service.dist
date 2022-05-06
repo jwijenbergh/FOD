@@ -5,6 +5,8 @@ Description=Firewall-On-Demand (FoD) gunicorn (front-end)
 After=network.target auditd.service
 Requires=fod-celeryd.service redis-server.service
 
+OnFailure=fod-status-email-user@%n.service
+
 [Service]
 
 #Type=forking

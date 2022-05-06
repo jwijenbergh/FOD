@@ -221,17 +221,24 @@ else
 
         #
 
-        cp -f "$fod_dir/fod-gunicorn.service.dist" "$fod_dir/fod-gunicorn.service"
-        sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/fod-gunicorn.service"
+	fod_systemd_dir="$fod_dir/systemd"
+        cp -f "$fod_systemd_dir/fod-gunicorn.service.dist" "$fod_systemd_dir/fod-gunicorn.service"
+        sed -i "s#/srv/flowspy#$fod_dir#" "$fod_systemd_dir/fod-gunicorn.service"
 
-        cp -f "$fod_dir/fod-celeryd.service.dist" "$fod_dir/fod-celeryd.service"
-        sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/fod-celeryd.service"
+        cp -f "$fod_systemd_dir/fod-celeryd.service.dist" "$fod_systemd_dir/fod-celeryd.service"
+        sed -i "s#/srv/flowspy#$fod_dir#" "$fod_systemd_dir/fod-celeryd.service"
+
+        cp -f "$fod_systemd_dir/fod-status-email-user@.service.dist" "$fod_systemd_dir/fod-status-email-user@.service"
+        sed -i "s#/srv/flowspy#$fod_dir#" "$fod_systemd_dir/fod-status-email-user@.service"
+
 
         if [ "$install_systemd_services" = 1 ]; then
           echo 1>&2
           echo "Install_systemd_services" 1>&2
           echo 1>&2
-          cp -f "$fod_dir/fod-gunicorn.service.dist" "$fod_dir/fod-celeryd.service.dist" "/etc/systemd/system/"
+          #cp -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "/etc/systemd/system/"
+          cp -v -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "$fod_systemd_dir/fod-status-email-user@.service" "/etc/systemd/system/" 1>&2
+	  systemctl daemon-reload
 
           sleep 5
           SYSTEMD_COLORS=1 systemctl status fod-gunicorn | cat

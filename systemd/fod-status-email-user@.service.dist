@@ -1,0 +1,9 @@
+[Unit]
+Description=status email for %i to user
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/flowspy
+ExecStart=/srv/flowspy/systemd/fod-systemd-email fod %i
+User=nobody
+Group=systemd-journal
