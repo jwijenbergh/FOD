@@ -776,9 +776,12 @@ def user_activation_notify(request, user):
         
         if settings.NOTIFY_ADMIN_MAILS:
             admin_mails = settings.NOTIFY_ADMIN_MAILS
+            context1=reg_view.get_email_context(reg_view.get_activation_key(user))
+            context1['user']=user
+            #logger.info("context1="+str(context1))
             message = render_to_string(
                 template_name = reg_view.email_body_template,
-                context=reg_view.get_email_context(reg_view.get_activation_key(user)),
+                context=context1,
                 request=request
             )
 
