@@ -11,6 +11,7 @@ install_basesw=1
 install_fodproper=1
 
 install_systemd_services=0
+ensure_installed_pythonenv_wrapper=1
 
 if grep -q -E '^systemd$' /proc/1/comm; then 
   echo "system is running systemd as init process, setting default install_systemd_services=1" 1>&2
@@ -129,6 +130,8 @@ if [ "$install_fodproper" = 0 ]; then
 
 else 
 
+  id fod &>/dev/null || useradd -m fod	
+
   echo "Setup python environment for FoD"
   #mkdir -p /var/log/fod /srv
   mkdir -p /var/log/fod "$venv_dir_base"
@@ -221,7 +224,7 @@ else
 
         #
 
-	fod_systemd_dir="$fod_dir/systemd"
+        fod_systemd_dir="$fod_dir/systemd"
         cp -f "$fod_systemd_dir/fod-gunicorn.service.dist" "$fod_systemd_dir/fod-gunicorn.service"
         sed -i "s#/srv/flowspy#$fod_dir#" "$fod_systemd_dir/fod-gunicorn.service"
 
@@ -231,6 +234,19 @@ else
         cp -f "$fod_systemd_dir/fod-status-email-user@.service.dist" "$fod_systemd_dir/fod-status-email-user@.service"
         sed -i "s#/srv/flowspy#$fod_dir#" "$fod_systemd_dir/fod-status-email-user@.service"
 
+##
+
+        if [ "$ensure_installed_pythonenv_wrapper" = 1 -a ! -e "$fod_dir/pythonenv" ]; then
+          echo "installing pythonev wrapper" 1>&2
+          cat > "$fod_dir/pythonenv" <<EOF
+#!/bin/bash
+. "$venv_dir/bin/activate"
+exec "\$@"
+EOF
+          chmod +x "$fod_dir/pythonenv"
+        fi
+
+##
 
         if [ "$install_systemd_services" = 1 ]; then
           echo 1>&2
@@ -238,10 +254,13 @@ else
           echo 1>&2
           #cp -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "/etc/systemd/system/"
           cp -v -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "$fod_systemd_dir/fod-status-email-user@.service" "/etc/systemd/system/" 1>&2
-	  systemctl daemon-reload
+          systemctl daemon-reload
 
-	  systemctl enable fod-gunicorn
-	  systemctl enable fod-celeryd
+          systemctl enable fod-gunicorn
+          systemctl enable fod-celeryd
+
+          systemctl restart fod-gunicorn
+          systemctl restart fod-celeryd
 
           sleep 5
           SYSTEMD_COLORS=1 systemctl status fod-gunicorn | cat
