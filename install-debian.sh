@@ -44,7 +44,8 @@ function init_mysqllikedb() {
   echo "CREATE DATABASE IF NOT EXISTS $DB__FOD_DBNAME;" | mysql
   echo "ALTER DATABASE $DB__FOD_DBNAME CHARACTER SET utf8;" | mysql
   echo "DROP USER IF EXISTS '$DB__FOD_USER'@'%';" | mysql
-  echo "CREATE USER IF NOT EXISTS '$DB__FOD_USER'@'%' IDENTIFIED BY '$DB__FOD_PASSWORD';" | mysql
+  #echo "CREATE USER IF NOT EXISTS '$DB__FOD_USER'@'%' IDENTIFIED BY '$DB__FOD_PASSWORD';" | mysql
+  echo "CREATE USER '$DB__FOD_USER'@'%' IDENTIFIED BY '$DB__FOD_PASSWORD';" | mysql
   #echo "GRANT ALL PRIVILEGES ON *.* TO '$DB__FOD_USER'@'%';" | mysql
   #echo "GRANT ALL ON *.* to '$DB__FOD_USER'@'172.18.0.2' IDENTIFIED BY '$DB__FOD_PASSWORD' WITH GRANT OPTION;" | mysql
   echo "GRANT ALL PRIVILEGES ON *.* to '$DB__FOD_USER'@'%' WITH GRANT OPTION;" | mysql
@@ -56,6 +57,8 @@ function init_mysqllikedb() {
   echo "SHOW GRANTS FOR '$DB__FOD_USER'@'%';" | mysql
   
   mysqladmin flush-privileges
+
+  echo "SELECT 1 " | mysql -u"$DB__FOD_USER" -p"$DB__FOD_PASSWORD" 
   
   echo "done with initalizing mysqllike database '$DB__FOD_DBNAME' for DB USER '$DB__FOD_USER'" 1>&2
   echo 1>&2
@@ -166,11 +169,24 @@ while [ $# -gt 0 ]; do
     DB__FOD_DBNAME="fod"
     DB__FOD_USER="fod"
     DB__FOD_PASSWORD="$(get_random_password)"
+  elif [ $# -ge 1 -a "$1" = "--use_db_mysqllike" ]; then
+    shift 1
+    install_db=""
+    init_db="mysql"
+    conf_db_access="mysql"
+    DB__FOD_DBNAME="fod"
+    DB__FOD_USER="fod"
+    DB__FOD_PASSWORD="$(get_random_password)"
   else
     break
   fi
 
 done
+
+if [ $# -gt 0 ]; then
+  echo "remaining unprocessed arguments: $*, aborting" 1>&2
+  exit 2
+fi
 
 ##
 
@@ -197,6 +213,14 @@ echo "$0: inst_dir=$inst_dir fod_dir=$fod_dir => inst_dir_is_fod_dir=$inst_dir_i
 
 if [ "$install_basesw" = 1 ]; then
 
+  if [ "$install_db" = "" ]; then
+    mysql_server_pkg=("")
+  elif [ "$install_db" = "mysql" ]; then
+    mysql_server_pkg=("mysql-server")
+  else
+    mysql_server_pkg=("mariadb-server")
+  fi
+
   set -e
 
   echo 1>&2
@@ -204,7 +228,7 @@ if [ "$install_basesw" = 1 ]; then
   apt-get -qqy update
   apt-get -qqy install virtualenv python3-venv python3-setuptools \
     python3-dev vim git build-essential libevent-dev libxml2-dev libxslt1-dev \
-    mariadb-server libmariadb-dev patch redis-server sqlite3 \
+    "${mysql_server_pkg[@]}" libmariadb-dev patch redis-server sqlite3 \
     rustc libssl-dev \
     procps 
   echo 1>&2
@@ -241,28 +265,48 @@ if [ -n "$install_db" ]; then
 
   echo 1>&2
   if [ "$install_db" = "mariadb" ]; then
-    echo "trying to install mariadb"
+    echo "trying to install mariadb" 1>&2
     apt-get -qqy update
     apt-get -y install mariadb-server
 
-    init_mysqllikedb "$DB__FOD_DBNAME" "$DB__FOD_USER" "$DB__FOD_PASSWORD"
-
   elif [ "$install_db" = "mysql" ]; then
-    echo "trying to install mysql"
+    echo "trying to install mysql" 1>&2
     apt-get -qqy update
-    apt-get -y install mysql-server
+    apt-get -y install mysql-server 
 
-    init_mysqllikedb "$DB__FOD_DBNAME" "$DB__FOD_USER" "$DB__FOD_PASSWORD"
+  elif [ "$install_db" = "sqlite3" ]; then
+    : 
+  else
+    echo "unknown db '$install_db'" 1>&2
   fi
   echo 1>&2
-
-  #conf_db_access "$fod_dir" "$conf_db_access" "$DB__FOD_DBNAME" "$DB__FOD_USER" "$DB__FOD_PASSWORD"
 
   set +e
 
 fi
 
-#exit
+##
+
+if [ -n "$init_db" ]; then
+
+  set -e
+
+  echo 1>&2
+  if [ "$init_db" = "mysql" -o "$init_db" = "mariadb" ]; then
+
+    echo "trying to init mysql" 1>&2
+    init_mysqllikedb "$DB__FOD_DBNAME" "$DB__FOD_USER" "$DB__FOD_PASSWORD"
+
+  elif [ "$init_db" = "sqlite3" ]; then
+    : 
+  else
+    echo "unknown db '$init_db'" 1>&2
+  fi
+  echo 1>&2
+
+  set +e
+
+fi
 
 ##
 
