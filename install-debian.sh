@@ -409,6 +409,7 @@ else
         fi
 
         mkdir -p "$fod_dir/log" "$fod_dir/logs"
+	touch "$fod_dir/debug.log"
         chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log"
 
         #./manage.py syncdb --noinput
