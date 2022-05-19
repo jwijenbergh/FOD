@@ -409,7 +409,7 @@ else
         fi
 
         mkdir -p "$fod_dir/log" "$fod_dir/logs"
-        chown -R fod: "$fod_dir/log" "$fod_dir/logs"
+        chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log"
 
         #./manage.py syncdb --noinput
         #mkdir -p /srv/flowspy/static/
@@ -434,6 +434,11 @@ else
         ./manage.py migrate
         ./manage.py loaddata initial_data
 	echo 1>&2
+       
+        #
+
+	# ./manage.py aboove may have created debug.log with root permissions:
+	chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log"
 
         #
 
