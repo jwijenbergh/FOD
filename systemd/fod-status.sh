@@ -66,35 +66,19 @@ print("access to NETCONF seems to be working");
 ' "$@" < /dev/null 
     ;;
 
-  *|-s|status)
-    #set -e
-
-    "$0" --process-status
-    pstatus="$?"
-    echo "process status=$pstatus"
-    echo
-
-    "$0" --database-access-status
-    dstatus="$?"
-    echo "database access status=$dstatus"
-    echo
-
-    "$0" --gunicorn-http-status
-    hstatus="$?"
-    echo "gunicorn http status=$hstatus"
-    echo
-
-    "$0" --netconf-access-status
-    nstatus="$?"
-    echo "NETCONF access status=$nstatus"
-    echo
-
-    all_status=$(( $pstatus | $dstatus | $hstatus | $nstatus ))
-    echo "all_status=$all_status"
-
-    exit "$all_status"
-
+  --sensu-status)
+    "$0" --status
+    statusx="$?"
+    echo "status=$statusx"
+    if [ "$statusx" = 0 ]; then
+      echo "all basic checks passed: OK"
+      exit 0
+    else 
+      echo "something went wrong during basic checks: ERROR"
+      exit 2
+    fi
   ;;
+
 
   -S|status-detailed)
     #set -e
@@ -115,6 +99,35 @@ print("access to NETCONF seems to be working");
     echo
 
     "$0" --netconf-access-status --with-passwords
+    nstatus="$?"
+    echo "NETCONF access status=$nstatus"
+    echo
+
+    all_status=$(( $pstatus | $dstatus | $hstatus | $nstatus ))
+    echo "all_status=$all_status"
+
+    exit "$all_status"
+    ;;
+
+  *|-s|--status)
+    #set -e
+
+    "$0" --process-status
+    pstatus="$?"
+    echo "process status=$pstatus"
+    echo
+
+    "$0" --database-access-status
+    dstatus="$?"
+    echo "database access status=$dstatus"
+    echo
+
+    "$0" --gunicorn-http-status
+    hstatus="$?"
+    echo "gunicorn http status=$hstatus"
+    echo
+
+    "$0" --netconf-access-status
     nstatus="$?"
     echo "NETCONF access status=$nstatus"
     echo
