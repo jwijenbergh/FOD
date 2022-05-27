@@ -655,6 +655,21 @@ def user_login(request):
         lastname = lookupShibAttr(settings.SHIB_LASTNAME, request.META)
         mail = lookupShibAttr(settings.SHIB_MAIL, request.META)
         entitlement = lookupShibAttr(settings.SHIB_ENTITLEMENT, request.META)
+      
+        ##
+
+        try:
+          SHIB_USERNAME__OLD_TO_MIGRATE_key = settings.SHIB_USERNAME__OLD_TO_MIGRATE
+        except:
+          SHIB_USERNAME__OLD_TO_MIGRATE_key = ""
+        logger.info('views::user_login(): SHIB_USERNAME__OLD_TO_MIGRATE_key=%s' % SHIB_USERNAME__OLD_TO_MIGRATE_key)
+
+        username_old_to_migrate_value = ""
+        if SHIB_USERNAME__OLD_TO_MIGRATE_key!="":
+          username_old_to_migrate_value = lookupShibAttr(SHIB_USERNAME__OLD_TO_MIGRATE_key, request.META)
+          logger.info('views::user_login(): username_old_to_migrate_value=%s' % username_old_to_migrate_value)
+
+        ##
 
         username__attrib_info1 = get_shibboleth_attrib_info_from_settings("SHIB_USERNAME", False)
         entitlement__attrib_info1 = get_shibboleth_attrib_info_from_settings("SHIB_ENTITLEMENT", False)
@@ -709,6 +724,18 @@ def user_login(request):
             user_exists = True
         except:
             user_exists = False
+
+        if not user_exists and username_old_to_migrate_value!="":
+          try:
+            logger.info('user does not exist for username=%s, but username_old_to_migrate_value=%s, trying user id attribute migration' % (username, username_old_to_migrate_value))
+            user_old = User.objects.get(username__exact=username_old_to_migrate_value)
+            logger.info('=> user_old='+str(user_old))
+            user.username = username
+            user.save()
+            user_exists = True
+          except:
+            pass
+
         user = authenticate(username=username, firstname=firstname, lastname=lastname, mail=mail, authsource='shibboleth')
         logger.debug('Authentication of %s' % user)
 
