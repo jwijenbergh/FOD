@@ -4,7 +4,7 @@
 # instructions:
 
 # 1. build container, e.g., by: 
-#> docker build -f ./Dockerfiles.d/Dockerfile.vnet_router2a -t vnet2a . # run from main dir
+#> docker build -f ./Dockerfiles.d/Dockerfile.vnet_router2.ubuntu -t vnet2.ubuntu . # run from main dir
 
 # 2. before running container make sure openvswitch module is loaded in kernel (modprobe openvswitch) and run container with --privileged (needed for openvswitch inside container)
 #> modprobe openvswitch
