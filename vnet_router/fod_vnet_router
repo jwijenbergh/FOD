@@ -467,7 +467,9 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
   "$0" --filter-ruleinfo-unique | tr '\r' '\n' | grep -v "^ *$" | \
   while read -r name ipversion source destination protocol source_ports destination_ports fragment_options then rest; do
     #echo "name=$name ipversion=$ipversion source=$source ..." 1>&2
-    
+ 
+    bgp_params1="$name $ipversion $source $destination $protocol $source_ports $destination_ports $fragment_options $then" 
+
     md5sum="$(printf "%s" "$name" | md5sum)"
     cookie="${md5sum:0:16}"
  
@@ -479,7 +481,7 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
       md5sum_params="$(printf "%s" "$bgpruleparams" | md5sum | cut -d ' ' -f 1)"
       rule_touchfile="/var/run/rule-$md5sum_params"
 
-      exabgpcli_flow_params=($(printf "%s" "$name $ipversion $source $destination $protocol $source_ports $destination_ports $fragment_options $then" | "$0" --ruleinfo_to_exabgp_flow_params))
+      exabgpcli_flow_params=($(printf "%s" "$bgp_params1" | "$0" --ruleinfo_to_exabgp_flow_params))
       #echo "exabgpcli_flow_params=${exabgpcli_flow_params[*]}" 1>&2
 
       #rule_active["$md5sum_params"]=1
@@ -490,12 +492,12 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
         touch "$rule_touchfile" 1>&2
       else
         echo "rule bgpruleparams=$bgpruleparams exabgpcli_flow_params=${exabgpcli_flow_params[*]} (md5sum=$md5sum_params) to be bgp installed" 1>&2 
-        echo "$bgpruleparams" > "$rule_touchfile"
+        echo "$bgp_params1" > "$rule_touchfile"
 
         #echo exabgpcli announce flow route source $source destination $destination protocol [ =$protocol ] source-port [ =53 ] destination-port [ =80 ] packet-length [ =777 =1122 ] fragment [ is-fragment dont-fragment ] rate-limit 1024 
-	(set -x; exabgpcli announce "${exabgpcli_flow_params[@]}" < /dev/null) 1>&2
-	exabgpcli_status="$?"
-	echo "announce exabgpcli_status=$exabgpcli_status" 1>&2
+        (set -x; exabgpcli announce "${exabgpcli_flow_params[@]}" < /dev/null) 1>&2
+        exabgpcli_status="$?"
+        echo "announce exabgpcli_status=$exabgpcli_status" 1>&2
 
       fi
 
@@ -589,16 +591,16 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
       (shopt -s nullglob; cd "$dir1" && for file1 in rule-*; do
         md5sum_params="${file1#rule-}"
         #echo "exabgp rule state file: md5sum_params=$md5sum_params" 1>&2
-	#stat "$dir1/.$$" "$file1" 1>&2
+        #stat "$dir1/.$$" "$file1" 1>&2
         if [ ! "$dir1/.$$" -nt "$file1" ]; then
           echo "active exabgp rule md5sum_params=$md5sum_params" 1>&2
         else      
-	  exabgpcli_flow_params=(cat "$file1")
-	  echo "to deactivate exabgp rule exabgpcli_flow_params=${exabgpcli_flow_params[*]} (md5sum_params=$md5sum_params)" 1>&2
+          exabgpcli_flow_params=($(cat "$file1" | "$0" --ruleinfo_to_exabgp_flow_params))
+          echo "to deactivate exabgp rule exabgpcli_flow_params=${exabgpcli_flow_params[*]} (md5sum_params=$md5sum_params)" 1>&2
 
-	  (set -x; exabgpcli withdraw "${exabgpcli_flow_params[@]}" < /dev/null) 1>&2
-	  exabgpcli_status="$?"
-	  echo "withdraw exabgpcli_status=$exabgpcli_status" 1>&2
+          (set -x; exabgpcli withdraw "${exabgpcli_flow_params[@]}" < /dev/null) 1>&2
+          exabgpcli_status="$?"
+          echo "withdraw exabgpcli_status=$exabgpcli_status" 1>&2
 
           rm -fv "rule-$md5sum_params" 1>&2
         fi
