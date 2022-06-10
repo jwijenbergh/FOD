@@ -1,0 +1,152 @@
+#!/bin/bash
+
+mkdir /run/bird
+chown bird /run/bird
+
+mkdir /var/log/bird
+chown bird /var/log/bird /var/log/bird/*
+
+##
+
+cat > /etc/bird/bird.conf <<EOF
+# This is a minimal configuration file, which allows the bird daemon to start
+# but will not cause anything else to happen.
+#
+# Please refer to the documentation in the bird-doc package or BIRD User's
+# Guide on http://bird.network.cz/ for more information on configuring BIRD and
+# adding routing protocols.
+
+log stderr all;
+#log "/var/log/bird/bird.log" all;
+
+# Change this into your BIRD router ID. It's a world-wide unique identification
+# of your router, usually one of router's IPv4 addresses.
+router id 10.0.0.3;
+
+##
+
+ipv4 table master4;
+ipv6 table master6;
+
+ipv4 table mcast4;
+ipv6 table mcast6;
+
+ipv4 table mtab4;
+ipv6 table mtab6;
+
+vpn4 table vpntab4;
+vpn6 table vpntab6;
+
+vpn4 table vpn4mc;
+vpn6 table vpn6mc;
+
+flow4 table flowtab4;
+flow6 table flowtab6;
+
+##
+
+# The Kernel protocol is not a real routing protocol. Instead of communicating
+# with other routers in the network, it performs synchronization of BIRD's
+# routing tables with the OS kernel.
+protocol kernel {
+        ipv4 {
+                export all;     # Default is export none
+        };
+        persist;                # Don't remove routes on BIRD shutdown
+}
+
+# The Device protocol is not a real routing protocol. It doesn't generate any
+# routes and it only serves as a module for getting information about network
+# interfaces from the kernel. 
+protocol device {
+	scan time 60;
+}
+
+protocol rip {
+        ipv4 {
+                import all;
+                export all;
+        };
+        interface "*";
+}
+
+protocol bgp {
+        local as 9993;                      # Use a private AS number
+        neighbor 10.0.0.1 as 9991;    # Our neighbor ...
+        multihop;                            # ... which is connected indirectly
+        debug all;
+        #export filter {                      # We use non-trivial export rules
+        #        if source = RTS_STATIC then { # Export only static routes
+        #                # Assign our community
+        #                bgp_community.add((65000,64501));
+        #                # Artificially increase path length
+        #                # by advertising local AS number twice
+        #                if bgp_path ~ [= 65000 =] then
+        #                        bgp_path.prepend(65000);
+        #                accept;
+        #        }
+        #        reject;
+        #};
+        ipv4 {
+                import all;
+                export all;
+        };
+        flow4 {
+                 import all;
+                 export all;
+        };
+        #import all;
+        #source address 127.0.0.2;   # Use a non-standard source address
+}
+
+#protocol bgp {
+#        local as 9993;                      # Use a private AS number
+#        neighbor 10.0.0.2 as 9992;    # Our neighbor ...
+#        multihop;                            # ... which is connected indirectly
+#        #export filter {                      # We use non-trivial export rules
+#        #        if source = RTS_STATIC then { # Export only static routes
+#        #                # Assign our community
+#        #                bgp_community.add((65000,64501));
+#        #                # Artificially increase path length
+#        #                # by advertising local AS number twice
+#        #                if bgp_path ~ [= 65000 =] then
+#        #                        bgp_path.prepend(65000);
+#        #                accept;
+#        #        }
+#        #        reject;
+#        #};
+#        ipv4 {
+#                import all;
+#                export all;
+#        };
+#        #flow4 {
+#        #        #base table "master4";
+#        #        import all;
+#        #         export all;
+#        # };
+#        #source address 127.0.0.2;   # Use a non-standard source address
+#}
+
+#protocol static {
+#        flow4;
+#
+#        route flow4 {
+#                dst 10.0.0.0/8;
+#                port > 24 && < 30 || 40..50,60..70,80 && >= 90;
+#                tcp flags 0x03/0x0f;
+#                length > 1024;
+#                dscp = 63;
+#                fragment dont_fragment, is_fragment || !first_fragment;
+#        };
+#};
+EOF
+
+set -e
+
+set -x
+
+/usr/sbin/bird -p
+chown bird /var/log/bird /var/log/bird/*
+
+exec /usr/sbin/bird -u bird -g bird "$@"
+

@@ -1,0 +1,64 @@
+#!/bin/bash
+
+mkfifo /run/exabgp.{in,out}
+chmod 0600 /run/exabgp.{in,out}
+chown exabgp: /run/exabgp.{in,out}
+
+##
+
+cat > /etc/exabgp/exabgp.conf <<EOF
+#neighbor 10.0.0.2 {
+#	router-id 10.0.0.1;
+#	local-address 10.0.0.1;
+#	local-as 9991;
+#
+#	peer-as 9992;
+#
+#	family {
+#            ipv4 unicast;
+#            ipv4 multicast;
+#            ipv4 nlri-mpls;
+#            ipv4 mpls-vpn;
+#            ipv4 flow;
+#            ipv4 flow-vpn;
+#            ipv6 unicast;
+#            ipv6 flow;
+#            ipv6 flow-vpn;
+#	}
+#
+#	static {
+#		route 10.4.0.0/32 next-hop self;
+#	}
+#}
+
+neighbor 10.0.0.3 {
+	router-id 10.0.0.1;
+	local-address 10.0.0.1;
+	local-as 9991;
+
+	peer-as 9993;
+
+	#family {
+	#    ipv4 unicast;
+        #    #ipv4 multicast;
+        #    #ipv4 nlri-mpls;
+        #    #ipv4 mpls-vpn;
+        #    #ipv4 flow;
+        #    #ipv4 flow-vpn;
+        #    #ipv6 unicast;
+        #    #ipv6 flow;
+        #    #ipv6 flow-vpn;
+	#}
+
+	static {
+		route 10.10.0.0/32 next-hop self;
+		route 10.100.0.0/32 next-hop self;
+	}
+}
+EOF
+
+##
+
+#/fod_vnet_router --mnexec h1 exabgp --debug /etc/exabgp/exabgp.conf
+exec exabgp --debug /etc/exabgp/exabgp.conf "$@"
+
