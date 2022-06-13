@@ -1,5 +1,20 @@
 #!/bin/bash
 
+router_id="$1"
+shift 1
+myas="$1"
+shift 1
+
+echo "$0: router_id=$router_id myas=$myas" 1>&2
+
+##
+
+[ -n "$router_id" ] || router_id="10.0.0.1"
+
+[ -n "$myas" ] || myas="9991"
+
+##
+
 mkfifo /run/exabgp.{in,out}
 chmod 0600 /run/exabgp.{in,out}
 chown exabgp: /run/exabgp.{in,out}
@@ -30,13 +45,33 @@ cat > /etc/exabgp/exabgp.conf <<EOF
 #		route 10.4.0.0/32 next-hop self;
 #	}
 #}
+EOF
 
-neighbor 10.0.0.3 {
-	router-id 10.0.0.1;
-	local-address 10.0.0.1;
-	local-as 9991;
+[ $# -gt 0 ] || set -- "10.0.0.3" "9993"
 
-	peer-as 9993;
+echo "$0: loop args: $*" 1>&2
+
+while [ $# -gt 0 ]; do
+  neighbor="$1"
+  shift 1
+
+  [ "$neighbor" != "--" ] || break
+
+  neighborAS="$1"
+  shift 1
+
+cat >> /etc/exabgp/exabgp.conf <<EOF
+#neighbor 10.0.0.3 
+neighbor $neighbor {
+	#router-id 10.0.0.1;
+	router-id $router_id;
+	#local-address 10.0.0.1;
+	local-address $router_id;
+	#local-as 9991;
+	local-as $myas;
+
+	#peer-as 9993;
+	peer-as $neighborAS;
 
 	#family {
 	#    ipv4 unicast;
@@ -57,8 +92,15 @@ neighbor 10.0.0.3 {
 }
 EOF
 
+done
+
 ##
 
-#/fod_vnet_router --mnexec h1 exabgp --debug /etc/exabgp/exabgp.conf
-exec exabgp --debug /etc/exabgp/exabgp.conf "$@"
+if [ "$1" = "--bg" ]; then
+  shift 1
+  nohup exabgp --debug /etc/exabgp/exabgp.conf "$@" > exbgp.log 1>&2 &
+else
+  #/fod_vnet_router --mnexec h1 exabgp --debug /etc/exabgp/exabgp.conf
+  exec exabgp --debug /etc/exabgp/exabgp.conf "$@"
+fi
 

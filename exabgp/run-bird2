@@ -1,14 +1,48 @@
 #!/bin/bash
 
-mkdir /run/bird
-chown bird /run/bird
-
-mkdir /var/log/bird
-chown bird /var/log/bird /var/log/bird/*
+filepostfix=""
+if [ "$1" = "--postfix" ]; then
+  shift 1
+  filepostfix="$1"
+  shift 1
+fi
 
 ##
 
-cat > /etc/bird/bird.conf <<EOF
+router_id="$1" 
+shift 1
+myas="$1"
+shift 1
+
+[ -n "$router_id" ] || router_id="10.0.0.3"
+[ -n "$myas" ] || myas="9993"
+
+#
+
+
+#
+
+mkdir "/run/bird$filepostfix"
+chown bird: "/run/bird$filepostfix"
+
+mkdir "/var/log/bird$filepostfix"
+chown bird: "/var/log/bird$filepostfix" "/var/log/bird$filepostfix/"*
+
+##
+
+pidfile="/run/bird$filepostfix/bird.pid"
+if [ -f "$pidfile" ]; then
+  pid="$(cat "$pidfile")"
+  echo "pidfile=$pidfile pid=$pid" 1>&2
+  if [ -n "$pid" ]; then 
+    kill "$pid"
+    sleep 1
+  fi
+fi
+
+##
+
+cat > "/etc/bird/bird$filepostfix.conf" <<EOF
 # This is a minimal configuration file, which allows the bird daemon to start
 # but will not cause anything else to happen.
 #
@@ -16,12 +50,13 @@ cat > /etc/bird/bird.conf <<EOF
 # Guide on http://bird.network.cz/ for more information on configuring BIRD and
 # adding routing protocols.
 
-log stderr all;
-#log "/var/log/bird/bird.log" all;
+#log stderr all;
+log "/var/log/bird$filepostfix/bird.log" all;
 
 # Change this into your BIRD router ID. It's a world-wide unique identification
 # of your router, usually one of router's IPv4 addresses.
-router id 10.0.0.3;
+#router id 10.0.0.3;
+router id $router_id;
 
 ##
 
@@ -69,10 +104,26 @@ protocol rip {
         };
         interface "*";
 }
+EOF
 
+[ $# -gt 0 ] || set -- 10.0.0.1
+
+while [ $# -gt 0 ]; do
+  neighbor="$1"
+  shift 1
+  if [ "$neighbor" = "--" ]; then
+    break
+  fi
+
+  neighborAS="$1"
+  shift 1
+
+cat >> "/etc/bird/bird$filepostfix.conf" <<EOF
 protocol bgp {
-        local as 9993;                      # Use a private AS number
-        neighbor 10.0.0.1 as 9991;    # Our neighbor ...
+        #local as 9993;                      # Use a private AS number
+        local as $myas;                      # Use a private AS number
+        #neighbor 10.0.0.1 as 9991;    # Our neighbor ...
+        neighbor $neighbor as $neighborAS;    # Our neighbor ...
         multihop;                            # ... which is connected indirectly
         debug all;
         #export filter {                      # We use non-trivial export rules
@@ -95,10 +146,22 @@ protocol bgp {
                  import all;
                  export all;
         };
+        ipv6 {
+                import all;
+                export all;
+        };
+        flow6 {
+                 import all;
+                 export all;
+        };
         #import all;
         #source address 127.0.0.2;   # Use a non-standard source address
 }
+EOF
 
+done
+
+cat >> "/etc/bird/bird$filepostfix.conf" <<EOF
 #protocol bgp {
 #        local as 9993;                      # Use a private AS number
 #        neighbor 10.0.0.2 as 9992;    # Our neighbor ...
@@ -142,11 +205,22 @@ protocol bgp {
 EOF
 
 set -e
+#/usr/sbin/bird -p # /run/bird/bird.ctl
+/usr/sbin/bird -c "/etc/bird/bird$filepostfix.conf" -s "/run/bird$filepostfix/bird.ctl" -p
+set +e
+
+chown bird "/var/log/bird$filepostfix" "/var/log/bird$filepostfix/"*
 
 set -x
+set -e
+#exec /usr/sbin/bird -u bird -g bird "$@"
+/usr/sbin/bird -c "/etc/bird/bird$filepostfix.conf" -s "/run/bird$filepostfix/bird.ctl" -P "/run/bird$filepostfix/bird.pid" -u bird -g bird "$@"
 
-/usr/sbin/bird -p
-chown bird /var/log/bird /var/log/bird/*
+#
 
-exec /usr/sbin/bird -u bird -g bird "$@"
+set +e
+echo "show protocols all bgp1" | birdc -s "/run/bird$filepostfix/bird.ctl"
+echo "show protocols all bgp2" | birdc -s "/run/bird$filepostfix/bird.ctl"
+echo "show route all" | birdc -s "/run/bird$filepostfix/bird.ctl"
+
 

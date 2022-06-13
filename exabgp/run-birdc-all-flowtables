@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for ctl in /run/bird*/bird.ctl; do 
+  echo 
+  echo "# $ctl:" 
+  echo -e "show route table flowtab4\nshow route table flowtab6" | birdc -s "$ctl"; 
+done
+

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+if [ "$1" = "--inner.post" ]; then
+  shift 1
+
+  /fod_vnet_router --mnexec h1 /run-exabgp 10.0.1.1 9991  10.0.1.3 9993
+  /fod_vnet_router --mnexec r1 /run-bird2 --postfix 3 1.1.1.3 9993  10.0.1.1 9991 10.0.2.2 9992
+  /fod_vnet_router --mnexec h2 /run-bird2 --postfix 2 1.1.1.2 9992  10.0.2.3 9993
+
+elif [ "$1" = "--inner2.post" ]; then
+  shift 1
+
+  echo h1 /run-exabgp 10.0.1.1 9991    10.0.1.3 9993 -- --bg
+  echo r1 /run-bird2 --postfix 3 1.1.1.3 9993   10.0.1.1 9991 10.0.2.2 9992
+  echo h2 /run-bird2 --postfix 2 1.1.1.2 9992   10.0.2.3 9993
+
+else 
+
+  killall bird
+  killall exabgp
+  "/fod_vnet_router" "--init.sysstart.netconfd" --custom /custom-mn-topo1.py --topo mytopo --pre <("$0" --inner2.post)
+
+fi
+
+
+
+
+
