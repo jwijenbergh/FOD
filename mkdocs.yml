@@ -9,6 +9,7 @@ docs_dir: doc
 #pages:
 nav:
     - 'Introduction': 'index.md'
+    - 'Prerequisites': 'prerequisites/generic.md'
     - 'Installation':
         - 'v1.3': 
           - 'Generic': 'installation/v1.3/generic.md'
