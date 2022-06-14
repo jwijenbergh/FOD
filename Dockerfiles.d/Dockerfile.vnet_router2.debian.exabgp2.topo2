@@ -4,11 +4,11 @@
 # instructions:
 
 # 1. build container, e.g., by: 
-#> docker build -f ./Dockerfiles.d/Dockerfile.vnet_router2.debian.exabgp -t vnet2.debian.exabgp . # run from main dir
+#> docker build -f ./Dockerfiles.d/Dockerfile.vnet_router2.debian.exabgp2.topo2 -t vnet2.debian.exabgp.topo2 . # run from main dir
 
 # 2. before running container make sure openvswitch module is loaded in kernel (modprobe openvswitch) and run container with --privileged (needed for openvswitch inside container)
 #> modprobe openvswitch
-#> docker run -t -i --privileged vnet2
+#> docker run -t -i --privileged vnet2.debian.exabgp.topo2
 
 # 3. after being started you can additionally enter the container (find its DOCKERID by 'docker ps'), e.g., by:
 #> docker exec -i -t DOCKERID /fod_vnet_router --mnexec h1 ping h2
@@ -39,13 +39,15 @@
 
 # ...
 # 'NETCONF_DEVICE': '172.17.0.3', # only an example, so change value to whatever is the IP address of the netconf db server container
-# 'NETCONF_PASS': 'netconf',
 # 'NETCONF_PORT': 830,
 # 'NETCONF_USER': 'netconf',
+# 'NETCONF_PASS': 'netconf',
 #
 # 'SNMP_IP': ['172.17.0.3'], # only an example, so change value to whatever is the IP address of the netconf db server container
 # 'SNMP_COMMUNITY': 'public',
 # ...
+
+#> docker exec -i -t DOCKERID /run-birdc-all-flowtables
 
 ##############################################################################
 ##############################################################################
@@ -87,6 +89,7 @@ COPY exabgp/ /
 #CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
 #CMD [ "bash", "-c", "set -x; nohup /usr/bin/supervisord -c /etc/supervisord.conf & sleep 5 ;/fod_vnet_router --init" ]
 #CMD [ "/fod_vnet_router", "--init.sysstart.netconfd" ]
+# ./exabgp/run-mnexabgp2
 CMD [ "/run-mnexabgp2" ]
 
 ##############################################################################
