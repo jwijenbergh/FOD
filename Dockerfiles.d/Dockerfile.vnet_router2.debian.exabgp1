@@ -4,11 +4,11 @@
 # instructions:
 
 # 1. build container, e.g., by: 
-#> docker build -f ./Dockerfiles.d/Dockerfile.vnet_router2.debian.exabgp -t vnet2.debian.exabgp . # run from main dir
+#> docker build -f ./Dockerfiles.d/Dockerfile.vnet_router2.debian.exabgp1 -t vnet2.debian.exabgp1 . # run from main dir
 
 # 2. before running container make sure openvswitch module is loaded in kernel (modprobe openvswitch) and run container with --privileged (needed for openvswitch inside container)
 #> modprobe openvswitch
-#> docker run -t -i --privileged vnet2
+#> docker run -t -i --privileged vnet2.debian.exabgp1
 
 # 3. after being started you can additionally enter the container (find its DOCKERID by 'docker ps'), e.g., by:
 #> docker exec -i -t DOCKERID /fod_vnet_router --mnexec h1 ping h2
