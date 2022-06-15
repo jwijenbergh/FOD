@@ -29,7 +29,7 @@ without an actual effect on any network, but FoD functionality of controlling ru
 
 similar to router-container/Dockerfile but will use netconfd (DEBIAN package) instead of CESNET's netopeer NETCONF server
 
-./Dockerfiles.d/Dockerfile.vnet_router0a : 
+- ./Dockerfiles.d/Dockerfile.vnet_router0a : 
 
 ### NETCONF test server docker container extended to virtual DDoS test network
 
@@ -42,13 +42,13 @@ SNMPd and a Perl SNMPd statistic collector script
 
 Yields a more complete simulation of a router for FoD.
 
-./Dockerfiles.d/Dockerfile.vnet_router1 : based on netopeer2
-./Dockerfiles.d/Dockerfile.vnet_router2 : similar to Dockerfile.vnet_router1, but will use netconfd (DEBIAN package) instead of CESNET's netopeer NETCONF server
+- ./Dockerfiles.d/Dockerfile.vnet_router1 : based on netopeer2
+- ./Dockerfiles.d/Dockerfile.vnet_router2 : similar to Dockerfile.vnet_router1, but will use netconfd (DEBIAN package) instead of CESNET's netopeer NETCONF server
 
-./Dockerfiles.d/Dockerfile.vnet_router2.ubuntu: like ./Dockerfiles.d/Dockerfile.vnet_router2, but based on UBUNTU
-./Dockerfiles.d/Dockerfile.vnet_router2.debian.exabgp1: extending ./Dockerfiles.d/Dockerfile.vnet_router2 to install some stuff for bgp testing inside the Mininet: exabgp, quagga, bird1
-./Dockerfiles.d/Dockerfile.vnet_router2.debian.exabgp2: extending ./Dockerfiles.d/Dockerfile.vnet_router2 to install some stuff for bgp testing inside the Mininet: exabgp, bird2
-./Dockerfiles.d/Dockerfile.vnet_router2.debian.exabgp2.topo2: extending ./Dockerfiles.d/Dockerfile.vnet_router2 to simple BGP testing vnet based on exabgp and bird2
+- ./Dockerfiles.d/Dockerfile.vnet_router2.ubuntu: like ./Dockerfiles.d/Dockerfile.vnet_router2, but based on UBUNTU
+- ./Dockerfiles.d/Dockerfile.vnet_router2.debian.exabgp1: extending ./Dockerfiles.d/Dockerfile.vnet_router2 to install some stuff for bgp testing inside the Mininet: exabgp, quagga, bird1
+- ./Dockerfiles.d/Dockerfile.vnet_router2.debian.exabgp2: extending ./Dockerfiles.d/Dockerfile.vnet_router2 to install some stuff for bgp testing inside the Mininet: exabgp, bird2
+- ./Dockerfiles.d/Dockerfile.vnet_router2.debian.exabgp2.topo2: extending ./Dockerfiles.d/Dockerfile.vnet_router2 to simple BGP testing vnet based on exabgp and bird2
 
 (find instructions how to build and run inside the Dockerfiles)
 

@@ -17,6 +17,7 @@ nav:
           - 'Red Hat': 'installation/v1.3/redhat.md'
         - 'v1.7':
           - 'Generic': 'installation/v1.7/generic.md'
+          - 'DEBIAN/UBUNTU': 'installation/v1.7/debian_ubuntu.md'
           - 'Docker': 'installation/v1.7/docker.md'
           - 'Docker Extra for Testing': 'installation/v1.7/docker_extra.md'
     - 'Configuration': 
