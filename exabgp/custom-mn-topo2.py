@@ -18,9 +18,9 @@ class MyTopo( Topo ):
         "Create custom topo."
 
         # Add hosts and switches
-        h1Host = self.addHost('h1', ip='10.0.1.1/24')
-        h2Host = self.addHost('h2', ip='10.0.2.1/24')
-        h3Host = self.addHost('h3', ip='10.0.3.1/24')
+        h1Host = self.addHost('h1', ip='10.0.1.1/24', defaultRoute='via 10.0.1.254')
+        h2Host = self.addHost('h2', ip='10.0.2.1/24', defaultRoute='via 10.0.2.254')
+        h3Host = self.addHost('h3', ip='10.0.3.1/24', defaultRoute='via 10.0.3.254')
 
         router1 = self.addHost('r1', ip='10.0.1.254/24')
         router2 = self.addHost('r2', ip='10.0.2.254/24')

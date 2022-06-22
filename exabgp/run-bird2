@@ -87,6 +87,9 @@ protocol kernel {
         ipv4 {
                 export all;     # Default is export none
         };
+        #ipv6 {
+        #        export all;     # Default is export none
+        #};
         persist;                # Don't remove routes on BIRD shutdown
 }
 
@@ -108,7 +111,12 @@ EOF
 
 [ $# -gt 0 ] || set -- 10.0.0.1
 
+
+count="0"
 while [ $# -gt 0 ]; do
+
+  count=$(( $count + 1 ))
+
   neighbor="$1"
   shift 1
   if [ "$neighbor" = "--" ]; then
@@ -159,6 +167,25 @@ protocol bgp {
 }
 EOF
 
+if [ "$count" =  1 ]; then
+
+cat >> "/etc/bird/bird$filepostfix.conf" <<EOF
+# Static route feed
+protocol static {
+        ipv4 { export all; };
+        #route 10.0.0.0/24 via 55.55.55.44;
+        #route 10.10.0.0/16 blackhole;
+        #route 10.20.0.0/20 unreachable;
+        #route 10.30.50.0/28 prohibit;
+        route 10.0.$filepostfix.0/24 via 10.0.$filepostfix.254;
+        #route 10.1.12.0/24 via 10.1.12.2;
+        #route 10.1.13.0/24 via 10.1.13.3;
+}
+
+EOF
+
+fi
+
 done
 
 cat >> "/etc/bird/bird$filepostfix.conf" <<EOF
@@ -202,6 +229,7 @@ cat >> "/etc/bird/bird$filepostfix.conf" <<EOF
 #                fragment dont_fragment, is_fragment || !first_fragment;
 #        };
 #};
+
 EOF
 
 set -e
