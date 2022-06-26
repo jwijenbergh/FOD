@@ -3,16 +3,21 @@
 <suite name="Failed suite [Default suite]" guice-stage="DEVELOPMENT">
   <test thread-count="5" name="Default test(failed)">
     <classes>
-      <class name="test.java.Tests.LoginTest">
+      <class name="test.java.Tests.AddRuleTest">
         <methods>
-          <include name="LoginWithoutData"/>
-          <include name="LoginWithWrongData"/>
-          <include name="LoginWithoutLogin"/>
-          <include name="LoginWithoutPassword"/>
+          <include name="AddWrongSrcPort"/>
+          <include name="AddWrongName"/>
+          <include name="AddName"/>
+          <include name="AddWithOutExpires"/>
+          <include name="AddNoName"/>
           <include name="testSetUp"/>
+          <include name="AddWrongSourceAddress"/>
+          <include name="AddWrongDestPort"/>
+          <include name="AddWrongDestinationAddress"/>
+          <include name="AddWrongPort"/>
           <include name="testSetDown"/>
         </methods>
-      </class> <!-- test.java.Tests.LoginTest -->
+      </class> <!-- test.java.Tests.AddRuleTest -->
     </classes>
   </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->
