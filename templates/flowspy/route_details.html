@@ -359,7 +359,7 @@ $(document).ready(function() {
             var my = $(this);
             my.html('Deactivating...')
             var routename = $(this).data("routename");
-            var delurl = "{% url 'delete-route' 'route_placeholder'%}".replace('route_placeholder', routename.toString());
+            var delurl = "{% url 'deactivate-route' 'route_placeholder'%}".replace('route_placeholder', routename.toString());
             $.ajax({
                 type: 'POST',
                 url: delurl,

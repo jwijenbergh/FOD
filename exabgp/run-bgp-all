@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -x
+
+#/fod_vnet_router --mnexec h2 /run-quagga-zebra -d
+#/fod_vnet_router --mnexec h2 /run-quagga-bgpd -d
+
+/fod_vnet_router --mnexec h3 /run-bird2 # -f
+
+/fod_vnet_router --mnexec h1 /run-exabgp
+

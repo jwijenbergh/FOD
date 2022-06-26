@@ -1,0 +1,254 @@
+#!/bin/bash
+
+filepostfix=""
+if [ "$1" = "--postfix" ]; then
+  shift 1
+  filepostfix="$1"
+  shift 1
+fi
+
+##
+
+router_id="$1" 
+shift 1
+myas="$1"
+shift 1
+
+[ -n "$router_id" ] || router_id="10.0.0.3"
+[ -n "$myas" ] || myas="9993"
+
+#
+
+
+#
+
+mkdir "/run/bird$filepostfix"
+chown bird: "/run/bird$filepostfix"
+
+mkdir "/var/log/bird$filepostfix"
+chown bird: "/var/log/bird$filepostfix" "/var/log/bird$filepostfix/"*
+
+##
+
+pidfile="/run/bird$filepostfix/bird.pid"
+if [ -f "$pidfile" ]; then
+  pid="$(cat "$pidfile")"
+  echo "pidfile=$pidfile pid=$pid" 1>&2
+  if [ -n "$pid" ]; then 
+    kill "$pid"
+    sleep 1
+  fi
+fi
+
+##
+
+cat > "/etc/bird/bird$filepostfix.conf" <<EOF
+# This is a minimal configuration file, which allows the bird daemon to start
+# but will not cause anything else to happen.
+#
+# Please refer to the documentation in the bird-doc package or BIRD User's
+# Guide on http://bird.network.cz/ for more information on configuring BIRD and
+# adding routing protocols.
+
+#log stderr all;
+log "/var/log/bird$filepostfix/bird.log" all;
+
+# Change this into your BIRD router ID. It's a world-wide unique identification
+# of your router, usually one of router's IPv4 addresses.
+#router id 10.0.0.3;
+router id $router_id;
+
+##
+
+ipv4 table master4;
+ipv6 table master6;
+
+ipv4 table mcast4;
+ipv6 table mcast6;
+
+ipv4 table mtab4;
+ipv6 table mtab6;
+
+vpn4 table vpntab4;
+vpn6 table vpntab6;
+
+vpn4 table vpn4mc;
+vpn6 table vpn6mc;
+
+flow4 table flowtab4;
+flow6 table flowtab6;
+
+##
+
+# The Kernel protocol is not a real routing protocol. Instead of communicating
+# with other routers in the network, it performs synchronization of BIRD's
+# routing tables with the OS kernel.
+protocol kernel {
+        ipv4 {
+                export all;     # Default is export none
+        };
+        #ipv6 {
+        #        export all;     # Default is export none
+        #};
+        persist;                # Don't remove routes on BIRD shutdown
+}
+
+# The Device protocol is not a real routing protocol. It doesn't generate any
+# routes and it only serves as a module for getting information about network
+# interfaces from the kernel. 
+protocol device {
+	scan time 60;
+}
+
+protocol rip {
+        ipv4 {
+                import all;
+                export all;
+        };
+        interface "*";
+}
+EOF
+
+[ $# -gt 0 ] || set -- 10.0.0.1
+
+
+count="0"
+while [ $# -gt 0 ]; do
+
+  count=$(( $count + 1 ))
+
+  neighbor="$1"
+  shift 1
+  if [ "$neighbor" = "--" ]; then
+    break
+  fi
+
+  neighborAS="$1"
+  shift 1
+
+cat >> "/etc/bird/bird$filepostfix.conf" <<EOF
+protocol bgp {
+        #local as 9993;                      # Use a private AS number
+        local as $myas;                      # Use a private AS number
+        #neighbor 10.0.0.1 as 9991;    # Our neighbor ...
+        neighbor $neighbor as $neighborAS;    # Our neighbor ...
+        multihop;                            # ... which is connected indirectly
+        debug all;
+        #export filter {                      # We use non-trivial export rules
+        #        if source = RTS_STATIC then { # Export only static routes
+        #                # Assign our community
+        #                bgp_community.add((65000,64501));
+        #                # Artificially increase path length
+        #                # by advertising local AS number twice
+        #                if bgp_path ~ [= 65000 =] then
+        #                        bgp_path.prepend(65000);
+        #                accept;
+        #        }
+        #        reject;
+        #};
+        ipv4 {
+                import all;
+                export all;
+        };
+        flow4 {
+                 import all;
+                 export all;
+        };
+        ipv6 {
+                import all;
+                export all;
+        };
+        flow6 {
+                 import all;
+                 export all;
+        };
+        #import all;
+        #source address 127.0.0.2;   # Use a non-standard source address
+}
+EOF
+
+if [ "$count" =  1 ]; then
+
+cat >> "/etc/bird/bird$filepostfix.conf" <<EOF
+# Static route feed
+protocol static {
+        ipv4 { export all; };
+        #route 10.0.0.0/24 via 55.55.55.44;
+        #route 10.10.0.0/16 blackhole;
+        #route 10.20.0.0/20 unreachable;
+        #route 10.30.50.0/28 prohibit;
+        route 10.0.$filepostfix.0/24 via 10.0.$filepostfix.254;
+        #route 10.1.12.0/24 via 10.1.12.2;
+        #route 10.1.13.0/24 via 10.1.13.3;
+}
+
+EOF
+
+fi
+
+done
+
+cat >> "/etc/bird/bird$filepostfix.conf" <<EOF
+#protocol bgp {
+#        local as 9993;                      # Use a private AS number
+#        neighbor 10.0.0.2 as 9992;    # Our neighbor ...
+#        multihop;                            # ... which is connected indirectly
+#        #export filter {                      # We use non-trivial export rules
+#        #        if source = RTS_STATIC then { # Export only static routes
+#        #                # Assign our community
+#        #                bgp_community.add((65000,64501));
+#        #                # Artificially increase path length
+#        #                # by advertising local AS number twice
+#        #                if bgp_path ~ [= 65000 =] then
+#        #                        bgp_path.prepend(65000);
+#        #                accept;
+#        #        }
+#        #        reject;
+#        #};
+#        ipv4 {
+#                import all;
+#                export all;
+#        };
+#        #flow4 {
+#        #        #base table "master4";
+#        #        import all;
+#        #         export all;
+#        # };
+#        #source address 127.0.0.2;   # Use a non-standard source address
+#}
+
+#protocol static {
+#        flow4;
+#
+#        route flow4 {
+#                dst 10.0.0.0/8;
+#                port > 24 && < 30 || 40..50,60..70,80 && >= 90;
+#                tcp flags 0x03/0x0f;
+#                length > 1024;
+#                dscp = 63;
+#                fragment dont_fragment, is_fragment || !first_fragment;
+#        };
+#};
+
+EOF
+
+set -e
+#/usr/sbin/bird -p # /run/bird/bird.ctl
+/usr/sbin/bird -c "/etc/bird/bird$filepostfix.conf" -s "/run/bird$filepostfix/bird.ctl" -p
+set +e
+
+chown bird "/var/log/bird$filepostfix" "/var/log/bird$filepostfix/"*
+
+set -x
+set -e
+#exec /usr/sbin/bird -u bird -g bird "$@"
+/usr/sbin/bird -c "/etc/bird/bird$filepostfix.conf" -s "/run/bird$filepostfix/bird.ctl" -P "/run/bird$filepostfix/bird.pid" -u bird -g bird "$@"
+
+#
+
+set +e
+echo "show protocols all bgp1" | birdc -s "/run/bird$filepostfix/bird.ctl"
+echo "show protocols all bgp2" | birdc -s "/run/bird$filepostfix/bird.ctl"
+echo "show route all" | birdc -s "/run/bird$filepostfix/bird.ctl"
+
+

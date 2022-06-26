@@ -1,0 +1,11 @@
+#!/bin/bash
+
+for ctl in /run/bird*/bird.ctl; do 
+  echo 
+  echo "# $ctl:" 
+  #echo -e "show route table flowtab4\nshow route table flowtab6" | birdc -s "$ctl"; 
+  echo -e "show route where (net.type = NET_FLOW4 || net.type = NET_FLOW6) all" | birdc -s "$ctl"; 
+  #echo -e "show route where (net.type = NET_FLOW4 || net.type = NET_FLOW6) all" | birdc -s "$ctl"; 
+  #{ echo -e "show route where (net.type = NET_FLOW4 || net.type = NET_FLOW6) all"; sleep 1; } | socat - unix-connect:"$ctl"
+done
+

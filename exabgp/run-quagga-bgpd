@@ -1,0 +1,28 @@
+#!/bin/bash
+
+cat > /etc/quagga/bgpd.conf <<EOF
+hostname SoftBGP
+password zebra987
+enable password zebra987
+log file /var/log/quagga/bgpd.log
+
+debug bgp events
+debug bgp filters
+debug bgp fsm
+debug bgp keepalives
+debug bgp updates
+
+router bgp 9992
+bgp router-id 10.0.0.2
+bgp log-neighbor-changes
+
+network 10.236.87.0/24
+
+neighbor 10.0.0.1 remote-as 9991 
+neighbor 10.0.0.1 capability dynamic
+neighbor 10.0.0.3 remote-as 9993
+EOF
+
+exec bgpd -f /etc/quagga/bgpd.conf "$@"
+
+

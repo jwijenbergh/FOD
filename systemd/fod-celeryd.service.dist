@@ -17,11 +17,12 @@ WorkingDirectory=/srv/flowspy
 #RuntimeDirectory=yourservice
 #RuntimeDirectoryMode=0755
 
-ExecStart=/srv/flowspy/pythonenv celery -A flowspy worker -B --concurrency=2 -l debug -f logs/celery.log
+ExecStartPre=-/usr/bin/rmdir /var/run/fod/snmppoll.lock
+ExecStart=/srv/flowspy/pythonenv celery -A flowspy worker -B --concurrency=2 -l debug -f /srv/flowspy/log/celery.log
 #PIDFile=/tmp/yourservice.pid
 
-#StandardOutput=./log/celeryd-stderr.log
-#StandardError=./log/celeryd-stderr.log
+StandardOutput=append:/srv/flowspy/log/celeryd-stdout.log
+StandardError=append:/srv/flowspy/log/celeryd-stderr.log
 
 Restart=on-failure
 

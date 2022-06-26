@@ -234,6 +234,10 @@ def poll_snmp_statistics():
       logger.info("poll_snmp_statistics(): get_snmp_stats failed: "+str(e))
       return False
 
+    if False:
+      for id in newdata:
+        logger.info("poll_snmp_statistics(): newdata id="+str(id))
+
     # lock history file access
     success = lock_history_file(wait=1, reason="poll_snmp_statistics()")
     if not success: 

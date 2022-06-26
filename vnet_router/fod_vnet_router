@@ -71,7 +71,8 @@ elif [ "$1" = "--init-snmp" ]; then #arg
     DEBIAN_FRONTEND="noninteractive" apt-get -qqy install snmpd snmp
   fi
 
-  sed -i -e 's/^agentAddress.*$/agentAddress  udp::161/' "/etc/snmp/snmpd.conf"
+  #sed -i -e 's/^agentAddress.*$/agentAddress  udp::161/' "/etc/snmp/snmpd.conf"
+  sed -i -e 's/^agentAddress.*$/agentAddress  0.0.0.0,[::1]/i' "/etc/snmp/snmpd.conf"
 
   if [ -f "/pass_persisttest" ]; then
      # /etc/snmp/snmpd.conf
@@ -213,7 +214,7 @@ elif [ "$1" = "--get_netconf_data" ]; then #arg
 
   if type -p yangcli &>/dev/null; then
   
-    #echo -e "connect server=localhost user=netconf password=netconf\nget-config --source running" | yangcli	  
+    #echo -e "connect server=localhost user=netconf password=netconf\nget-config --source running" | yangcli      
 
     #if type -p mktemp &>/dev/null; then
     #  tmpscript1="$(mktemp)"
@@ -239,7 +240,7 @@ elif [ "$1" = "--get_netconf_data" ]; then #arg
     #echo -e "connect -l netconf -p 830 localhost\nget-config --source running" | sshpass -pnetconf /usr/local/bin/netopeer2-cli
     echo -e "connect -l netconf -p 830 localhost\nget-config --source running" | sshpass -v -PPassword: -pnetconf /usr/local/bin/netopeer2-cli
 
-  fi	  
+  fi      
 
 elif [ "$1" = "--parse_netconf_to_ruleinfo" -o "$1" = "--parse" ]; then #arg
   shift 1
@@ -266,7 +267,7 @@ elif [ "$1" = "--parse_netconf_to_ruleinfo" -o "$1" = "--parse" ]; then #arg
       print "then=" thenaction > "/dev/stderr"
     }
 
-    str = esc1(name) " " (isv6 ? 6 : 4) " "
+    str = esc1(name) " " (isv6 ? "6" : "4" ) " "
     str = str esc1(param["source"]) " " esc1(param["destination"]) " " esc1(param["protocol"]) " " esc1(param["source-port"]) " " esc1(param["destination-port"]) " " esc1(param["fragment"])
     str = str " " thenaction
 
@@ -302,11 +303,11 @@ elif [ "$1" = "--parse_netconf_to_ruleinfo" -o "$1" = "--parse" ]; then #arg
   match1==1 && /<[a-z]+/ { 
     if ($2=="prefix") {
       if (last_parameter_key=="source" || last_parameter_key=="destination") {
-	isv6=1
+        isv6=1
         #param[last_parameter_key] = (param[last_parameter_key]=="") ? $3 : (param[last_parameter_key] "," $3);     
         param[last_parameter_key] = $3 
       } else {
-	print "error last_parameter_key=" last_parameter_key  > "/dev/stderr"
+        print "error last_parameter_key=" last_parameter_key  > "/dev/stderr"
       }
     } else {
       param[$2] = (param[$2]=="") ? $3 : (param[$2] "," $3); 
@@ -330,19 +331,124 @@ elif [ "$1" = "--filter-ruleinfo-unique" ]; then
     {
       line=$0
       name=$1
-      $1=""
+      #$1=""
       key=$0
       if (!seen[key]) {
         print line
-	seen[key]=name
+        seen[key]=name
       } else {
         print "skipping duplicate rule (already_existing_name=" seen[key] "): " line > "/dev/stderr"
       }
     }
   ' 
 
+elif [ "$1" = "--ruleinfo_to_exabgp_flow_params" ]; then #arg
+  shift 1
+  offset="$1" #arg
+  shift 1
+
+  [ -n "$offset" ] || offset="0"
+
+  exec awk '
+
+    function get_exabgp_protocol_spec(protocols) {
+      ret = ""
+      if (protocols=="-") {
+        return ret
+      }
+
+      n = split(protocols, a1, /,/) 
+      for (i=1; i<=n; i++) {
+        ret = get " =" a1[i]
+      }
+
+      return ret
+    }
+
+    function get_exabgp_port_spec(source_ports) {
+
+      #print "get_exabgp_port_spec() source_ports=" source_ports > "/dev/stderr"
+
+      ret = ""
+      if (source_ports=="-") {
+        return ret
+      }
+      
+      n = split(source_ports, a1, /,/) 
+      for (i=1; i<=n; i++) {
+        port_exabgp = a1[i]
+        if (match(port_exabgp, /([^-]+)-([^-]+)/, a2)) {
+          port_exabgp = ">=" a2[1] "&<=" a2[2]
+        } else {
+          port_exabgp = "=" port_exabgp 
+        }
+        ret = ret " " port_exabgp
+      } 
+
+       return ret
+    }  
+
+    function get_exabgp_frag_spec(fragment_options) {
+
+      ret = ""
+      if (fragment_options=="-") {
+        return ret
+      }
+      
+      ret = fragment_options
+      gsub(/,/, " ", ret) 
+
+      return ret
+    }
+
+    #$2=="bgpflowspec"
+    {
+      #offset=4
+      rulename=$(offset + 1) # not used
+      ipversion=$(offset + 2) # not used
+      source=$(offset + 3)
+      destination=$(offset + 4)
+      protocols=$(offset + 5)
+      source_ports=$(offset + 6)
+      destination_ports=$(offset + 7)
+      fragment_options=$(offset + 8)
+      tcpoptions=$(offset + 9) # TODO
+      then=$(offset + 9)    
+  
+      protocols_exabgp = get_exabgp_protocol_spec(protocols) 
+      source_ports_exabgp = get_exabgp_port_spec(source_ports)
+      destination_ports_exabgp = get_exabgp_port_spec(destination_ports)
+      fragment_options_exabgp = get_exabgp_frag_spec(fragment_options)
+
+      then_exabgp = then
+      gsub(/discard-/, "discard", then_exabgp)
+      gsub(/rate-limit-/, "rate-limit ", then_exabgp)
+      gsub(/k$/, "", then_exabgp)
+
+      #print "flow route source " source " destination " destination " protocol [" protocols_exabgp " ] source-port [" source_ports_exabgp " ] destination-port [" destination_ports_exabgp " ] packet-length [ =777 =1122 ] fragment [ is-fragment dont-fragment ] rate-limit 1024 "
+      print "flow route source " source " destination " destination " protocol [" protocols_exabgp " ] source-port [" source_ports_exabgp " ] destination-port [" destination_ports_exabgp " ] fragment [ " fragment_options_exabgp " ] " then_exabgp
+    }
+  ' offset="$offset"
+
 elif [ "$1" = "--process_ruleinfo" ]; then #arg
   shift 1
+
+  use_ovs=1
+  if [ -f "/noovs" ]; then 
+    use_ovs=0
+  fi
+
+  also_use_exabgp=0
+  if type -p exabgpcli &>/dev/null && pgrep exabgp &>/dev/null; then
+    #echo "exabgp seems to be installed and running, also_use_exabgp" 1>&2
+    also_use_exabgp=1
+  fi
+  #also_use_exabgp=0
+
+  echo 1>&2
+  echo "$0: process_ruleinfo use_ovs=$use_ovs also_use_exabgp=$also_use_exabgp" 1>&2
+
+  ##
 
   state_file0="/fod_vnet_router.state"
   state_file="$state_file0.$$"
@@ -353,11 +459,51 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
   #  (set -x; ovs-ofctl del-flows "$bridge")
   #done
 
-  "$0" --filter-ruleinfo-unique | \
+  dir1="/var/run"
+  touch "$dir1/.$$"
+
+  #declare -A rule_active
+
+  "$0" --filter-ruleinfo-unique | tr '\r' '\n' | grep -v "^ *$" | \
   while read -r name ipversion source destination protocol source_ports destination_ports fragment_options then rest; do
+    #echo "name=$name ipversion=$ipversion source=$source ..." 1>&2
+ 
+    bgp_params1="$name $ipversion $source $destination $protocol $source_ports $destination_ports $fragment_options $then" 
 
     md5sum="$(printf "%s" "$name" | md5sum)"
     cookie="${md5sum:0:16}"
+ 
+    if [ "$also_use_exabgp" = 1 ]; then #exabgp
+
+      #echo "$0: TODO exabgp $name $ipversion $source $destination $protocol $source_ports $destination_ports $fragment_options $then $rest" 1>&2
+
+      bgpruleparams="$ipversion $source $destination $protocol $source_ports $destination_ports $fragment_options $then"
+      md5sum_params="$(printf "%s" "$bgpruleparams" | md5sum | cut -d ' ' -f 1)"
+      rule_touchfile="/var/run/rule-$md5sum_params"
+
+      exabgpcli_flow_params=($(printf "%s" "$bgp_params1" | "$0" --ruleinfo_to_exabgp_flow_params))
+      #echo "exabgpcli_flow_params=${exabgpcli_flow_params[*]}" 1>&2
+
+      #rule_active["$md5sum_params"]=1
+
+      if [ -e "$rule_touchfile" ]; then
+        #echo "rule bgpruleparams=$bgpruleparams | exabgpcli_flow_params=${exabgpcli_flow_params[*]} (md5sum_params=$md5sum_params) is already bgp installed" 1>&2 
+        echo "rule bgpruleparams=$bgpruleparams exabgpcli_flow_params=${exabgpcli_flow_params[*]} (md5sum_params=$md5sum_params) is already bgp installed" 1>&2 
+        touch "$rule_touchfile" 1>&2
+      else
+        echo "rule bgpruleparams=$bgpruleparams exabgpcli_flow_params=${exabgpcli_flow_params[*]} (md5sum=$md5sum_params) to be bgp installed" 1>&2 
+        echo "$bgp_params1" > "$rule_touchfile"
+
+        #echo exabgpcli announce flow route source $source destination $destination protocol [ =$protocol ] source-port [ =53 ] destination-port [ =80 ] packet-length [ =777 =1122 ] fragment [ is-fragment dont-fragment ] rate-limit 1024 
+        (set -x; exabgpcli announce "${exabgpcli_flow_params[@]}" < /dev/null) 1>&2
+        exabgpcli_status="$?"
+        echo "announce exabgpcli_status=$exabgpcli_status" 1>&2
+
+      fi
+
+  fi # !exabgp
+  
+  if [ "$use_ovs" = 1 ]; then
 
     proto="ip"
     address_pre="nw_"
@@ -410,19 +556,19 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
       if [ "$fragment_options" != "-" ]; then
         #  ip_frag = no yes first later not_later
         case "$fragment_options" in
-	    is-fragment,last-fragment|last-fragment) add1="$add1" ;;
-	    *) ;;
-	esac
+            is-fragment,last-fragment|last-fragment) add1="$add1" ;;
+            *) ;;
+        esac
       fi
 
       if [ "$flow_exists" = 0 ]; then
         (set -x; ovs-ofctl add-flow "$bridge" "cookie=0x$cookie,priority=1,table=0,$proto,${address_pre}src=$source,${address_pre}dst=$destination${add1},actions=drop")
-	echo "name=$name add-flow (1) status=$?" 1>&2
-	ovs-ofctl dump-flows "$bridge" 1>&2
+        echo "name=$name add-flow (1) status=$?" 1>&2
+        ovs-ofctl dump-flows "$bridge" 1>&2
       else 
         (set -x; ovs-ofctl mod-flows "$bridge" "cookie=0x$cookie/-1,priority=1,table=0,$proto,${address_pre}src=$source,${address_pre}dst=$destination${add1},actions=drop")
         echo "name=$name mod-flow status=$?" 1>&2
-	ovs-ofctl dump-flows "$bridge" 1>&2
+        ovs-ofctl dump-flows "$bridge" 1>&2
       fi
    
     done
@@ -430,11 +576,41 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
     counter_values="$("$0" --get_counters_for_rule "$cookie")";
     echo "name=$name counter_values=$counter_values" 1>&2
 
-    echo "0x$cookie bgpflowspec $counter_values $name $source $destination $protocol $protocol_num $source_ports $destination_ports $fragment_options $then" >> "$state_file"
+  fi #endof !exabgp
+  
+  [ -n "$counter_values" ] || counter_values="- -"
 
-  done
+  echo "0x$cookie bgpflowspec $counter_values $name $source $destination $protocol $protocol_num $source_ports $destination_ports $fragment_options $then" >> "$state_file"
+
+  done # end while rule info read
 
   ##
+
+  if [ "$also_use_exabgp" = 1 ]; then #exabgp
+
+      (shopt -s nullglob; cd "$dir1" && for file1 in rule-*; do
+        md5sum_params="${file1#rule-}"
+        #echo "exabgp rule state file: md5sum_params=$md5sum_params" 1>&2
+        #stat "$dir1/.$$" "$file1" 1>&2
+        if [ ! "$dir1/.$$" -nt "$file1" ]; then
+          echo "active exabgp rule md5sum_params=$md5sum_params" 1>&2
+        else      
+          exabgpcli_flow_params=($(cat "$file1" | "$0" --ruleinfo_to_exabgp_flow_params))
+          echo "to deactivate exabgp rule exabgpcli_flow_params=${exabgpcli_flow_params[*]} (md5sum_params=$md5sum_params)" 1>&2
+
+          (set -x; exabgpcli withdraw "${exabgpcli_flow_params[@]}" < /dev/null) 1>&2
+          exabgpcli_status="$?"
+          echo "withdraw exabgpcli_status=$exabgpcli_status" 1>&2
+
+          rm -fv "rule-$md5sum_params" 1>&2
+        fi
+      done)
+
+      rm -f "$dir1/.$$"
+
+  fi #! exabgp
+
+  if [ "$use_ovs" = 1 ]; then
 
   name="XXXX Test XXXX"
   md5sum="$(printf "%s" "$name" | md5sum)"
@@ -457,6 +633,7 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
 
     ovs-ofctl dump-flows "$bridge"
 
+
   done
   
   echo "0x$cookie default" >> "$state_file"
@@ -475,6 +652,8 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
     done
     ovs-ofctl dump-flows "$bridge" 1>&2
   done
+    
+  fi #endof !exabgp
 
   ##
 
