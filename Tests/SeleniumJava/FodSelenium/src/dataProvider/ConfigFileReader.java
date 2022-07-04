@@ -76,4 +76,22 @@ public class ConfigFileReader {
 		 if(ruleName != null) return ruleName;
 		 else throw new RuntimeException("rule Name not specified in the Configuration.properties file.");
 		 }
+	 
+	 public String getSQLURL() {
+		 String SQLURL = properties.getProperty("SQLURL");
+		 if(SQLURL != null) return SQLURL;
+		 else throw new RuntimeException("SQLURL not specified in the Configuration.properties file.");
+		 }
+	 
+	 public String getSQLUsr() {
+		 String SQLUsr = properties.getProperty("SQLUsr");
+		 if(SQLUsr != null) return SQLUsr;
+		 else throw new RuntimeException("SQLUsr not specified in the Configuration.properties file.");
+		 }
+	 
+	 public String getSQLPass() {
+		 String SQLPass = properties.getProperty("SQLPass");
+		 if(SQLPass != null) return SQLPass;
+		 else throw new RuntimeException("SQLPass not specified in the Configuration.properties file.");
+		 }
 }

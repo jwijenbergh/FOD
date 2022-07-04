@@ -3,6 +3,11 @@ package test.java.Tests;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.concurrent.TimeUnit;
 import dataProvider.ConfigFileReader;
 import org.openqa.selenium.By;
@@ -15,6 +20,8 @@ import org.testng.annotations.Test;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.AfterClass;
 
+
+
 public class SetupTest {
 
         static WebDriver driver;
@@ -22,6 +29,30 @@ public class SetupTest {
         static String url;
         
         static ConfigFileReader configFileReader = new ConfigFileReader();
+        
+        public static void DeleteData() throws SQLException {
+        	Connection con=DriverManager.getConnection(  
+        			configFileReader.getSQLURL(),configFileReader.getSQLUsr(),configFileReader.getSQLPass());  
+            String query = "delete from route where name like \"testui%\";";
+            try (Statement stmt = con.createStatement()) {
+              ResultSet rs = stmt.executeQuery(query);
+             
+            } catch (SQLException e) {
+            	//SetupTest.printSQLException(e);
+            }
+          }
+        
+        public static void AddRulesData() throws SQLException {
+        	Connection con=DriverManager.getConnection(  
+        			configFileReader.getSQLURL(),configFileReader.getSQLUsr(),configFileReader.getSQLPass());  
+            String query = "insert into route (name, destination, source, status, filed, last_updated, expires, applier_id) values (\"testui4\", \"1.0.0.4/32\", \"0.0.0.0\", \"INACTIVE\", \"2022-01-19 12:38:08.000\", \"2022-01-19 12:38:08.000\", \"2022-01-19\", 1), (\"testui3\", \"1.0.0.4/32\", \"0.0.0.0\", \"ACTIVE\", \"2022-01-19 12:38:08.000\", \"2022-01-19 12:38:08.000\", \"2022-01-19\", 1), (\"testui1\", \"1.0.0.4/32\", \"0.0.0.0\", \"PENDING\", \"2022-01-19 12:38:08.000\", \"2022-01-19 12:38:08.000\", \"2022-01-19\", 1), (\"testui1\", \"1.0.0.4/32\", \"0.0.0.0\", \"ERROR\", \"2022-01-19 12:38:08.000\", \"2022-01-19 12:38:08.000\", \"2022-01-19\", 1);";
+            try (Statement stmt = con.createStatement()) {
+              ResultSet rs = stmt.executeQuery(query);
+             
+            } catch (SQLException e) {
+            	//SetupTest.printSQLException(e);
+            }
+          }
 
 	@Test
 	public static void OnlyPassword() 
@@ -1269,10 +1300,11 @@ public class SetupTest {
 
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException {
 
                 testSetUp();
-
+        DeleteData();
+        AddRulesData();
 		OnlyPassword();
 		OnlyNotSavePassword();
 		OnlyRouterHost();
