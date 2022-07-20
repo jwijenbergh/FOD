@@ -9,9 +9,9 @@ docker build -f ./Dockerfiles.d/Dockerfile.seleniumcli.debian.base -t seleniumcl
 
 # 2. run selenium container
 
-docker run -ti --privileged -e=FOD_IP=172.17.0.2 -e=FOD_PORT=8000 -e=FOD_USER=admin -e=FOD_PWD="blabla" seleniumcli.debian make runtest1 # to start fully automated
+docker run -ti --privileged -w=/srv/flowspy/Tests/SeleniumJava/FodSelenium -e=FOD_IP=172.17.0.2 -e=FOD_PORT=8000 -e=FOD_USER=admin -e=FOD_PWD="blabla" seleniumcli.debian make runtest1 # to start fully automated # adapt values of FOD_IP, FOD_PORT, FOD_USER, FOD_PWD accordingly to your FoD container
 
-docker run -ti --privileged seleniumcli.debian bash # to start for manual testing inside
+docker run -ti --privileged -w=/srv/flowspy/Tests/SeleniumJava/FodSelenium -e=FOD_IP=172.17.0.2 -e=FOD_PORT=8000 -e=FOD_USER=admin -e=FOD_PWD="blabla" seleniumcli.debian bash # to start for manual testing inside : inside you can run e.g. "make runtest1"
 
 
 # 3. (optional) vnc read-only access (to monitor chromium controlled by Selnium):
