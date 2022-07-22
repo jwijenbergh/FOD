@@ -1,0 +1,23 @@
+
+(all docker commands below run from FoD top-level directory)
+
+
+# 1. build selenium container (in 2 steps)
+docker build -f ./Dockerfiles.d/Dockerfile.seleniumcli.debian.base -t seleniumcli.debian.base . && docker build -f ./Dockerfiles.d/Dockerfile.seleniumcli.debian.step2 -t seleniumcli.debian .
+
+
+
+# 2. run selenium container
+
+docker run -ti --privileged -w=/srv/flowspy/Tests/SeleniumJava/FodSelenium -e=FOD_IP=172.17.0.2 -e=FOD_PORT=8000 -e=FOD_USER=admin -e=FOD_PWD="blabla" seleniumcli.debian make runtest1 # to start fully automated # adapt values of FOD_IP, FOD_PORT, FOD_USER, FOD_PWD accordingly to your FoD container
+
+docker run -ti --privileged -w=/srv/flowspy/Tests/SeleniumJava/FodSelenium -e=FOD_IP=172.17.0.2 -e=FOD_PORT=8000 -e=FOD_USER=admin -e=FOD_PWD="blabla" seleniumcli.debian bash # to start for manual testing inside : inside you can run e.g. "make runtest1"
+
+
+# 3. (optional) vnc read-only access (to monitor chromium controlled by Selnium):
+
+# during "make runtest1" is running:
+# if you have TightVNC under linux 
+vncviewer -via IP_OF_SERVER__WHERE_DOCKER_CONTAINERS_RUN -viewonly IP_OF_SELENIUM_CONTAINER:0 # replace IP_OF_SELENIUM_CONTAINER with IP of your server (ssh access needs to work from local machine) and IP_OF_SELENIUM_CONTAINER with selenium container IP (find ou e.g. by "docker ps" to find out SELENIUM_CONTAINER_ID and "docker inspect SELENIUM_CONTAINER_ID")
+
+
