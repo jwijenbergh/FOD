@@ -1303,8 +1303,8 @@ public class SetupTest {
 	public static void main(String[] args) throws SQLException {
 
                 testSetUp();
-        DeleteData();
-        AddRulesData();
+        //DeleteData();
+        //AddRulesData();
 		OnlyPassword();
 		OnlyNotSavePassword();
 		OnlyRouterHost();
