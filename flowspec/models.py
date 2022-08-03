@@ -689,7 +689,7 @@ class Route(models.Model):
             #logger.info("containing_peer_ranges(): peers all="+str(PeerRange.objects.all()))
             #containing_peer_ranges = PeerRange.objects.filter(network__contains(destination_network))
             #containing_peer_ranges = [obj for obj in PeerRange.objects.all() if ip_network(obj.network).__contains__(destination_network)]
-            containing_peer_ranges = [obj for obj in PeerRange.objects.all() if ip_network(obj.network).network_address <= destination_network.network_address and ip_network(obj.network).broadcast_address >= destination_network.broadcast_address ]
+            containing_peer_ranges = [obj for obj in PeerRange.objects.all() if destination_network.version==ip_network(obj.network).version and ip_network(obj.network).network_address <= destination_network.network_address and ip_network(obj.network).broadcast_address >= destination_network.broadcast_address ]
             logger.info("containing_peer_ranges(): containing_peer_ranges="+str(containing_peer_ranges))
         except Exception as e:
             logger.info("containing_peer_ranges(): exception occured: "+str(e))
