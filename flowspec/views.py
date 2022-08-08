@@ -191,6 +191,7 @@ def group_routes_ajax(request):
         ivaltrees_per_version = flowspec.iprange_match.build_ival_trees_per_ipversion(request.user)
         all_routes = Route.objects.all()
         all_group_routes = convert_container_to_queryset(flowspec.iprange_match.filter_rules_by_ivaltree(ivaltrees_per_version, all_routes), Route)
+        #logger.info("views::group_routes_ajax(): => all_group_routes="+str(all_group_routes))
 
     jresp = {}
     routes = build_routes_json(ivaltrees_per_version, all_group_routes, request.user, request.user.is_superuser)
@@ -298,7 +299,9 @@ def build_routes_json(ivaltrees_per_version, groutes, user, is_superuser):
             #except UserProfile.DoesNotExist:
             #    rd['peer'] = ''
 
-            rd['peer'] = flowspec.iprange_match.get_matching_related_peer_for_rule_destination(ivaltrees_per_version, r)
+            (rd['peer'], is_route_applier_related) = flowspec.iprange_match.get_matching_related_peer_for_rule_destination(ivaltrees_per_version, r)
+            if not is_route_applier_related:
+              rd['peer']=rd['peer']+"*"
 
         rd['filed'] = "%s" % r.filed.strftime("%F %T")
         if r.last_updated!=None:

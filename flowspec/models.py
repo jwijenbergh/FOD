@@ -287,7 +287,7 @@ class Route(models.Model):
         #        if ip_network(self.destination, strcit=False) in net:
         #            username = peer
         #            break
-        username = find_matching_peer_by_ipprefix__simple(peers, route.destination)
+        username = find_matching_peer_by_ipprefix__simple(peers, self.destination)
 
         if username:
             peer = username.peer_tag
