@@ -90,6 +90,7 @@
     <script src="{% static 'js/dataTableslatest/dataTables.bootstrap.js' %}"></script>
 
     {% if user.is_authenticated %}
+
 <script type="text/javascript" src="{% url 'load-js' 'pollerdash' %}"></script>
 {% endif %}
 
@@ -101,81 +102,97 @@ var filterbtns = '<div class="btn-group col-centered">\
     <a type="button" class="btn btn-outline btn-sm btn-default" name="status_filter" value="DEACTIVATED" id="show_deactivated">DEACTIVATED</a>\
     </div>';
 
-
-$.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallback, bStandingRedraw )
-{
-    bStandingRedraw = true
-
-    // DataTables 1.10 compatibility - if 1.10 then versionCheck exists.
-    // 1.10s API has ajax reloading built in, so we use those abilities
-    // directly.
-    if ( $.fn.dataTable.versionCheck ) {
-	try {
-        var api = new $.fn.dataTable.Api( oSettings );
-
-        if ( sNewSource ) {
-            api.ajax.url( sNewSource ).load( fnCallback, !bStandingRedraw );
-        }
-        else {
-            api.ajax.reload( fnCallback, !bStandingRedraw );
-        }
-        return;
-	} catch (e) {
-		console.log("Error: " + e);
-		return;
-	}
-    }
-
-    if ( sNewSource !== undefined && sNewSource !== null ) {
-        oSettings.sAjaxSource = sNewSource;
-    }
-
-    // Server-side processing should just call fnDraw
-    if ( oSettings.oFeatures.bServerSide ) {
-        this.fnDraw();
-        return;
-    }
-
-    this.oApi._fnProcessingDisplay( oSettings, true );
-    var that = this;
-    var iStart = oSettings._iDisplayStart;
-    var aData = [];
-
-    this.oApi._fnServerParams( oSettings, aData );
-
-    oSettings.fnServerData.call( oSettings.oInstance, oSettings.sAjaxSource, aData, function(json) {
-        /* Clear the old information from the table */
-        that.oApi._fnClearTable( oSettings );
-
-        /* Got the data - add it to the table */
-        var aData =  (oSettings.sAjaxDataProp !== "") ?
-            that.oApi._fnGetObjectDataFn( oSettings.sAjaxDataProp )( json ) : json;
-
-        for ( var i=0 ; i<aData.length ; i++ )
-        {
-            that.oApi._fnAddData( oSettings, aData[i] );
-        }
-
-        oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
-
-        that.fnDraw();
-
-        if ( bStandingRedraw === true )
-        {
-            oSettings._iDisplayStart = iStart;
-            that.oApi._fnCalculateEnd( oSettings );
-            that.fnDraw( false );
-        }
-
-        that.oApi._fnProcessingDisplay( oSettings, false );
-
-        /* Callback user function - for event handlers etc */
-        if ( typeof fnCallback == 'function' && fnCallback !== null )
-        {
-            fnCallback( oSettings );
-        }
-    }, oSettings );
-};
+//var request_in_progress = 0
+//var is_first_request = 1
+//
+//$.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallback, bStandingRedraw )
+//{
+//    console.log("fnReloadAjax(): start request_in_progress="+request_in_progress+" sNewSource="+sNewSource+"\n")
+//
+//    if (request_in_progress>0) {
+//      console.log("Warn: fnReloadAjax: skipping reload, as another request is still in progress (request_in_progress="+request_in_progress+")\n")
+//      return 
+//    }
+//
+//    request_in_progress++
+//    console.log("request_in_progress="+request_in_progress+"\n")
+//
+//    //
+//
+//    bStandingRedraw = true
+//
+//    // DataTables 1.10 compatibility - if 1.10 then versionCheck exists.
+//    // 1.10s API has ajax reloading built in, so we use those abilities
+//    // directly.
+//    if ( $.fn.dataTable.versionCheck ) {
+//      try {
+//        var api = new $.fn.dataTable.Api( oSettings );
+//
+//        if ( sNewSource ) {
+//          api.ajax.url( sNewSource ).load( fnCallback, !bStandingRedraw );
+//        } else {
+//          api.ajax.reload( fnCallback, !bStandingRedraw );
+//        }
+//        request_in_progress--
+//        return;
+//      } catch (e) {
+//        console.log("Error: " + e);
+//        request_in_progress--
+//        return;
+//      }
+//    }
+//
+//    if ( sNewSource !== undefined && sNewSource !== null ) {
+//      oSettings.sAjaxSource = sNewSource;
+//    }
+//
+//    // Server-side processing should just call fnDraw
+//    if ( oSettings.oFeatures.bServerSide ) {
+//      this.fnDraw();
+//      request_in_progress--
+//      return;
+//    }
+//
+//    this.oApi._fnProcessingDisplay( oSettings, true );
+//    var that = this;
+//    var iStart = oSettings._iDisplayStart;
+//    var aData = [];
+//
+//    this.oApi._fnServerParams( oSettings, aData );
+//
+//    oSettings.fnServerData.call( oSettings.oInstance, oSettings.sAjaxSource, aData, function(json) {
+//        /* Clear the old information from the table */
+//        that.oApi._fnClearTable( oSettings );
+//
+//        /* Got the data - add it to the table */
+//        var aData =  (oSettings.sAjaxDataProp !== "") ?
+//            that.oApi._fnGetObjectDataFn( oSettings.sAjaxDataProp )( json ) : json;
+//
+//        for ( var i=0 ; i<aData.length ; i++ )
+//        {
+//            that.oApi._fnAddData( oSettings, aData[i] );
+//        }
+//
+//        oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
+//
+//        that.fnDraw();
+//
+//        if ( bStandingRedraw === true )
+//        {
+//            oSettings._iDisplayStart = iStart;
+//            that.oApi._fnCalculateEnd( oSettings );
+//            that.fnDraw( false );
+//        }
+//
+//        that.oApi._fnProcessingDisplay( oSettings, false );
+//
+//        /* Callback user function - for event handlers etc */
+//        if ( typeof fnCallback == 'function' && fnCallback !== null )
+//        {
+//            fnCallback( oSettings );
+//        }
+//    }, oSettings );
+//};
 $.fn.dataTable.ext.errMode = 'throw';
 var oTable;
 var start;
@@ -226,7 +243,8 @@ $(document).ready( function(){
                                     url: delurl,
                                     cache: false,
                                     success: function(data) {
-                                     oTable.fnReloadAjax(refreshUrl);
+                                      //oTable.fnReloadAjax(refreshUrl);
+                                      $('#routes_table').DataTable().ajax.reload();
                                     }
                                 });
                                 $( this ).dialog( "close" );
@@ -253,7 +271,8 @@ $(document).ready( function(){
                                     url: delurl,
                                     cache: false,
                                     success: function(data) {
-                                     oTable.fnReloadAjax(refreshUrl);
+                                      //oTable.fnReloadAjax(refreshUrl);
+                                      $('#routes_table').DataTable().ajax.reload();
                                     }
                                 });
                                 $( this ).dialog( "close" );
@@ -402,6 +421,10 @@ $(document).ready( function(){
 
          ]
 } );
+
+//console.log("init: oTable="+oTable);
+//console.log("init: ajax2="+$('#routes_table').DataTable().ajax);
+
 $('#filterplaceholder').html(filterbtns);
 
 
@@ -429,6 +452,19 @@ $('#filterplaceholder').html(filterbtns);
     clearTimeout(window.refresh_size);
     window.refresh_size = setTimeout(function() { update_size(); }, 250);
   });
+
+/*lock1=false
+setInterval(function() {
+  if (lock1) {
+    console.log("skipping updating routes tables, as prior request is still in progress")
+  } else {
+    lock1=true
+    console.log("updating routes tables")
+    $('#routes_table').DataTable().ajax.reload();
+    console.log("done with updating routes tables")
+    lock1=false
+  }
+}, 45000); */
 
 var update_size = function() {
     $(oTable).css({ width: $(oTable).parent().width() });
