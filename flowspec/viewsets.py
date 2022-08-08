@@ -6,6 +6,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from rest_framework import viewsets
 from flowspec.models import Route, ThenAction, FragmentType, MatchProtocol, MatchDscp
+from flowspec.models import convert_container_to_queryset
 
 from flowspec.serializers import (
     RouteSerializer,
@@ -55,7 +56,7 @@ class RouteViewSet(viewsets.ModelViewSet):
         except Exception as e: 
           logger.info("RouteViewSet::get_queryset(): got exception e="+str(e))
           return convert_container_to_queryset([], Route)
-        logger.info("RouteViewSet::get_queryset(): user="+str(user))
+        #logger.info("RouteViewSet::get_queryset(): user="+str(user))
 
         if scope == "applier":
             return convert_container_to_queryset(self.get_users_routes_by_applier_only(user), Route)
@@ -294,17 +295,6 @@ class StatsRoutesViewSet(viewsets.ViewSet):
 
 #############################################################################
 #############################################################################
-# global helpers 
-
-# class1's attribute 'id' should be existing and be the primary key, e.g., be a Django model class
-def convert_container_to_queryset(list1, class1):
-         #temp1_ids = [obj.id for obj in list1]
-         temp1_ids = [obj.id for obj in list1 if obj != None]
-         temp2_ids = set(temp1_ids)
-         return class1.objects.filter(id__in=temp2_ids)
-
-#############################################################################
-#############################################################################
 
 def global__get_users_routes_all(user):
          routes1=global__get_users_routes_by_its_peers(user)
@@ -316,11 +306,30 @@ def global__get_users_routes_all(user):
 # all these following functions return normal containers, not particular query sets
 # if needed convert them back to query sets by convert_container_to_queryset
 def global__get_users_routes_by_its_peers(user):
-        users_peers_set = set(user.userprofile.peers.all())
+        #users_peers_set = set(user.userprofile.peers.all())
+        users_peers = list(user.userprofile.peers.all())
+        users_peer_ranges0 = [peer.networks.all() for peer in users_peers]
+
+        # flatten list of lists
+        users_peer_ranges = []
+        for sub_list in users_peer_ranges0:
+           users_peer_ranges += sub_list
+
+        users_peer_ranges = list(set(users_peer_ranges)) # make elements unique
+
+        logger.info("viewsets::global__get_users_routes_by_its_peers(): users_peer_ranges="+str(users_peer_ranges))
+
+        #
+
         routes_all = list(Route.objects.filter())
         #routes_all = list(Route.objects)
         #temp1 = [obj for obj in routes_all]
-        temp1 = [obj for obj in routes_all if len(set(obj.containing_peers()).intersection(users_peers_set))>0]
+
+        # has bad perf:
+        #temp1 = [obj for obj in routes_all if len(set(obj.containing_peers()).intersection(users_peers_set))>0]
+
+        temp1 = [obj for obj in routes_all if len(obj.containing_ip_networks(users_peer_ranges))>0]
+        
         return temp1
 
 def global__get_users_routes_by_applier_only(user):

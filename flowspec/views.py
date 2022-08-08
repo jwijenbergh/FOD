@@ -39,6 +39,8 @@ from django.forms.models import model_to_dict
 
 from flowspec.forms import *
 from flowspec.models import *
+from flowspec.model_utils import convert_container_to_queryset
+
 from peers.models import *
 
 from django_registration.backends.activation.views import RegistrationView
@@ -52,6 +54,10 @@ from django.core.exceptions import PermissionDenied
 from flowspec.helpers import send_new_mail, get_peer_techc_mails
 import datetime
 import os
+
+import flowspec.iprange_match
+
+##
 
 LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'views.log')
 # FORMAT = '%(asctime)s %(levelname)s: %(message)s'
@@ -171,15 +177,23 @@ def group_routes_ajax(request):
             'error.html',
             {'error': error}
         )
+
+    ivaltrees_per_version=None
     if request.user.is_superuser:
         all_group_routes = Route.objects.all()
     else:
-        query = Q()
-        for peer in peers:
-            query |= Q(applier__userprofile__in=peer.user_profile.all())
-        all_group_routes = Route.objects.filter(query)
+        #filter_router_based_on_applier # easy, biut incomplete
+        #if filter_router_based_on_applier:
+        #  query = Q()
+        #  for peer in peers:
+        #    query |= Q(applier__userprofile__in=peer.user_profile.all())
+        #  all_group_routes = Route.objects.filter(query)
+        ivaltrees_per_version = flowspec.iprange_match.build_ival_trees_per_ipversion(request.user)
+        all_routes = Route.objects.all()
+        all_group_routes = convert_container_to_queryset(flowspec.iprange_match.filter_rules_by_ivaltree(ivaltrees_per_version, all_routes), Route)
+
     jresp = {}
-    routes = build_routes_json(all_group_routes, request.user.is_superuser)
+    routes = build_routes_json(ivaltrees_per_version, all_group_routes, request.user, request.user.is_superuser)
     jresp['aaData'] = routes
     return HttpResponse(json.dumps(jresp), content_type='application/json')
 
@@ -194,25 +208,43 @@ def overview_routes_ajax(request):
     except UserProfile.DoesNotExist:
         error = "User <strong>%s</strong> does not belong to any peer or organization. It is not possible to create new firewall rules.<br>Please contact Helpdesk to resolve this issue" % request.user.username
         return render(request, 'error.html', {'error': error})
-    query = Q()
-    for peer in peers:
-        query |= Q(applier__userprofile__in=peer.user_profile.all())
-    all_group_routes = Route.objects.filter(query)
+
+    ivaltrees_per_version=None
     if request.user.is_superuser or request.user.has_perm('accounts.overview'):
         all_group_routes = Route.objects.all()
+    else:
+      #filter_router_based_on_applier # easy, biut incomplete
+      #if filter_router_based_on_applier:
+      #query = Q()
+      #for peer in peers:
+      #  query |= Q(applier__userprofile__in=peer.user_profile.all())
+      #all_group_routes = Route.objects.filter(query)
+      ivaltrees_per_version = flowspec.iprange_match.build_ival_trees_per_ipversion(request.user)
+      all_routes = Route.objects.all()
+      all_group_routes = convert_container_to_queryset(flowspec.iprange_match.filter_rules_by_ivaltree(ivaltrees_per_version, all_routes), Route)
+
     jresp = {}
-    routes = build_routes_json(all_group_routes, request.user.is_superuser)
+    routes = build_routes_json(ivaltrees_per_version, all_group_routes, request.user, request.user.is_superuser)
     jresp['aaData'] = routes
     return HttpResponse(json.dumps(jresp), content_type='application/json')
 
-def build_routes_json(groutes, is_superuser):
+def build_routes_json(ivaltrees_per_version, groutes, user, is_superuser):
+  #logger.info("views::build_routes_json(): start")
+  try:
+
+    if ivaltrees_per_version==None:
+      ivaltrees_per_version = flowspec.iprange_match.build_ival_trees_per_ipversion(user)
+
     routes = []
+
+    count1=0
     for r in groutes.prefetch_related(
             'applier',
             'fragmenttype',
             'protocol',
             'dscp',
     ):
+        count1=count1+1
         rd = {}
         rd['id'] = r.pk
         rd['port'] = r.port
@@ -243,20 +275,30 @@ def build_routes_json(groutes, is_superuser):
             rd['applier'] = 'unknown'
             rd['peer'] = ''
         else:
-            peers = r.applier.userprofile.peers.select_related()
-            username = None
-            for peer in peers:
-                if username:
-                    break
-                for network in peer.networks.all():
-                    net = ip_network(network)
-                    if ip_network(r.destination) in net:
-                        username = peer.peer_name
-                        break
-            try:
-                rd['peer'] = username
-            except UserProfile.DoesNotExist:
-                rd['peer'] = ''
+            #peers = r.applier.userprofile.peers.select_related()
+            #username = None
+            #for peer in peers:
+            #    if username:
+            #        break
+            #    count=0
+            #    for network in peer.networks.all():
+            #        count=count+1
+            #        if count%5000==1:
+            #          #logger.info("views::build_routes_json(): r="+str(r)+" peer="+str(peer)+" count="+str(count)+" r.destination="+str(r.destination)+" network="+str(network))
+            #          logger.info("views::build_routes_json(): n="+str(count1)+" peer="+str(peer)+" count="+str(count)+" r.destination="+str(r.destination)+" network="+str(network))
+            #        try:
+            #            net = ip_network(network)
+            #            if ip_network(r.destination) in net:
+            #              username = peer.peer_name
+            #              break
+            #        except Exception as e:
+            #            logger.error("views::build_routes_json(): network="+str(network)+": got exception: "+e, exc_info=True)
+            #try:
+            #    rd['peer'] = username
+            #except UserProfile.DoesNotExist:
+            #    rd['peer'] = ''
+
+            rd['peer'] = flowspec.iprange_match.get_matching_related_peer_for_rule_destination(ivaltrees_per_version, r)
 
         rd['filed'] = "%s" % r.filed.strftime("%F %T")
         if r.last_updated!=None:
@@ -267,8 +309,11 @@ def build_routes_json(groutes, is_superuser):
         rd['isnonexpire'] = "%s" % r.is_no_expire
         rd['response'] = "%s" % r.response
         routes.append(rd)
+  except Exception as e:
+    logger.error("views::build_routes_json(): exception occurred: "+str(e), exc_info=True)
     return routes
-
+  #logger.info("views::build_routes_json(): returning #routes="+str(len(routes)))
+  return routes
 
 @login_required
 @never_cache
@@ -315,8 +360,10 @@ def add_route(request):
                 route.applier = request.user
             route.status = "PENDING"
             route.response = "Applying"
-            route.source = ip_network('%s/%s' % (ip_network(route.source).network_address.compressed, ip_network(route.source).prefixlen)).compressed
-            route.destination = ip_network('%s/%s' % (ip_network(route.destination).network_address.compressed, ip_network(route.destination).prefixlen)).compressed
+            net_route_source1 = ip_network(route.source, strict=False)
+            net_route_destination1 = ip_network(route.destination, strict=False)
+            route.source = ip_network('%s/%s' % (net_route_source1.network_address.compressed, net_route_source1.prefixlen)).compressed
+            route.destination = ip_network('%s/%s' % (net_route_destination1.network_address.compressed, net_route_destination1.prefixlen)).compressed
             try:
                 route.requesters_address = request.META['HTTP_X_FORWARDED_FOR']
             except:
@@ -392,13 +439,16 @@ def edit_route(request, route_slug):
             route.name = route_original.name
             route.status = route_original.status
             route.response = route_original.response
+
+            net_route_source=ip_network(route.source, strict=False)
+            net_route_destination=ip_network(route.destination, strict=False)
             if not request.user.is_superuser:
                 route.applier = request.user
             if bool(set(changed_data) & set(critical_changed_values)) or (not route_original.status == 'ACTIVE'):
                 route.status = "PENDING"
                 route.response = "Applying"
-                route.source = ip_network('%s/%s' % (ip_network(route.source).network_address.compressed, ip_network(route.source).prefixlen)).compressed
-                route.destination = ip_network('%s/%s' % (ip_network(route.destination).network_address.compressed, ip_network(route.destination).prefixlen)).compressed
+                route.source = ip_network('%s/%s' % (net_route_source.network_address.compressed, net_route_source.prefixlen)).compressed
+                route.destination = ip_network('%s/%s' % (net_route_destination.network_address.compressed, net_route_destination.prefixlen)).compressed
                 try:
                     route.requesters_address = request.META['HTTP_X_FORWARDED_FOR']
                 except:
@@ -406,8 +456,8 @@ def edit_route(request, route_slug):
                     route.requesters_address = 'unknown'
             else:
                 # without this compressed IPv6 addresses end up extened (from above's attribute validation)
-                route.source = ip_network('%s/%s' % (ip_network(route.source).network_address.compressed, ip_network(route.source).prefixlen)).compressed
-                route.destination = ip_network('%s/%s' % (ip_network(route.destination).network_address.compressed, ip_network(route.destination).prefixlen)).compressed
+                route.source = ip_network('%s/%s' % (net_route_source.network_address.compressed, net_route_source.prefixlen)).compressed
+                route.destination = ip_network('%s/%s' % (net_route_destination.network_address.compressed, net_route_destination.prefixlen)).compressed
 
             route.save()
             if bool(set(changed_data) & set(critical_changed_values)) or (not route_original.status == 'ACTIVE'):
@@ -490,32 +540,39 @@ def prolong_route(request, route_slug):
 def delete_route_view(request, route_slug):
     if request.is_ajax():
         route = get_object_or_404(Route, name=route_slug)
-        peers = route.applier.userprofile.peers.all()
+        user_peers = request.user.userprofile.peers.all()
+        if route.applier!=None:
+          route_applier_peers = route.applier.userprofile.peers.all()
+        else:
+          route_applier_peers = user_peers
         username = None
         if route.status == "ACTIVE":
             html = "<html><body>Cannot delete active Route! Deactivate at first</body></html>"
             return HttpResponse(html)
             
-        for peer in peers:
-            if username:
-                break
-            for network in peer.networks.all():
-                net = ip_network(network)
-                if ip_network(route.destination) in net:
-                    username = peer
-                    break
-        applier_peer = username
-        peers = request.user.userprofile.peers.all()
-        username = None
-        for peer in peers:
-            if username:
-                break
-            for network in peer.networks.all():
-                net = ip_network(network)
-                if ip_network(route.destination) in net:
-                    username = peer
-                    break
-        requester_peer = username
+        #for peer in route_applier_peers:
+        #    if username:
+        #        break
+        #    for network in peer.networks.all():
+        #        net = ip_network(network, strict=False)
+        #        if ip_network(route.destination, strict=False) in net:
+        #            username = peer
+        #            break
+        #applier_peer = username
+        applier_peer = flowspec.iprange_match.find_matching_peer_by_ipprefix__simple(route_applier_peers, route.destination)
+
+        #username = None
+        #for peer in user_peers:
+        #    if username:
+        #        break
+        #    for network in peer.networks.all():
+        #        net = ip_network(network, strcit=False)
+        #        if ip_network(route.destination, strict=False) in net:
+        #            username = peer
+        #            break
+        #requester_peer = username
+        requester_peer = flowspec.iprange_match.find_matching_peer_by_ipprefix__simple(user_peers, route.destination)
+
         if applier_peer == requester_peer or request.user.is_superuser:
             route.expires = datetime.date.today()
             if not request.user.is_superuser:
@@ -545,28 +602,34 @@ def delete_route_view(request, route_slug):
 def deactivate_route_view(request, route_slug):
     if request.is_ajax():
         route = get_object_or_404(Route, name=route_slug)
-        peers = route.applier.userprofile.peers.all()
-        username = None
-        for peer in peers:
-            if username:
-                break
-            for network in peer.networks.all():
-                net = ip_network(network)
-                if ip_network(route.destination) in net:
-                    username = peer
-                    break
-        applier_peer = username
-        peers = request.user.userprofile.peers.all()
-        username = None
-        for peer in peers:
-            if username:
-                break
-            for network in peer.networks.all():
-                net = ip_network(network)
-                if ip_network(route.destination) in net:
-                    username = peer
-                    break
-        requester_peer = username
+
+        route_applier_peers = route.applier.userprofile.peers.all()
+
+        #username = None
+        #for peer in peers:
+        #    if username:
+        #        break
+        #    for network in peer.networks.all():
+        #        net = ip_network(network, strict=False)
+        #        if ip_network(route.destination, strict=False) in net:
+        #            username = peer
+        #            break
+        #applier_peer = username
+        applier_peer = flowspec.iprange_match.find_matching_peer_by_ipprefix__simple(route_applier_peers, route.destination)
+
+        user_peers = request.user.userprofile.peers.all()
+        #username = None
+        # for peer in peers:
+        #     if username:
+        #         break
+        #     for network in peer.networks.all():
+        #         net = ip_network(network, strict=False)
+        #         if ip_network(route.destination, strict=False) in net:
+        #             username = peer
+        #             break
+        #requester_peer = username
+        requester_peer = flowspec.iprange_match.find_matching_peer_by_ipprefix__simple(user_peers, route.destination)
+
         if applier_peer == requester_peer or request.user.is_superuser:
             route.status = "PENDING"
             route.expires = datetime.date.today()
@@ -1013,10 +1076,15 @@ def lookupShibAttr(attrmap, requestMeta):
 @never_cache
 def routedetails(request, route_slug):
     route = get_object_or_404(Route, name=route_slug)
+
+    ivaltrees_per_version = flowspec.iprange_match.build_ival_trees_per_ipversion(request.user)
+    matching_rule_appliers_peer = flowspec.iprange_match.get_matching_related_peer_for_rule_destination(ivaltrees_per_version, route)
+
     #return render(request, 'flowspy/route_details.html', {'route': route})
     now = datetime.datetime.now()
     return render(request, 'flowspy/route_details.html', {
       'route': route, 
+      'matching_rule_appliers_peer': matching_rule_appliers_peer,
       'mytime': now, 
       'tz' : settings.TIME_ZONE,
       'is_superuser' : request.user.is_superuser,

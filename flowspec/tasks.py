@@ -34,6 +34,8 @@ from sys import exit
 import time
 import redis
 
+from peers.models import *
+
 LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
 
 # FORMAT = '%(asctime)s %(levelname)s: %(message)s'
@@ -209,26 +211,46 @@ def batch_delete(routes, **kwargs):
 
 @shared_task(ignore_result=True)
 def announce(messg, user, route):
-    peers = user.userprofile.peers.all()
-    username = user.username
-    tgt_net = ip_network(route.destination)
+  try:
+    if user!=None:
+      #peers = user.userprofile.peers.all()
+      peers = Peer.objects.all()
+      username = user.username
+    else:
+      peers = Peer.objects.all()
+      username = None
+
+    visited_channel = {}
+    tgt_net = ip_network(route.destination, strict=False)
     for peer in peers:
         for network in peer.networks.all():
-            net = ip_network(network)
-            logger.info("ANNOUNCE check ip " + str(ip_network(route.destination)) + str(type(ip_network(route.destination))) + " in net " + str(net) + str(type(net)))
+            net = ip_network(network, strict=False)
+            #logger.info("ANNOUNCE check ip " + str(tgt_net) + str(type(tgt_net)) + " in net " + str(net) + str(type(net)))
             # check if the target is a subnet of peer range (python3.6 doesn't have subnet_of())
             try:
-              if tgt_net.network_address >= net.network_address and tgt_net.broadcast_address <= net.broadcast_address:
+              if tgt_net.version==net.version and tgt_net.network_address >= net.network_address and tgt_net.broadcast_address <= net.broadcast_address:
                 username = peer.peer_tag
                 logger.info("ANNOUNCE found peer " + str(username))
-                break
+                
+                #break
+                if username not in visited_channel:
+                  visited_channel[username]=True
+                  announce_redis_lowlevel(messg, username)
+
             except TypeError:
                pass
 
+    #self.announce_redis_lowlevel(messg, username)
+  except Exception as e:
+    logger.info("tasks::announce(): got excention e: " + str(e), exc_info=True)
+
+
+@shared_task(ignore_result=True)
+def announce_redis_lowlevel(messg, channelname):
     messg = str(messg)
     logger.info("ANNOUNCE " + messg)
     r = redis.StrictRedis()
-    key = "notifstream_%s" % username
+    key = "notifstream_%s" % channelname
     obj = {"m": messg, "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
     logger.info("ANNOUNCE " + str(obj))
     lastid = r.xadd(key, obj, maxlen=settings.NOTIF_STREAM_MAXSIZE, approximate=False)

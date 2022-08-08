@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*- vim:fileencoding=utf-8:
 # vim: tabstop=4:shiftwidth=4:softtabstop=4:expandtab
 
-from flowspec.models import *
+#from flowspec.models import *
+from flowspec.model_utils import convert_container_to_queryset
 from peers.models import *
 
 from ipaddress import *
@@ -80,5 +81,35 @@ def get_matching_related_peer_for_rule_destination(ivaltrees_per_version, route)
        logger.error("iprange_match::get_matching_related_peer_for_rule_destination(): got exception: "+str(e), exc_info=True)
 
    return peer_name_tmp
+
+##
+
+def filter_rules_by_ivaltree(ivaltrees_per_version, all_routes):
+      filtered_routes = [route for route in all_routes if get_matching_related_peer_for_rule_destination(ivaltrees_per_version, route)!=None]
+      return filtered_routes
+
+#def filter_rules_by_ivaltree__ret_queryset(ivaltrees_per_version, all_routes):
+#      filtered_routes = filter_rules_by_ivaltree(ivaltrees_per_version, all_routes)
+#      filtered_routes_qs = convert_container_to_queryset(filtered_routes, Route)
+#      #filtered_routes_qs = flowspec.models.convert_container_to_queryset(filtered_routes, Route)
+#      return filtered_routes_qs
+
+##
+
+def find_matching_peer_by_ipprefix__simple(peers, route_destination):
+    net_route_destination = ip_network(route_destination, strict=False)
+    return find_matching_peer_by_ipnet__simple(peers, net_route_destination)
+
+def find_matching_peer_by_ipnet__simple(peers, net_route_destination):
+    peer_matched__name=None
+    for peer in peers:
+      if peer_matched__name:
+        break
+      for network in peer.networks.all():
+        net = ip_network(network, strict=False)
+        if net_route_destination in net:
+          peer_matched__name = peer
+          break
+    return peer_matched__name
 
 

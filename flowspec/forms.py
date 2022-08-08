@@ -156,7 +156,7 @@ class RouteForm(forms.ModelForm):
         user = self.cleaned_data.get('applier', None)
 
         if source:
-            source = ip_network(source).compressed
+            source = ip_network(source, strict=False).compressed
             existing_routes = existing_routes.filter(source=source)
         else:
             existing_routes = existing_routes.filter(source=None)
@@ -189,10 +189,13 @@ class RouteForm(forms.ModelForm):
                 existing_routes = existing_routes.filter(pk__in=route_pk_list)
         else:
             existing_routes = existing_routes.filter(port=None)
+            
+        net_destination = ip_network(destination, strict=False) 
         for route in existing_routes:
             if name != route.name:
                 existing_url = reverse('edit-route', args=[route.name])
-                if ip_network(destination) in ip_network(route.destination) or ip_network(route.destination) in ip_network(destination):
+                net_route_destination = ip_network(route.destination, strict=False) 
+                if net_destination in net_route_destination or net_route_destination in net_destination:
                     raise forms.ValidationError('Found an exact %s rule, %s with destination prefix %s<br>To avoid overlapping try editing rule <a href=\'%s\'>%s</a>' % (route.status, route.name, route.destination, existing_url, route.name))
         return self.cleaned_data
 
