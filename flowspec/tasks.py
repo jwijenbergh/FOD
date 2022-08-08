@@ -167,6 +167,7 @@ def delete_route(routepk, **kwargs):
               raise TimeoutError()
             
     if route.status == "INACTIVE":
+        announce("[%s] Deleting inactive rule : %s" % (route.applier_username_nice, route.name_visible), route.applier, route)
         logger.info("Deleting inactive route...")
         route.delete()
         logger.info("Deleting finished.")
