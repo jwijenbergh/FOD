@@ -17,7 +17,9 @@ WorkingDirectory=/srv/flowspy
 #RuntimeDirectory=yourservice
 #RuntimeDirectoryMode=0755
 
-ExecStart=/srv/flowspy/pythonenv gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1 -k gevent --limit-request-fields 10000 --timeout 30
+#ExecStart=/srv/flowspy/pythonenv gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1 -k gevent --limit-request-fields 10000 --timeout 30
+ExecStart=/srv/flowspy/pythonenv gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 10 -k gevent --limit-request-fields 10000 --timeout 30 --graceful-timeout 25
+
 #PIDFile=/tmp/yourservice.pid
 
 StandardOutput=append:/srv/flowspy/log/gunicorn-stdout.log
