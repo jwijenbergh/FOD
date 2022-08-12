@@ -178,7 +178,7 @@ var updater = {
             updater.showMessage(messages[i], peerid);
             try {
               body = messages[i].body 
-              if (body.match(/Successfully committed$/) || body.match(/Deleting inactive/) || body.match(/NETCONF connection failed/)) {
+              if (body.match(/Successfully committed$/) || body.match(/Deleting inactive/) || body.match(/NETCONF/)) {
                 reloadContent = true;
               }
             } catch (e) {
