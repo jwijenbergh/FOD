@@ -61,10 +61,16 @@ function reloadDataTable(cause) {
     try {
       console.log("DataTable reload triggered after new rule update messages");
 
-      //oTable.fnReloadAjax(refreshUrl);
-      //console.log("oTable="+oTable);
-      //console.log("ajax2="+$('#routes_table').DataTable().ajax);
-      $('#routes_table').DataTable().ajax.reload();
+     if ($('#routes_table').DataTable().ajax!=undefined) {
+       //oTable.fnReloadAjax(refreshUrl);
+       //console.log("oTable="+oTable);
+       //console.log("ajax2="+$('#routes_table').DataTable().ajax);
+       $('#routes_table').DataTable().ajax.reload();
+     } else {
+       console.log("DataTable.ajax is undefined");
+       //oTable.fnReloadAjax(refreshUrl);
+       window.location.reload(false); 	
+     }
 
       console.log("DataTable reload returned");
     } catch (e) {
