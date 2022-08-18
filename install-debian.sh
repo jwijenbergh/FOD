@@ -439,7 +439,8 @@ else
         #
 
 	# ./manage.py aboove may have created debug.log with root permissions:
-	chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log"
+	chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log" 
+	[ ! -d "/var/log/fod" ] || chown -R fod: "/var/log/fod"
 
         #
 
