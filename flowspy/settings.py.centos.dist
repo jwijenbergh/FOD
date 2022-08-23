@@ -609,6 +609,8 @@ MAX_RULE_EXPIRE_DAYS = 30
 ##############################################################################
 # rule deletion (via rest)
 
+RESTAPI_DEL_METHOD__FOR_NONALLOWED_USERS__DEACTIVATES = False
+
 ALLOW_DELETE_FULL_FOR_ADMIN = True
 ALLOW_DELETE_FULL_FOR_USER_ALL = False
 ALLOW_DELETE_FULL_FOR_USER_LIST = [

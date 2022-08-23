@@ -247,6 +247,15 @@ class RouteViewSet(viewsets.ModelViewSet):
         full_delete_is_allowed = request.user.userprofile.is_delete_allowed()
         logger.info("RouteViewSet::delete(): username_request="+str(username_request)+" user_is_admin="+str(user_is_admin)+" => full_delete_is_allowed="+str(full_delete_is_allowed))
 
+        try:
+          restapidel_fornonallowedusers_decativates = settings.RESTAPI_DEL_METHOD__FOR_NONALLOWED_USERS__DEACTIVATES
+        except:
+          restapidel_fornonallowedusers_decativates = False
+        logger.info("RouteViewSet::delete(): restapidel_fornonallowedusers_decativates="+str(restapidel_fornonallowedusers_decativates))
+
+        if (not full_delete_is_allowed) and (not restapidel_fornonallowedusers_decativates):
+          return Response({"status": "deletion forbidden; for deactivation use PATCH instead."}, 403)
+
         add_info1=""
         if obj.status!="INACTIVE" :
             obj.status = "PENDING"
