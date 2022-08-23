@@ -246,14 +246,19 @@ class RouteViewSet(viewsets.ModelViewSet):
         user_is_admin = request.user.is_superuser
         full_delete_is_allowed = request.user.userprofile.is_delete_allowed()
         logger.info("RouteViewSet::delete(): username_request="+str(username_request)+" user_is_admin="+str(user_is_admin)+" => full_delete_is_allowed="+str(full_delete_is_allowed))
-        if obj.status!="INACTIVE":
-          obj.status = "PENDING"
-          obj.save()
+
+        add_info1=""
+        if obj.status!="INACTIVE" :
+            obj.status = "PENDING"
+            obj.save()
+            add_info1="non-inactive "
+        else:
+            add_info1="inactive "
 
         #if True or not self.request.user.is_superuser():
         if full_delete_is_allowed:
             job = delete_route.delay(obj.pk)
-            return Response({"status": "Received task to delete route.", "job_id": str(job)}, 202)
+            return Response({"status": "Received task to delete "+add_info1+"route.", "job_id": str(job)}, 202)
         else:
             if obj.status == "INACTIVE":
                 return Response({"status": "Cannot deactivate route that is inactive already."}, 406)
