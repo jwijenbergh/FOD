@@ -8,6 +8,8 @@ from rest_framework import viewsets
 from flowspec.models import Route, ThenAction, FragmentType, MatchProtocol, MatchDscp
 from flowspec.models import convert_container_to_queryset
 
+from flowspec.tasks import announce
+
 from flowspec.serializers import (
     RouteSerializer,
     ThenActionSerializer,
@@ -162,7 +164,7 @@ class RouteViewSet(viewsets.ModelViewSet):
             obj.response = "N/A"
             obj.save()
 
-        def work_on_active_object(obj, new_status):
+        def work_on_active_object(obj, new_status, partial, route_params_changed):
             """
             Decides which `commit` action to choose depending on the
             requested status
@@ -170,21 +172,27 @@ class RouteViewSet(viewsets.ModelViewSet):
             Cases:
             * `ACTIVE` ~> `INACTIVE`: The `Route` must be deleted from the
                 flowspec device (`commit_deactivate`)
-            * `ACTIVE` ~> `ACTIVE`: The `Route` is present, so it must be
+            * (not partial or route_params_changed) and `ACTIVE` ~> `ACTIVE`: The `Route` is present and to be changed actually, so it must be
                 edited (`commit_edit`)
+            * partial (PATCH method) and !route_params_changed and `ACTIVE` ~> `ACTIVE`: only update database object 
 
             :param new_status: the newly requested status
             :type new_status: str
             :param obj: the `Route` object
             :type obj: `flowspec.models.Route`
             """
-            set_object_pending(obj)
-            if new_status == 'INACTIVE':
-                deactivate_route.delay(obj.pk)
-            else:
-                obj.commit_edit()
 
-        def work_on_inactive_object(obj, new_status):
+            if new_status == 'INACTIVE':
+                set_object_pending(obj)
+                deactivate_route.delay(obj.pk)
+            elif not partial or route_params_changed: # in case of an PATCH without status change and !route_params_changed dont re-commit object
+                set_object_pending(obj)
+                obj.commit_edit()
+            else:
+                obj.save()
+                announce("[%s] Rule non-flowspec-params updated: %s" % (obj.applier_username_nice, obj.name_visible), obj.applier, obj)
+
+        def work_on_inactive_object(obj, new_status, partial):
             """
             Decides which `commit` action to choose depending on the
             requested status
@@ -200,6 +208,9 @@ class RouteViewSet(viewsets.ModelViewSet):
             if new_status == 'ACTIVE':
                 set_object_pending(obj)
                 obj.commit_add()
+            else:
+                obj.save()
+                announce("[%s] Rule non-flowspec-params updated: %s" % (obj.applier_username_nice, obj.name_visible), obj.applier, obj)
         
         #if not partial:
         #   raise PermissionDenied('Permission Denied')
@@ -207,16 +218,21 @@ class RouteViewSet(viewsets.ModelViewSet):
         obj = get_object_or_404(self.queryset, pk=pk)
         old_status = obj.status
 
-        serializer = RouteSerializer(
-            obj, context={'request': request},
-            #data=request.DATA, partial=partial)
-            data=request.data, partial=partial)
-        logger.info("RouteViewSet::update(): request.data="+str(request.data))
+        serializer = RouteSerializer(obj, context={'request': request}, data=request.data, partial=partial)
+        logger.info("RouteViewSet::update(): partial="+str(partial)+" request.data="+str(request.data))
 
         if serializer.is_valid():
             #new_status = serializer.object.status
             new_status = serializer.data["status"]
-            requested_status = request.data["status"]
+
+            try:
+              requested_status = request.data["status"]
+            except KeyError:
+              if partial:
+                requested_status = old_status
+              else:
+                return Response("no status specified", status=400)
+
             #if requested_status == 'INACTIVE':
             new_status = requested_status
             #logger.info("RouteViewSet::update(): data="+str(request.data))
@@ -225,17 +241,177 @@ class RouteViewSet(viewsets.ModelViewSet):
             logger.info("RouteViewSet::update(): obj.type="+str(type(obj)))
             logger.info("RouteViewSet::update(): obj="+str(obj))
             logger.info("RouteViewSet::update(): old_status="+str(old_status)+", new_status="+str(new_status))
+        
+            route_params_changed = self.helper_check_route_params_change(partial, obj, serializer, request.data)
+
             super(RouteViewSet, self).update(request, pk, partial=partial)
+            obj = get_object_or_404(self.queryset, pk=pk)
+
             if old_status == 'ACTIVE':
-                work_on_active_object(obj, new_status)
+                work_on_active_object(obj, new_status, partial, route_params_changed)
             elif old_status in ['INACTIVE', 'ERROR']:
-                work_on_inactive_object(obj, new_status)
-            logger.info("RouteViewSet::update(): obj="+str(obj))
-            return Response(
-                RouteSerializer(obj,context={'request': request}).data,
-                status=200)
+                work_on_inactive_object(obj, new_status, partial)
+            logger.info("RouteViewSet::update(): returning (obj="+str(obj)+" obj.status="+str(obj.status)+")")
+            return Response(RouteSerializer(obj, context={'request': request}).data, status=200)
         else:
             return Response(serializer.errors, status=400)
+
+    def helper_check_route_params_change(self, is_partial, obj, serializer, request_data):
+
+            #old_source = obj.source
+            old_source = serializer.data["source"]
+            try:
+              new_source = request_data["source"]
+            except KeyError:
+              if is_partial:
+                new_source = old_source
+              else:
+                new_source = None
+
+            #old_destination = obj.destination
+            old_destination = serializer.data["destination"]
+            try:
+              new_destination = request_data["destination"]
+            except KeyError:
+              if is_partial:
+                new_destination = old_destination
+              else:
+                new_destination = None
+
+            #old_sourceport = obj.sourceport
+            old_sourceport = serializer.data["sourceport"]
+            try:
+              new_sourceport = request_data["sourceport"]
+            except KeyError:
+              if is_partial:
+                new_sourceport = old_sourceport
+              else:
+                new_sourceport = None
+
+            #old_destinationport = obj.destinationport
+            old_destinationport = serializer.data["destinationport"]
+            try:
+              new_destinationport = request_data["destinationport"]
+            except KeyError:
+              if is_partial:
+                new_destinationport = old_destinationport
+              else:
+                new_destinationport = None
+
+            #old_port = obj.port
+            old_port = serializer.data["port"]
+            try:
+              new_port = request_data["port"]
+            except KeyError:
+              if is_partial:
+                new_port = old_port
+              else:
+                new_port = None
+
+            #old_protocol = [str(el) for el in obj.protocol.all()]
+            old_protocol = [str(el) for el in serializer.data["protocol"]]
+            old_protocol.sort()
+            try:
+              new_protocol = [str(el) for el in request_data["protocol"]]
+              new_protocol.sort()
+            except KeyError:
+              if is_partial:
+                new_protocol = old_protocol
+              else:
+                new_protocol = []
+
+            #old_fragmentype = [str(el) for  el in obj.fragmenttype.all()]
+            old_fragmentype = [str(el) for el in serializer.data["fragmenttype"]]
+            old_fragmentype.sort()
+            try:
+              new_fragmentype = [str(el) for el in request_data["fragmenttype"]]
+              new_fragmentype.sort()
+            except KeyError:
+              if is_partial:
+                  new_fragmentype = old_fragmentype
+              else:
+                  new_fragmentype = []
+
+            old_icmptype = obj.icmptype
+            #old_icmptype = serializer.data["icmptype"]
+            try:
+              new_icmptype = request_data["icmptype"]
+            except KeyError:
+              if is_partial:
+                new_icmptype = old_icmptype
+              else:
+                new_icmptype = None
+
+            old_icmpcode = obj.icmpcode
+            #old_icmpcode = serializer.data["icmpcode"]
+            try:
+              new_icmpcode = request_data["icmpcode"]
+            except KeyError:
+              if is_partial:
+                new_icmpcode = old_icmpcode
+              else:
+                new_icmpcode = None
+
+            old_tcpflag = obj.tcpflag
+            #old_tcpflag = serializer.data["tcpflag"]
+            try:
+              new_tcpflag = request_data["tcpflag"]
+            except KeyError:
+              if is_partial:
+                new_tcpflag = old_tcpflag
+              else:
+                new_tcpflag = None
+
+            old_dscp = obj.dscp
+            #old_dscp = serializer.data["dscp"]
+            try:
+              new_dscp = request_data["dscp"]
+            except KeyError:
+              if is_partial:
+                new_dscp = old_dscp
+              else:
+                new_dscp = None
+
+            old_packetlength = obj.packetlength
+            #old_packetlength = serializer.data["packetlength"]
+            try:
+              new_packetlength = request_data["packetlength"]
+            except KeyError:
+              if is_partial:
+                new_packetlength = old_packetlength
+              else:
+                new_packetlength = None
+
+            #old_then = [str(el) for el in obj.then.all()]
+            old_then = [str(el) for el in serializer.data["then"]]
+            old_then.sort()
+            try:
+              new_then = [str(el) for el in request_data["then"]]
+              new_then.sort()
+            except KeyError:
+              if is_partial:
+                new_then = old_then
+              else:
+                new_then = None
+            
+            #logger.info("RouteViewSet::helper_check_route_params_change(): old_source="+str(old_source)+", new_source="+str(new_source))
+            #logger.info("RouteViewSet::helper_check_route_params_change(): old_sourceport="+str(old_sourceport)+", new_sourceport="+str(new_sourceport))
+            #logger.info("RouteViewSet::helper_check_route_params_change(): old_destination="+str(old_destination)+", new_destination="+str(new_destination))
+            #logger.info("RouteViewSet::helper_check_route_params_change(): old_destinationport="+str(old_destinationport)+", new_destinationport="+str(new_destinationport))
+            #logger.info("RouteViewSet::helper_check_route_params_change(): old_protocol="+str(old_protocol)+", new_protocol="+str(new_protocol))
+            #logger.info("RouteViewSet::helper_check_route_params_change(): old_fragmentype="+str(old_fragmentype)+", new_fragmentype="+str(new_fragmentype))
+            #logger.info("RouteViewSet::helper_check_route_params_change(): old_then="+str(old_then)+", new_then="+str(new_then))
+            ##logger.info("RouteViewSet::helper_check_route_params_change(): old="+str(obj))
+            #logger.info("RouteViewSet::helper_check_route_params_change(): old_icmptype="+str(old_icmptype)+", new_icmptype="+str(new_icmptype))
+            #logger.info("RouteViewSet::helper_check_route_params_change(): old_icmpcode="+str(old_icmpcode)+", new_icmpcode="+str(new_icmpcode))
+            #logger.info("RouteViewSet::helper_check_route_params_change(): old_tcpflag="+str(old_tcpflag)+", new_tcpflag="+str(new_tcpflag))
+            #logger.info("RouteViewSet::helper_check_route_params_change(): old_dscp="+str(old_dscp)+", new_dscp="+str(new_dscp))
+            #logger.info("RouteViewSet::helper_check_route_params_change(): old_packetlength="+str(old_packetlength)+", new_packetlength="+str(new_packetlength))
+
+            route_params_changed = old_source!=new_source or old_destination != new_destination or old_sourceport!=new_sourceport or old_destinationport!=new_destinationport or old_protocol!=new_protocol or old_fragmentype!=new_fragmentype or old_then!=new_then
+            logger.info("RouteViewSet::helper_check_route_params_change(): => route_params_changed="+str(route_params_changed))
+
+            return route_params_changed
 
     def destroy(self, request, pk=None, partial=False):
         """ HTTTP DELETE Method """

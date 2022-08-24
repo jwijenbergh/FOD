@@ -99,6 +99,13 @@ def edit(routepk, callback=None):
 @shared_task(ignore_result=True, autoretry_for=(TimeoutError, TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True, retry_kwargs={'max_retries': settings.NETCONF_MAX_RETRY_BEFORE_ERROR})
 def deactivate_route(routepk, **kwargs):
     """Deactivate the Route in ACTIVE state. Permissions must be checked before this call."""
+
+    reason_text = ''
+    if "reason" in kwargs:
+      reason = kwargs['reason']
+      reason_text = 'Reason: %s.' % reason
+
+    # here imported to avoid cyclic import on file level
     from flowspec.models import Route
     route = Route.objects.get(pk=routepk)
     initial_status = route.status
@@ -106,11 +113,13 @@ def deactivate_route(routepk, **kwargs):
         logger.error("tasks::deactivate(): Cannot deactivate route that is not in ACTIVE or potential ACTIVE status.")
         return
     logger.info("tasks::deactivate_route(): initial_status="+str(initial_status))
+        
+    announce("[%s] Suspending rule : %s. %sPlease wait..." % (route.applier_username_nice, route.name_visible, reason_text), route.applier, route)
 
     applier = PR.Applier(route_object=route)
     # Delete from router via NETCONF
     commit, response = applier.apply(operation="delete")
-    reason_text = ''
+    #reason_text = ''
     logger.info("tasks::deactivate_route(): commit="+str(commit))
     if commit:
         route.status="INACTIVE"
@@ -229,13 +238,16 @@ def announce(messg, user, route):
             # check if the target is a subnet of peer range (python3.6 doesn't have subnet_of())
             try:
               if tgt_net.version==net.version and tgt_net.network_address >= net.network_address and tgt_net.broadcast_address <= net.broadcast_address:
-                username = peer.peer_tag
-                logger.info("ANNOUNCE found peer " + str(username))
+                peername = peer.peer_tag
+                #logger.info("ANNOUNCE found peer " + str(peername))
                 
                 #break
-                if username not in visited_channel:
-                  visited_channel[username]=True
-                  announce_redis_lowlevel(messg, username)
+                if peername not in visited_channel:
+                  logger.info("ANNOUNCE found peer to announce to: " + str(peername))
+                  visited_channel[peername]=True
+                  announce_redis_lowlevel(messg, peername)
+                else:
+                  logger.info("ANNOUNCE peer already haveing announced to: " + str(peername))
 
             except TypeError:
                pass

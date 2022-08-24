@@ -170,13 +170,21 @@ class RouteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Route
         fields = (
-            'name', 'id', 'comments', 'applier', 'source', 'sourceport',
-            'destination', 'destinationport', 'port', 'dscp', 'fragmenttype',
-            'icmpcode', 'packetlength', 'protocol', 'tcpflag', 'then', 'filed',
-            'last_updated', 'status', 'expires', 'response', 'comments',
+            'name', 'id', 'comments', 
+            'applier', 
+            'packetlength',
+            'source', 'destination', 
+            'dscp', 'fragmenttype',
+            'protocol',
+            'icmptype', 'icmpcode', 
+            'sourceport', 'destinationport', 'port', 
+            'tcpflag', 
+            'then', 
+            'filed', 'last_updated', 
+            'status', 'expires', 'response', 
             'requesters_address')
         read_only_fields = (
-            'requesters_address', 'response', 'last_updated', 'id', 'filed')
+            'id', 'requesters_address', 'filed', 'last_updated', 'response')
 
 
 class PortSerializer(serializers.HyperlinkedModelSerializer):

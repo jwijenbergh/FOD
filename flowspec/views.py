@@ -79,7 +79,9 @@ def user_routes(request):
         request,
         'user_routes.html',
         {
-            'routes': user_routes
+            'routes': user_routes,
+            'maxexpires': settings.MAX_RULE_EXPIRE_DAYS,
+            'expiration_day_offset': settings.EXPIRATION_DAYS_OFFSET
         },
     )
 
@@ -160,7 +162,10 @@ def group_routes(request):
     return render(
         request,
         'user_routes.html',
-        {}
+        {
+            'maxexpires': settings.MAX_RULE_EXPIRE_DAYS,
+            'expiration_day_offset': settings.EXPIRATION_DAYS_OFFSET
+        }
     )
 
 
@@ -529,14 +534,17 @@ def prolong_route(request, route_slug):
             ('Cannot edit a pending rule: %s.') % (route_slug)
         )
         return HttpResponseRedirect(reverse("group-routes"))
+ 
+    add_days = settings.EXPIRATION_DAYS_OFFSET - 1
+    prolonged_date = datetime.date.today()+datetime.timedelta(add_days)
+    if route_edit.expires < prolonged_date:
+      route_edit.expires = prolonged_date
+      #route_edit.expires = route_edit.expires+datetime.timedelta(30)
 
-    route_edit.expires = datetime.date.today()+datetime.timedelta(30)
-    #route_edit.expires = route_edit.expires+datetime.timedelta(30)
-
-    if True:
       #route_edit.commit_edit()
       route_edit.save()
-      return HttpResponseRedirect(reverse("group-routes"))
+
+    return HttpResponseRedirect(reverse("group-routes"))
 
 @login_required
 @never_cache

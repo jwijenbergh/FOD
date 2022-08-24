@@ -294,7 +294,7 @@ class Route(models.Model):
         else:
             peer = None
 
-        send_message("[%s] Adding rule %s. Please wait..." % (self.applier_username_nice, self.name), peer)
+        send_message("[%s] Adding rule %s. Please wait..." % (self.applier_username_nice, self.name_visible), peer, self)
         response = add.delay(self.pk)
         logger.info('Got add job id: %s' % response)
         if not settings.DISABLE_EMAIL_NOTIFICATION:
@@ -346,13 +346,7 @@ class Route(models.Model):
         else:
             peer = None
 
-        send_message(
-            '[%s] Editing rule %s. Please wait...' %
-            (
-                self.applier_username_nice,
-                self.name
-            ), peer
-        )
+        send_message('[%s] Editing rule %s. Please wait...' % (self.applier_username_nice, self.name_visible), peer, self)
         response = edit.delay(self.pk)
         logger.info('Got edit job id: %s' % response)
         if not settings.DISABLE_EMAIL_NOTIFICATION:
@@ -389,6 +383,7 @@ class Route(models.Model):
 
     def commit_deactivate(self, *args, **kwargs):
         username = None
+
         reason_text = ''
         reason = ''
         if "reason" in kwargs:
@@ -411,13 +406,14 @@ class Route(models.Model):
             peer = username.peer_tag
         else:
             peer = None
-        send_message(
-            '[%s] Suspending rule %s. %sPlease wait...' % (
-                self.applier_username_nice,
-                self.name,
-                reason_text
-            ), peer
-        )
+        #send_message(
+        #    '[%s] Suspending rule %s. %sPlease wait...' % (
+        #        self.applier_username_nice,
+        #        self.name_visible,
+        #        reason_text
+        #    ), 
+        #    peer, self
+        #)
         if not settings.DISABLE_EMAIL_NOTIFICATION:
             fqdn = Site.objects.get_current().domain
             admin_url = 'https://%s%s' % (
@@ -748,14 +744,16 @@ class Route(models.Model):
 
 ##
 
-def send_message(msg, user):
-#    username = user.username
-    peer = user
-    #b = beanstalkc.Connection()
-    #b.use(settings.POLLS_TUBE)
-    tube_message = json.dumps({'message': str(msg), 'username': peer})
-    #b.put(tube_message)
-    #b.close()
+def send_message(msg, peer, route):
+    ##    username = user.username
+    ##b = beanstalkc.Connection()
+    ##b.use(settings.POLLS_TUBE)
+    #tube_message = json.dumps({'message': str(msg), 'username': peer})
+    ##b.put(tube_message)
+    ##b.close()
+
+    # use new announce method in tasks.py
+    announce(msg, peer, route)
 
 #############################################################################
 #############################################################################

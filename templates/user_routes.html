@@ -398,7 +398,12 @@ $(document).ready( function(){
                      prolongurl = "{% url 'prolong-route' 'routename'  %}".replace('routename', full.name.toString());
                      if (status == "ACTIVE" ){
                          btn = '<a href="'+editurl+'" class="btn-info btn btn-sm btn-outline">{% trans "Edit" %}</a>';
-			 if (full.isnonexpire !== 'True') { 
+                         today1 = new Date(Date.now());
+                         expires = new Date(full.expires);
+			 delta = Math.floor(expires.getTime()/1000/86400) - Math.floor(today1.getTime()/1000/86400)
+			 max_delta = {{ expiration_day_offset }} -1
+			 //btn = btn + delta + " " + max_delta
+			 if (full.isnonexpire !== 'True' && delta < max_delta) { 
                            btn = btn + '<a href="'+prolongurl+'" class="btn-info btn btn-sm btn-outline">{% trans "Prolong" %}</a>';
 			 }
                          btn = btn + ' <button class="deactivate_button btn-warning btn btn-sm btn-outline" id="'+full.name+'" data-routename="'+full.name+'">{% trans "Deactivate" %}</button>';
