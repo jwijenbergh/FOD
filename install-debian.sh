@@ -15,6 +15,8 @@ ensure_installed_pythonenv_wrapper=1
 
 install_mta=""
 
+try_install_docu=1
+
 #
 
 install_db=""
@@ -409,45 +411,55 @@ else
         fi
 
         mkdir -p "$fod_dir/log" "$fod_dir/logs"
-	touch "$fod_dir/debug.log"
+        touch "$fod_dir/debug.log"
         chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log"
+
+        if [ "$try_install_docu" = 1 ]; then
+          echo "trying to install mkdocs-based documentation" 1>&2
+          (
+            set -e
+            which mkdocs 2>/dev/null >/dev/null || apt-get install mkdocs
+            cd "$fod_dir" && mkdocs build
+            true # in case of failure override failure status, as the documentation is non-essential
+          )
+        fi
 
         #./manage.py syncdb --noinput
         #mkdir -p /srv/flowspy/static/
         mkdir -p "$static_dir"
         ./manage.py collectstatic --noinput
 
-  ##
+        ##
 
         #if [ "$init_db" = "mariadb" -o "$init_db" = "mysql" ]; then
         #  init_mysqllikedb "$DB__FOD_DBNAME" "$DB__FOD_USER" "$DB__FOD_PASSWORD"
         #fi
 
         if [ -n "$conf_db_access" ]; then
-	  echo "setting DB access config" 1>&2
+          echo "setting DB access config" 1>&2
           conf_db_access "$fod_dir" "$conf_db_access" "$DB__FOD_DBNAME" "$DB__FOD_USER" "$DB__FOD_PASSWORD"
-	  echo 1>&2
+          echo 1>&2
         fi
 
         ##    
 
-	echo "deploying/updating database schema" 1>&2
+        echo "deploying/updating database schema" 1>&2
         ./manage.py migrate
         ./manage.py loaddata initial_data
-	echo 1>&2
-       
+        echo 1>&2
+        
         #
 
-	# ./manage.py aboove may have created debug.log with root permissions:
-	chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log" 
-	[ ! -d "/var/log/fod" ] || chown -R fod: "/var/log/fod"
+        # ./manage.py aboove may have created debug.log with root permissions:
+        chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log" 
+        [ ! -d "/var/log/fod" ] || chown -R fod: "/var/log/fod"
 
         #
 
-	echo "providing supervisord config" 1>&2
+        echo "providing supervisord config" 1>&2
         cp -f "$fod_dir/supervisord.conf.dist" "$fod_dir/supervisord.conf"
         sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/supervisord.conf"
-	echo 1>&2
+        echo 1>&2
 
         #
 
