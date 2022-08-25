@@ -14,7 +14,7 @@ RUN yum -y install procps
 
 RUN mkdir -p /var/log/fod /srv
 #COPY . /srv/flowspy
-COPY install-centos.sh requirements.txt /srv/flowspy/
+COPY install-centos.sh requirements.txt requirements-centos.txt /srv/flowspy/
 
 RUN (cd /srv/flowspy; ./install-centos.sh --basesw;)
 
