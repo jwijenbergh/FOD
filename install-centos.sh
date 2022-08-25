@@ -7,11 +7,20 @@
 fod_dir="/srv/flowspy"
 venv_dir="/srv/venv"
 
+inside_docker=0
+
+
 install_basesw=1
 install_fodproper=1
 
+ensure_installed_pythonenv_wrapper=1
+
 #
 
+if [ -e "/.dockenv" ]; then 
+  echo "running inside docker assummed" 1>&2
+  inside_docker=1
+fi
 while [ $# -gt 0 ]; do
 
   if [ $# -ge 1 -a "$1" = "--here" ]; then
@@ -192,6 +201,21 @@ else
 
 	mkdir -p /var/run/fod 
 	#chown fod /var/run/fod
+
+        ##
+
+        if [ "$ensure_installed_pythonenv_wrapper" = 1 -a \( "$inside_docker" = 1 -o ! -e "$fod_dir/pythonenv" \) ]; then
+          echo "adding pythonev wrapper" 1>&2
+          cat > "$fod_dir/pythonenv" <<EOF
+#!/bin/bash
+. "$venv_dir/bin/activate"
+exec "\$@"
+EOF
+          chmod +x "$fod_dir/pythonenv"
+          echo 1>&2
+       fi
+
+       ##
   )
 
   set +e

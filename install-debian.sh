@@ -7,6 +7,8 @@
 fod_dir="/srv/flowspy"
 venv_dir="/srv/venv"
 
+inside_docker=0
+
 install_basesw=1
 install_fodproper=1
 
@@ -95,11 +97,16 @@ function conf_db_access () {
 ##############################################################################
 ##############################################################################
 
+if [ -e "/.dockenv" ]; then 
+  echo "running inside docker assummed" 1>&2
+  inside_docker=1
+fi
+
 if grep -q -E '^systemd$' /proc/1/comm; then 
   echo "system is running systemd as init process, setting default install_systemd_services=1" 1>&2
   install_systemd_services=1
-elif [ -e "/.dockenv" ]; then 
-  echo "running inside docker assummed, setting default install_systemd_services=0" 1>&2
+elif [ "$inside_docker" = 1 ]; then 
+  echo "inside_docker=$inside_docker, so setting default install_systemd_services=0" 1>&2
   install_systemd_services=0
 fi
 
@@ -470,7 +477,7 @@ else
 
 ##
 
-        if [ "$ensure_installed_pythonenv_wrapper" = 1 -a ! -e "$fod_dir/pythonenv" ]; then
+        if [ "$ensure_installed_pythonenv_wrapper" = 1 -a \( "$inside_docker" = 1 -o ! -e "$fod_dir/pythonenv" \) ]; then
           echo "adding pythonev wrapper" 1>&2
           cat > "$fod_dir/pythonenv" <<EOF
 #!/bin/bash
