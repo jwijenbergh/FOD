@@ -178,7 +178,7 @@ var updater = {
             updater.showMessage(messages[i], peerid);
             try {
               body = messages[i].body 
-              if (body.match(/Successfully committed$/) || body.match(/Deleting inactive/) || body.match(/NETCONF/) || body.match(/non-flowspec-params updated/)) {
+              if (body.match(/Successfully committed$/) || body.match(/Deleting inactive/) || body.match(/NETCONF/) || body.match(/non-flowspec-params updated/) || body.match(/Rule/) || body.match(/Please wait/)) {
                 reloadContent = true;
               }
             } catch (e) {

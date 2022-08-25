@@ -125,8 +125,11 @@ class RouteViewSet(viewsets.ModelViewSet):
                     elif requested_status == "INACTIVE":
                         route.status = "INACTIVE"
                         route.save()
+                        announce("[%s] new inactive Rule added: %s" % (route.applier_username_nice, route.name_visible), route.applier, route)
                     else:
                         route.save()
+                        announce("[%s] new non-active Rule added: %s" % (route.applier_username_nice, route.name_visible), route.applier, route)
+
                     obj.data["status"] = route.status
                     logger.info("RouteViewSet::create(): => route="+str(route))
                     logger.info("RouteViewSet::create(): => route.status="+str(route.status))
