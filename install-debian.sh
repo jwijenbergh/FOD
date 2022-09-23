@@ -330,6 +330,8 @@ if [ -n "$init_db" ]; then
 
   set +e
 
+fi
+
 ##
 
 python_version="$(python3 --version | cut -d ' ' -f 2,2)"
