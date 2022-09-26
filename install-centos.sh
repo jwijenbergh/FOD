@@ -299,7 +299,7 @@ else
   (
     cd flowspy # jump into settings subdir flowspy
 
-    if [ "$inside_docker" = 1 -a -e settings.py.centos ]; then # user has own centos-specific settings prepared yet ?
+    if [ "$inside_docker" = 1 -a -e settings.py.centos.docker ]; then # user has own centos-specific settings prepared yet ?
       
       cp -f settings.py.centos.docker settings.py
 
