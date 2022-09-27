@@ -285,7 +285,12 @@ def check_sync(route_name=None, selected_routes=[]):
                 subtask(deactivate_route).delay(str(route.id), reason="EXPIRED")
         else:
             if route.status != 'EXPIRED':
+                old_status = route.status
                 route.check_sync()
+                new_status = route.status
+                if old_status != new_status:
+                  logger.info('status of rule changed during check_sync %s : %s -> %s' % (route.name, old_status, new_status))
+                  announce("[%s] Rule status change after sync check: %s - Result: %s" % ("-", route.name_visible, ""), route.applier, route)
 
 
 @shared_task(ignore_result=True)
