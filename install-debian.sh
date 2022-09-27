@@ -503,7 +503,7 @@ else
           echo "trying to install mkdocs-based documentation" 1>&2
           (
             set -e
-            which mkdocs 2>/dev/null >/dev/null || apt-get install mkdocs
+            which mkdocs 2>/dev/null >/dev/null || apt-get install -y mkdocs
             cd "$fod_dir" && mkdocs build
             true # in case of failure override failure status, as the documentation is non-essential
           )
