@@ -282,7 +282,7 @@ def check_sync(route_name=None, selected_routes=[]):
         if route.has_expired() and (route.status != 'EXPIRED' and route.status != 'ADMININACTIVE' and route.status != 'INACTIVE' and route.status != 'INACTIVE_TODELETE' and route.status != 'PENDING_TODELETE'):
             if route.status != 'ERROR':
                 logger.info('Expiring %s route %s' %(route.status, route.name))
-                subtask(delete).delay(route, reason="EXPIRED")
+                subtask(deactivate_route).delay(str(route.id), reason="EXPIRED")
         else:
             if route.status != 'EXPIRED':
                 route.check_sync()
