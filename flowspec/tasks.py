@@ -38,6 +38,8 @@ from peers.models import *
 
 LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
 
+RULE_CHANGELOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'rule_changelog.log')
+
 # FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 # logging.basicConfig(format=FORMAT)
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
@@ -46,6 +48,15 @@ logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(LOG_FILENAME)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+rule_changelog_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+rule_changelog_logger = logging.getLogger(__name__+"__rule_changelog")
+rule_changelog_logger.setLevel(logging.DEBUG)
+rule_changelog_handler = logging.FileHandler(RULE_CHANGELOG_FILENAME)
+rule_changelog_handler.setFormatter(rule_changelog_formatter)
+rule_changelog_logger.addHandler(rule_changelog_handler)
+
+##
 
 @shared_task(ignore_result=True, autoretry_for=(TimeoutError, TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True, retry_kwargs={'max_retries': settings.NETCONF_MAX_RETRY_BEFORE_ERROR})
 def add(routepk, callback=None):
@@ -219,6 +230,8 @@ def batch_delete(routes, **kwargs):
 
 @shared_task(ignore_result=True)
 def announce(messg, user, route):
+
+  rule_changelog_logger.info(messg)
 
   try:
     if user!=None:
