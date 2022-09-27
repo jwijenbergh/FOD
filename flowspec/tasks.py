@@ -41,7 +41,6 @@ LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
 # FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 # logging.basicConfig(format=FORMAT)
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(LOG_FILENAME)
@@ -158,7 +157,7 @@ def delete_route(routepk, **kwargs):
     from flowspec.models import Route
     route = Route.objects.get(pk=routepk)
     logger.info("tasks::delete_route(): initial route.status="+str(route.status))
-    if route.status != "INACTIVE":
+    if route.status != "INACTIVE" and route.status != "EXPIRED":
         logger.info("Deactivating active route...")
         # call deactivate_route() directly since we are already on background (celery task)
         try:
@@ -169,7 +168,7 @@ def delete_route(routepk, **kwargs):
         except Exception as e:
             logger.info("tasks::delete_route(): exception during deactivate_route: "+str(e))
         logger.info("tasks::delete_route(): deactivate_route done => route.status="+str(route.status))
-        if route.status != "INACTIVE" and delete_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
+        if route.status != "INACTIVE" and route.status != "EXPIRED" and delete_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
             # Repeat due to error in deactivation
             route.status = "PENDING"
             route.save()
@@ -177,7 +176,7 @@ def delete_route(routepk, **kwargs):
               logger.error("Deactivation failed, repeat the deletion process.")
               raise TimeoutError()
             
-    if route.status == "INACTIVE":
+    if route.status == "INACTIVE" or route.status == "EXPIRED":
         announce("[%s] Deleting inactive rule : %s" % (route.applier_username_nice, route.name_visible), route.applier, route)
         logger.info("Deleting inactive route...")
         route.delete()
@@ -220,6 +219,7 @@ def batch_delete(routes, **kwargs):
 
 @shared_task(ignore_result=True)
 def announce(messg, user, route):
+
   try:
     if user!=None:
       #peers = user.userprofile.peers.all()
