@@ -484,12 +484,12 @@ elif [ "$1" = "--helper__process_ruleinfo__exabgp1" ]; then #arg
   shift 1
   fragment_options="$1"
   shift 1
-  then="$1"
+  thenx="$1"
   shift 1
 
-  #echo "$0: TODO exabgp $name $ipversion $source $destination $protocol $source_ports $destination_ports $fragment_options $then $rest" 1>&2
+  #echo "$0: TODO exabgp $name $ipversion $source $destination $protocol $source_ports $destination_ports $fragment_options $thenx $rest" 1>&2
 
-  bgpruleparams="$ipversion $source $destination $protocol $source_ports $destination_ports $fragment_options $then"
+  bgpruleparams="$ipversion $source $destination $protocol $source_ports $destination_ports $fragment_options $thenx"
   md5sum_params="$(printf "%s" "$bgpruleparams" | md5sum | cut -d ' ' -f 1)"
   rule_touchfile="/var/run/rule-$md5sum_params"
 
@@ -500,16 +500,16 @@ elif [ "$1" = "--helper__process_ruleinfo__exabgp1" ]; then #arg
 
   if [ -e "$rule_touchfile" ]; then
     #echo "rule bgpruleparams=$bgpruleparams | exabgpcli_flow_params=${exabgpcli_flow_params[*]} (md5sum_params=$md5sum_params) is already bgp installed" 1>&2 
-    echo "rule bgpruleparams=$bgpruleparams exabgpcli_flow_params=${exabgpcli_flow_params[*]} (md5sum_params=$md5sum_params) is already bgp installed" 1>&2 
+    echo "$0: rule bgpruleparams=$bgpruleparams exabgpcli_flow_params=${exabgpcli_flow_params[*]} (md5sum_params=$md5sum_params) is already bgp installed" 1>&2 
     touch "$rule_touchfile" 1>&2
   else
-    echo "rule bgpruleparams=$bgpruleparams exabgpcli_flow_params=${exabgpcli_flow_params[*]} (md5sum=$md5sum_params) to be bgp installed" 1>&2 
+    echo "$0: rule bgpruleparams=$bgpruleparams exabgpcli_flow_params=${exabgpcli_flow_params[*]} (md5sum=$md5sum_params) to be bgp installed" 1>&2 
     echo "$bgp_params1" > "$rule_touchfile"
 
     #echo exabgpcli announce flow route source $source destination $destination protocol [ =$protocol ] source-port [ =53 ] destination-port [ =80 ] packet-length [ =777 =1122 ] fragment [ is-fragment dont-fragment ] rate-limit 1024 
     (set -x; exabgpcli announce "${exabgpcli_flow_params[@]}" < /dev/null) 1>&2
     exabgpcli_status="$?"
-    echo "announce exabgpcli_status=$exabgpcli_status" 1>&2
+    echo "$0: announce exabgpcli_status=$exabgpcli_status" 1>&2
   fi
 
 elif [ "$1" = "--helper__process_ruleinfo__exabgp_postproc" ]; then #arg
@@ -545,7 +545,7 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method1_step1" ]; then #arg
   shift 1
   ipversion="$1"
   shift 1
-  source="$1"
+  sourcex="$1"
   shift 1
   destination="$1"
   shift 1
@@ -557,7 +557,7 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method1_step1" ]; then #arg
   shift 1
   fragment_options="$1"
   shift 1
-  then="$1"
+  thenx="$1"
   shift 1
 
   ##
@@ -571,7 +571,7 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method1_step1" ]; then #arg
     proto_add="6"
   fi
 
-  echo "name=$name ipversion=$ipversion cookie=$cookie source=$source destination=$destination protocol=$protocol source_ports=$source_ports destination_ports=$destination_ports fragment_options=$fragment_options then=$then" 1>&2
+  echo "$0: helper__process_ruleinfo__ovs_method1_step1(): name=$name ipversion=$ipversion cookie=$cookie source=$sourcex destination=$destination protocol=$protocol source_ports=$source_ports destination_ports=$destination_ports fragment_options=$fragment_options then=$thenx" 1>&2
 
   if [ "$protocol" = "icmp" -a "$ipversion" = "6" ]; then
      protocol="ipv6-icmp"
@@ -579,12 +579,12 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method1_step1" ]; then #arg
 
   if [ "$protocol" = "${protocol#[0-9]}" ]; then
     protocol_num="$(getent protocols "$protocol" | awk '{ print $2; }')"
-    echo "name=$name protocol=$protocol => protocol_num=$protocol_num" 1>&2
+    #echo "helper__process_ruleinfo__ovs_method1_step1(): name=$name protocol=$protocol => protocol_num=$protocol_num" 1>&2
     [ -n "$protocol_num" ] || protocol_num="-"
   else
     protocol_num="$protocol"
   fi
-  echo "name=$name => protocol=$protocol protocol_num=$protocol_num" 1>&2
+  #echo "helper__process_ruleinfo__ovs_method1_step1(): name=$name => protocol=$protocol protocol_num=$protocol_num" 1>&2
 
   ovs-vsctl list-br | tr " " "\n" | while read bridge; do
     
@@ -594,7 +594,7 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method1_step1" ]; then #arg
     #ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "0x$cookie" | grep -q .
     (set -x; ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "cookie=" | grep -q .)
     flow_exists=$(( 1 - $? ))
-    echo "name=$name cookie=$cookie => flow_exists=$flow_exist" 1>&2
+    #echo "helper__process_ruleinfo__ovs_method1_step1(): name=$name cookie=$cookie => flow_exists=$flow_exist" 1>&2
 
     add1=""
     if [ "$protocol_num" != "-" ]; then
@@ -619,12 +619,12 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method1_step1" ]; then #arg
     fi
 
     if [ "$flow_exists" = 0 ]; then
-      (set -x; ovs-ofctl add-flow "$bridge" "cookie=0x$cookie,priority=1,table=0,$proto,${address_pre}src=$source,${address_pre}dst=$destination${add1},actions=drop")
-      echo "name=$name add-flow (1) status=$?" 1>&2
+      (set -x; ovs-ofctl add-flow "$bridge" "cookie=0x$cookie,priority=1,table=0,$proto,${address_pre}src=$sourcex,${address_pre}dst=$destination${add1},actions=drop")
+      echo "$0: helper__process_ruleinfo__ovs_method1_step1(): name=$name add-flow (1) status=$?" 1>&2
       ovs-ofctl dump-flows "$bridge" 1>&2
     else 
-      (set -x; ovs-ofctl mod-flows "$bridge" "cookie=0x$cookie/-1,priority=1,table=0,$proto,${address_pre}src=$source,${address_pre}dst=$destination${add1},actions=drop")
-      echo "name=$name mod-flow status=$?" 1>&2
+      (set -x; ovs-ofctl mod-flows "$bridge" "cookie=0x$cookie/-1,priority=1,table=0,$proto,${address_pre}src=$sourcex,${address_pre}dst=$destination${add1},actions=drop")
+      echo "$0: helper__process_ruleinfo__ovs_method1_step1(): name=$name mod-flow status=$?" 1>&2
       ovs-ofctl dump-flows "$bridge" 1>&2
     fi
  
@@ -647,13 +647,13 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method1_postproc" ]; then #arg
     #ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "0x$cookie" | grep -q .
     (set -x; ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "cookie=" | grep -q .)
     flow_exists=$(( 1 - $? ))
-    echo "loop2: cookie=$cookie => flow_exists=$flow_exist" 1>&2
+    echo "$0: helper__process_ruleinfo__ovs_method1_postproc(): loop2: cookie=$cookie => flow_exists=$flow_exist" 1>&2
 
     if [ "$flow_exists" = 0 ]; then
       #ovs-ofctl add-flow "$bridge" in_port="${bridge}-eth1",actions=output:"${bridge}-eth2" # allow any other traficc passthru
       #ovs-ofctl add-flow "$bridge" in_port="${bridge}-eth2",actions=output:"${bridge}-eth1" # allow any other traficc passthru
       ovs-ofctl add-flow "$bridge" "cookie=0x$cookie,priority=0,table=0,actions=normal"
-      echo "loop2: add-flow status=$?" 1>&2
+      echo "$0: helper__process_ruleinfo__ovs_method1_postproc(): loop2: add-flow status=$?" 1>&2
     fi
 
     ovs-ofctl dump-flows "$bridge"
@@ -669,9 +669,9 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method1_postproc" ]; then #arg
       cookie="$(printf "0x%016x" "$cookie0")"
       #echo "loop over all existing of rules (bridge $bridge) cookie0=$cookie0 => cookie=$cookie" 1>&2
       if ! grep -q -E "^$cookie" "$state_file"; then 
-        echo "clean-loop: outdated cookie $cookie" 1>&2
+        echo "$0: helper__process_ruleinfo__ovs_method1_postproc(): clean-loop: outdated cookie $cookie" 1>&2
         ovs-ofctl del-flows "$bridge" "cookie=$cookie/-1"
-        echo "clean-loop: del-flow status=$?" 1>&2
+	echo "$0: helper__process_ruleinfo__ovs_method1_postproc(): clean-loop: del-flow status=$?" 1>&2
       fi
     done
     ovs-ofctl dump-flows "$bridge" 1>&2
@@ -685,7 +685,7 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method2_step1" ]; then #arg
   shift 1
   ipversion="$1"
   shift 1
-  source="$1"
+  sourcex="$1"
   shift 1
   destination="$1"
   shift 1
@@ -711,7 +711,7 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method2_step1" ]; then #arg
     proto_add="6"
   fi
 
-  echo "name=$name ipversion=$ipversion cookie=$cookie source=$source destination=$destination protocol=$protocol source_ports=$source_ports destination_ports=$destination_ports fragment_options=$fragment_options then=$then" 1>&2
+  echo "$0: helper__process_ruleinfo__ovs_method2_step1(): name=$name ipversion=$ipversion cookie=$cookie source=$sourcex destination=$destination protocol=$protocol source_ports=$source_ports destination_ports=$destination_ports fragment_options=$fragment_options then=$then" 1>&2
 
   if [ "$protocol" = "icmp" -a "$ipversion" = "6" ]; then
      protocol="ipv6-icmp"
@@ -719,12 +719,12 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method2_step1" ]; then #arg
 
   if [ "$protocol" = "${protocol#[0-9]}" ]; then
     protocol_num="$(getent protocols "$protocol" | awk '{ print $2; }')"
-    echo "name=$name protocol=$protocol => protocol_num=$protocol_num" 1>&2
+    #echo "name=$name protocol=$protocol => protocol_num=$protocol_num" 1>&2
     [ -n "$protocol_num" ] || protocol_num="-"
   else
     protocol_num="$protocol"
   fi
-  echo "name=$name => protocol=$protocol protocol_num=$protocol_num" 1>&2
+  #echo "name=$name => protocol=$protocol protocol_num=$protocol_num" 1>&2
 
   ##
 
@@ -750,8 +750,8 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method2_step1" ]; then #arg
     esac
   fi
 
-  #echo "priority=1,table=0,$proto,${address_pre}src=$source,${address_pre}dst=$destination${add1} cookie=0x$cookie actions=drop" >> "$ovs_replace_flow_file" 
-  echo "priority=1,$proto,${address_pre}src=$source,${address_pre}dst=$destination${add1} cookie=0x$cookie actions=drop" >> "$ovs_replace_flow_file" 
+  #echo "priority=1,table=0,$proto,${address_pre}src=$sourcex,${address_pre}dst=$destination${add1} cookie=0x$cookie actions=drop" >> "$ovs_replace_flow_file" 
+  echo "priority=1,$proto,${address_pre}src=$sourcex,${address_pre}dst=$destination${add1} cookie=0x$cookie actions=drop" >> "$ovs_replace_flow_file" 
 
   ##
 
@@ -800,7 +800,7 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
   #also_use_exabgp=0
 
   echo 1>&2
-  echo "$0: process_ruleinfo use_ovs=$use_ovs also_use_exabgp=$also_use_exabgp" 1>&2
+  echo "$0: process_ruleinfo: use_ovs=$use_ovs use_ovs_method2=$use_ovs_method2 also_use_exabgp=$also_use_exabgp" 1>&2
 
   ##
 
@@ -825,6 +825,8 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
   "$0" --filter-ruleinfo-unique | tr '\r' '\n' | grep -v "^ *$" | \
   while read -r name ipversion source destination protocol source_ports destination_ports fragment_options then rest; do
     #echo "name=$name ipversion=$ipversion source=$source ..." 1>&2
+  
+    echo "$0: process_ruleinfo: loop: step name=$name" 1>&2
  
     bgp_params1="$name $ipversion $source $destination $protocol $source_ports $destination_ports $fragment_options $then" 
 
@@ -840,31 +842,35 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
       if [ "$use_ovs_method2" = 0 ]; then
         protocol_num="$("$0" --helper__process_ruleinfo__ovs_method1_step1 "$state_file" "$cookie" "$ipversion" "$source" "$destination" "$protocol" "$source_ports" "$destination_ports" "$fragment_options" "$then")"
       else
-        "$0" --helper__process_ruleinfo__ovs_method2_step1 "$ovs_replace_flow_file" "$cookie" "$ipversion" "$source" "$destination" "$protocol" "$source_ports" "$destination_ports" "$fragment_options" "$then" | nl
         protocol_num="$("$0" --helper__process_ruleinfo__ovs_method2_step1 "$ovs_replace_flow_file" "$cookie" "$ipversion" "$source" "$destination" "$protocol" "$source_ports" "$destination_ports" "$fragment_options" "$then")"
       fi
       [ -n "$protocol_num" ] || protocol_num="-"
-      echo "protocol=$protocol => protocol_num=$protocol_num" 1>&2
+      #echo "protocol=$protocol => protocol_num=$protocol_num" 1>&2
   
       counter_values="$("$0" --get_counters_for_rule "$cookie")";
-      echo "name=$name counter_values=$counter_values" 1>&2
+      echo "$0: process_ruleinfo: loop: step: name=$name counter_values=$counter_values" 1>&2
   
     fi #endof !exabgp
     
     [ -n "$counter_values" ] || counter_values="- -"
  
-    echo "cookie=$cookie name=$name" 1>&2 
-    echo "cookie=$cookie source=$source" 1>&2 
-    echo "cookie=$cookie destination=$destination" 1>&2 
-    echo "cookie=$cookie destination_ports=$destination_ports" 1>&2 
-    echo "cookie=$cookie fragment_options=$fragment_options" 1>&2 
-    echo "cookie=$cookie then=$then" 1>&2 
-    echo "0x$cookie bgpflowspec $counter_values $name $source $destination $protocol $protocol_num $source_ports $destination_ports $fragment_options $then" 
+    #echo "cookie=$cookie name=$name" 1>&2 
+    #echo "cookie=$cookie source=$source" 1>&2 
+    #echo "cookie=$cookie destination=$destination" 1>&2 
+    #echo "cookie=$cookie destination_ports=$destination_ports" 1>&2 
+    #echo "cookie=$cookie fragment_options=$fragment_options" 1>&2 
+    #echo "cookie=$cookie then=$then" 1>&2 
+    #echo "0x$cookie bgpflowspec $counter_values $name $source $destination $protocol $protocol_num $source_ports $destination_ports $fragment_options $then" 
     echo "0x$cookie bgpflowspec $counter_values $name $source $destination $protocol $protocol_num $source_ports $destination_ports $fragment_options $then" >> "$state_file"
+
+    echo 1>&2
 
   done # end while rule info read
 
   ##
+
+  echo "" 1>&2
+  echo "$0: process_ruleinfo: post process" 1>&2
 
   if [ "$also_use_exabgp" = 1 ]; then #exabgp
     "$0" --helper__process_ruleinfo__exabgp_postproc "$dir1"
@@ -879,6 +885,8 @@ elif [ "$1" = "--process_ruleinfo" ]; then #arg
   ##
 
   mv -f "$state_file" "$state_file0"
+  
+  echo "$0: process_ruleinfo: done" 1>&2
 
 elif [ "$1" = "--get_counters_for_rule" ]; then #arg
   shift 1
