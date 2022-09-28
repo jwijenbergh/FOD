@@ -102,6 +102,9 @@ sub get_snmp_rulename
   $dst =~ s/\/32//;
   $src =~ s/\/32//;
 
+  $src =~ s/^0.0.0.0\/0$/0\/0/;
+  $dst =~ s/^0.0.0.0\/0$/0\/0/;
+
   my $rulename = $dst.",".$src;
 
   my $proto = $protocol_num;  
