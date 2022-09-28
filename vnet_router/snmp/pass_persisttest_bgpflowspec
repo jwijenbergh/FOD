@@ -116,7 +116,7 @@ sub get_snmp_rulename
   my $src_port_str = ($srcports!="-") ? get_ports_str($srcports) : undef;
   my $dst_port_str = ($dstports!="-") ? get_ports_str($dstports) : undef;
 
-  if (defined($proto)) {
+  if (defined($proto) && $proto ne '' && $proto ne '-') {
     $rulename .= ",proto=$proto";
   }
 
