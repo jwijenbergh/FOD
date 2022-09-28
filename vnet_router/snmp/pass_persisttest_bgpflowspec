@@ -120,7 +120,9 @@ sub get_snmp_rulename
   my $dst_port_str = ($dstports!="-") ? get_ports_str($dstports) : undef;
 
   if (defined($proto) && $proto ne '' && $proto ne '-') {
-    $rulename .= ",proto=$proto";
+    my $proto2 = $proto;
+    $proto2 =~ s/,/,=/g;
+    $rulename .= ",proto=$proto2";
   }
 
   if (defined($dst_port_str) && $dst_port_str ne "") {

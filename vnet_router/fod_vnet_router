@@ -677,6 +677,25 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method1_postproc" ]; then #arg
     ovs-ofctl dump-flows "$bridge" 1>&2
   done
 
+elif [ "$1" = "--helper_protocol_list_to_num_list" ]; then #arg
+  shift 1
+  protocol="$1"  #arg
+  shift 1
+ 
+  printf "%s\n" "$protocol" | tr "," "\\n" | while read protocol1 rest; do
+      getent protocols "$protocol1" | awk '{ print $2; }'
+    done | awk '
+      !/^\s*$/ {
+        proto_num1 = $1;
+	print "proto_num1=" proto_num1 > "/dev/stderr"
+	proto_num_list = (proto_num_list!="") ? (proto_num_list "," proto_num1) : proto_num1 
+      }
+      END {
+	print "proto_num_list=" proto_num_list > "/dev/stderr"
+        print (proto_num_list!="") ? proto_num_list : "-"
+      }
+'
+
 elif [ "$1" = "--helper__process_ruleinfo__ovs_method2_step1" ]; then #arg
   shift 1
   ovs_replace_flow_file="$1"  
@@ -718,19 +737,18 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method2_step1" ]; then #arg
   fi
 
   if [ "$protocol" = "${protocol#[0-9]}" ]; then
-    protocol_num="$(getent protocols "$protocol" | awk '{ print $2; }')"
-    #echo "name=$name protocol=$protocol => protocol_num=$protocol_num" 1>&2
-    [ -n "$protocol_num" ] || protocol_num="-"
+    protocol_num="$("$0" --helper_protocol_list_to_num_list "$protocol")"
   else
     protocol_num="$protocol"
   fi
-  #echo "name=$name => protocol=$protocol protocol_num=$protocol_num" 1>&2
+  echo "$0: helper__process_ruleinfo__ovs_method2_step1(): name=$name => protocol=$protocol protocol_num=$protocol_num" 1>&2
 
   ##
 
   add1=""
   if [ "$protocol_num" != "-" ]; then
-    add1="$add1,ip_proto=$protocol_num"
+    add2="$(printf "%s" "$protocol_num" | sed -e 's/,/,ip_proto=/g')"
+    add1="$add1,ip_proto=$add2"
   fi
   if [ "$destination_ports" != "-" ]; then
     destination_ports0="$(printf "%s" "$destination_ports" | grep -Eo "^[0-9]+")"
@@ -745,7 +763,13 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method2_step1" ]; then #arg
   if [ "$fragment_options" != "-" ]; then
     #  ip_frag = no yes first later not_later
     case "$fragment_options" in
-        is-fragment,last-fragment|last-fragment) add1="$add1" ;;
+        # is-fragment, dont-fragment, first-fragment, last-fragment, not-a-fragment
+        *dont-fragment*) add1="$add1,nw_frag=no" ;; # TODO: not equivalent
+        *not-a-fragment*) add1="$add1,nw_frag=no" ;;
+        is-fragment) add1="$add1,nw_frag=yes" ;;
+	*first-fragment*) add1="$add1,nw_frag=first" ;;
+	!first-fragment) add1="$add1,nw_frag=later" ;;
+	*last-fragment*) add1="$add1,nw_frag=later" ;; # TODO: not equivalent
         *) ;;
     esac
   fi
@@ -776,7 +800,9 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method2_postproc" ]; then #arg
   ##
 
   ovs-vsctl list-br | tr " " "\n" | while read bridge; do
-    
+  
+    ovs-ofctl set-frags "$bridge" nx-match # fragment handling
+
     ovs-ofctl replace-flows "$bridge" "$ovs_replace_flow_file"
     ovs-ofctl diff-flows "$bridge" /dev/null
 
