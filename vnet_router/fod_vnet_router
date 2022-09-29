@@ -746,10 +746,12 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method2_step1" ]; then #arg
   ##
 
   add1=""
-  if [ "$protocol_num" != "-" ]; then
-    add2="$(printf "%s" "$protocol_num" | sed -e 's/,/,ip_proto=/g')"
-    add1="$add1,ip_proto=$add2"
-  fi
+
+  #if [ "$protocol_num" != "-" ]; then
+  #  #add2="$(printf "%s" "$protocol_num" | sed -e 's/,/,ip_proto=/g')"
+  #  add1="$add1,ip_proto=$add2"
+  #fi
+
   if [ "$destination_ports" != "-" ]; then
     destination_ports0="$(printf "%s" "$destination_ports" | grep -Eo "^[0-9]+")"
     [ "$destination_ports" = "$destination_ports0" ] || echo "warning: destination_ports=$destination_ports => only destination_ports 0=$destination_ports0 used, ranges or lists not supported yet" 1>&2
@@ -775,7 +777,17 @@ elif [ "$1" = "--helper__process_ruleinfo__ovs_method2_step1" ]; then #arg
   fi
 
   #echo "priority=1,table=0,$proto,${address_pre}src=$sourcex,${address_pre}dst=$destination${add1} cookie=0x$cookie actions=drop" >> "$ovs_replace_flow_file" 
-  echo "priority=1,$proto,${address_pre}src=$sourcex,${address_pre}dst=$destination${add1} cookie=0x$cookie actions=drop" >> "$ovs_replace_flow_file" 
+
+  if [ "$protocol_num" = "" -o "$protocol_num" = "-" ]; then
+    echo "priority=1,$proto,${address_pre}src=$sourcex,${address_pre}dst=$destination${add1} cookie=0x$cookie actions=drop" >> "$ovs_replace_flow_file" 
+  else
+
+    printf "%s\\n" "$protocol_num" | tr "," "\\n" | while read protocol_num1 rest; do
+      add10=",ip_proto=$protocol_num1$add1"
+      echo "priority=1,$proto,${address_pre}src=$sourcex,${address_pre}dst=$destination${add10} cookie=0x$cookie actions=drop" >> "$ovs_replace_flow_file" 
+    done
+
+  fi
 
   ##
 
@@ -919,16 +931,26 @@ elif [ "$1" = "--get_counters_for_rule" ]; then #arg
   cookie="$1" #arg
   shift 1
 
-  ovs-vsctl list-br | tr " " "\n" | while read bridge; do
-     #line1="$(ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "0x$cookie" | head -1)"
-     line1="$(ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "cookie=" | head -1)"
-     npkts="$(printf "%s" "$line1" | grep -Eo "n_packets=[0-9]+" | sed -e 's/^n_packets=//')"
-     nbytes="$(printf "%s" "$line1" | grep -Eo "n_bytes=[0-9]+" | sed -e 's/^n_bytes=//')"
-    [ -n "$npkts" ] || npkts="0"
-    [ -n "$nbytes" ] || nbytes="0"
- 
-    echo "$npkts $nbytes"
+  #ovs-vsctl list-br | tr " " "\n" | while read bridge; do
+  #   #line1="$(ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "0x$cookie" | head -1)"
+  #   line1="$(ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "cookie=" | head -1)"
+  #   npkts="$(printf "%s" "$line1" | grep -Eo "n_packets=[0-9]+" | sed -e 's/^n_packets=//')"
+  #   nbytes="$(printf "%s" "$line1" | grep -Eo "n_bytes=[0-9]+" | sed -e 's/^n_bytes=//')"
+  #  [ -n "$npkts" ] || npkts="0"
+  #  [ -n "$nbytes" ] || nbytes="0"
+  #  echo "$npkts $nbytes"
+  #done | awk '{ sum1+=$1; sum2+=$2; } END { print (sum1 ? sum1 : "0") " " (sum2 ? sum2 : "0"); };'
 
+  ovs-vsctl list-br | tr " " "\n" | while read bridge; do
+     ovs-ofctl dump-flows "$bridge" "cookie=0x$cookie/-1" | grep "cookie=" | while read line1; do
+       #echo "loop inner bridge=$bridge line1=$line1" 1>&2
+       npkts="$(printf "%s" "$line1" | grep -Eo "n_packets=[0-9]+" | sed -e 's/^n_packets=//')"
+       nbytes="$(printf "%s" "$line1" | grep -Eo "n_bytes=[0-9]+" | sed -e 's/^n_bytes=//')"
+       [ -n "$npkts" ] || npkts="0"
+       [ -n "$nbytes" ] || nbytes="0"
+ 
+       echo "$npkts $nbytes"
+    done
   done | awk '{ sum1+=$1; sum2+=$2; } END { print (sum1 ? sum1 : "0") " " (sum2 ? sum2 : "0"); };'
 
 #arg
