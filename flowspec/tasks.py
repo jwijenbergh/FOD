@@ -33,6 +33,7 @@ from os import fork,_exit
 from sys import exit
 import time
 import redis
+from django.forms.models import model_to_dict
 
 from peers.models import *
 
@@ -231,7 +232,8 @@ def batch_delete(routes, **kwargs):
 @shared_task(ignore_result=True)
 def announce(messg, user, route):
 
-  rule_changelog_logger.info(messg)
+  route_dict = model_to_dict(route)
+  rule_changelog_logger.info(messg+" route_dict="+str(route_dict))
 
   try:
     if user!=None:
