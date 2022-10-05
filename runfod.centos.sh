@@ -101,7 +101,8 @@ echo "Starting FoD gunicorn in foreground" 1>&2
 #exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1 --limit-request-fields 10000 --timeout 30
 #exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1
 #exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1 -k gevent --limit-request-fields 10000 --timeout 30 #--preload
-exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi --reload -w 1 -k gevent --limit-request-fields 10000 --timeout 30 
+#exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi --reload -w 1 -k gevent --limit-request-fields 10000 --timeout 30 
+exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi --reload -w 10 -k gevent --limit-request-fields 10000 --timeout 30 
 
 ##############################################################################
 ##############################################################################
