@@ -1,8 +1,11 @@
 #!/bin/bash
+#!/bin/sh
 #
 # This script installs all dependencies for Firewall-on-Demand running in Python3
 # with Celery, Redis, and sqlite.
 #
+
+SCRIPT_NAME="install-debian.sh"
 
 fod_dir="/srv/flowspy"
 venv_dir="/srv/venv"
@@ -94,10 +97,11 @@ function conf_db_access () {
 
 }
 
+##
 ##############################################################################
 ##############################################################################
 
-if [ -e "/.dockenv" ]; then 
+if [ -e "/.dockerenv" ]; then 
   echo "running inside docker assummed" 1>&2
   inside_docker=1
 fi
@@ -206,7 +210,7 @@ echo "conf_db_access=$conf_db_access DB_NAME=$DB__FOD_DBNAME DB_USER=$DB__FOD_US
 venv_dir_base="$(dirname "$venv_dir")"
 
 static_dir="$fod_dir/static"
-        
+
 inst_dir="$(dirname "$0")"
 
 mkdir -p "$fod_dir" || exit
@@ -220,7 +224,12 @@ fi
 echo "$0: inst_dir=$inst_dir fod_dir=$fod_dir => inst_dir_is_fod_dir=$inst_dir_is_fod_dir venv_dir=$venv_dir static_dir=$static_dir" 1>&2
 #exit
 
+#############################################################################
+#############################################################################
+
 if [ "$install_basesw" = 1 ]; then
+
+  echo "$0: step 1: installing base software dependencies (OS packages)" 1>&2
 
   if [ "$install_db" = "" ]; then
     mysql_server_pkg=("")
@@ -292,9 +301,15 @@ if [ -n "$install_db" ]; then
 
   set +e
 
+  echo "$0: step 1 done" 1>&2
+
 fi
 
 ##
+
+echo "$0: step 1a: handling sqlite3 too old fixup post actions" 1>&2 # only needed for CENTOS
+
+echo "$0: step 1b: preparing database system" 1>&2
 
 if [ -n "$init_db" ]; then
 
@@ -319,7 +334,25 @@ fi
 
 ##
 
+python_version="$(python3 --version | cut -d ' ' -f 2,2)"
+#if [ "$assume__sqlite_version__to_old" = 1 ]; then
+#  echo "$0: assume__sqlite_version__to_old=$assume__sqlite_version__to_old => using requirements-centos.txt" 1>&2
+#  cp "$fod_dir/requirements-centos.txt" "$fod_dir/requirements.txt"
+if [ -e "$fod_dir/requirements.txt.python$python_version" ]; then
+  echo "$0: using python version specific $fod_dir/requirements.txt.python$python_version" 1>&2
+  cp "$fod_dir/requirements.txt.python$python_version" "$fod_dir/requirements.txt"
+else
+  echo "$0: using $fod_dir/requirements.txt" 1>&2
+fi
+
+#############################################################################
+#############################################################################
+
 if [ "$install_fodproper" = 0 ]; then
+  
+  echo "$0: step 2a: installing Python dependencies only" 1>&2
+
+  set -e
 
   echo "Setup partial python environment for FoD"
 
@@ -337,19 +370,35 @@ if [ "$install_fodproper" = 0 ]; then
   #source /srv/venv/bin/activate
   source "$venv_dir/bin/activate"
 
-  # fix
-  pip install setuptools==57.5.0
+  ##
 
+  # fix for broken anyjson and cl
+  # TODO: fix this more cleanly
+  pip install 'setuptools==57.5.0'
   pip install wheel
+
   pip install -r requirements.txt
 
-else 
+  echo "$0: step 2a done" 1>&2
 
+else
+
+  echo "$0: step 2: installing FoD in installation dir + ensuring Python dependencies are installed + setting-up FoD settings, database preparations, and FoD run-time environment" 1>&2
+
+  set -e
+  
+  echo "$0: step 2.0" 1>&2
+  
   id fod &>/dev/null || useradd -m fod  
 
-  echo "Setup python environment for FoD"
+
   #mkdir -p /var/log/fod /srv
   mkdir -p /var/log/fod "$venv_dir_base"
+
+  ##
+
+  echo "Setup python environment for FoD"
+
   if [ -x pyvenv ]; then
     #pyvenv /srv/venv
     pyvenv "$venv_dir"
@@ -358,85 +407,121 @@ else
     virtualenv --python=python3 "$venv_dir"
   fi
   ln -sf "$venv_dir" "$fod_dir/venv"
+
   (
-        set +e
-        #source /srv/venv/bin/activate
-        source "$venv_dir/bin/activate"
-        #mkdir -p /srv/flowspy/
-        mkdir -p "$fod_dir"
+  set +e
+  #source /srv/venv/bin/activate
+  source "$venv_dir/bin/activate"
 
-        if [ "$inst_dir_is_fod_dir" = 0 ]; then
+  ##
 
-          # Select source dir and copy FoD into /srv/flowspy/
-          if [ "`basename "$0"`" = install-debian.sh ]; then
-                # this script is in the source directory
-                #cp -f -r "`dirname $0`"/* /srv/flowspy/
-                cp -f -r "$inst_dir"/* "$fod_dir"
-          elif [ -e /vagrant ]; then
-                # vagrant's copy in /vagrant/
-                #cp -f -r /vagrant/* /srv/flowspy/
-                cp -f -r /vagrant/* "$fod_dir"
-          elif [ -e ./install-centos.sh ]; then
-                # current directory is with the sourcecode
-                #cp -f -r ./* /srv/flowspy/
-                cp -f -r ./* "$fod_dir"
-          else
-                echo "Could not find FoD src directory tried `dirname $0`, /vagrant/, ./"
-                exit 1
-          fi
+  #mkdir -p /srv/flowspy/
+  mkdir -p "$fod_dir"
 
-        fi
+  if [ "$inst_dir_is_fod_dir" = 0 ]; then
+  
+    echo "$0: step 2.1: coyping from source dir to installation dir $fod_dir" 1>&2
 
-        #find "$fod_dir/" -not -user fod -exec chown -v fod: {} \;
-        find "$fod_dir/" -not -user fod -exec chown fod: {} \;
+    MYSELF="$(basename "$0")"
 
-        set -e
-        
-        #cd /srv/flowspy/
-        cd "$fod_dir"
-        (
-                cd flowspy
+    # Select source dir and copy FoD into /srv/flowspy/
+    if [ "$MYSELF" = "$SCRIPT_NAME" ]; then # if started as main script, e.g., in Docker or on OS-installation
+      # this script is in the source directory
+      #cp -f -r "`dirname $0`"/* /srv/flowspy/
+      cp -f -r "$inst_dir"/* "$fod_dir"
+    elif [ -e /vagrant ]; then # running in vagrant with /vagrant available
+      # vagrant's copy in /vagrant/
+      #cp -f -r /vagrant/* /srv/flowspy/
+      cp -f -r /vagrant/* "$fod_dir"
+    elif [ -e "$SCRIPT_NAME" ]; then # running in vagrant with script current dir == install dir
+      # current directory is with the sourcecode
+      #cp -f -r ./* /srv/flowspy/
+      cp -f -r ./* "$fod_dir"
+    else
+      echo "Could not find FoD src directory tried `dirname $0`, /vagrant/, ./"
+      exit 1
+    fi
 
-                if [ ! -e settings.py ]; then
-                  cp -f settings.py.dist settings.py
-                  patch settings.py < settings.py.patch
-                
-                  sed -i "s#/srv/flowspy#$fod_dir#" "settings.py"
-                fi
-        )
+  fi
 
-        if [ "$install_basesw" = 1 ]; then #are we running in --both mode, i.e. for the venv init is run for the first time, i.e. the problematic package having issues with to new setuptools is not yet installed?
-          # fix
-          pip install setuptools==57.5.0
-          :
-        fi
+   #find "$fod_dir/" -not -user fod -exec chown -v fod: {} \;
+   find "$fod_dir/" -not -user fod -exec chown fod: {} \;
 
-        pip install -r requirements.txt
+ ###
 
-        if [ ! -e "flowspy/settings_local.py" ]; then
-          touch flowspy/settings_local.py
-        fi
+  set -e
+  
+  echo "$0: step 2.2: setting-up FoD settings" 1>&2
+
+  #cd /srv/flowspy/
+  cd "$fod_dir"
+  (
+    cd flowspy # jump into settings subdir flowspy
+
+    if [ "$inside_docker" = 1 -a -e settings.py.docker ]; then # user has own settings prepared yet ?
+
+      cp -f settings.py.docker settings.py
+
+    elif [ -e settings.py ]; then # user has prepared a generic settings yet ?
+
+      : # nothing todo
+
+    else # prepare from settings.py.dist + settings.py.patch
+
+      cp -f settings.py.dist settings.py
+      patch settings.py < settings.py.patch
+      sed -i "s#/srv/flowspy#$fod_dir#" "settings.py"
+
+    fi
+  )
+
+  if [ ! -e "flowspy/settings_local.py" ]; then
+    touch flowspy/settings_local.py
+  fi
+  
+  echo "$0: step 2.3: ensuring Python dependencies are installed" 1>&2
+
+  if [ "$install_basesw" = 1 ]; then #are we running in --both mode, i.e. for the venv init is run for the first time, i.e. the problematic package having issues with to new setuptools is not yet installed?
+    # fix for broken anyjson and cl
+    # TODO: fix this more cleanly
+    pip install 'setuptools==57.5.0'
+  fi
+
+  # actual proper installation of python requirements
+  pip install -r requirements.txt
+
+  ##
+
+  echo "$0: step 2.4.1: preparing log sub dirs" 1>&2
 
         mkdir -p "$fod_dir/log" "$fod_dir/logs"
         touch "$fod_dir/debug.log"
         chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log"
-
+	
         if [ "$try_install_docu" = 1 ]; then
+	  echo "$0: step 2.4.2: compiling internal docu" 1>&2
           echo "trying to install mkdocs-based documentation" 1>&2
           (
             set -e
-            which mkdocs 2>/dev/null >/dev/null || apt-get install mkdocs
+            which mkdocs 2>/dev/null >/dev/null || apt-get install -y mkdocs
             cd "$fod_dir" && mkdocs build
             true # in case of failure override failure status, as the documentation is non-essential
           )
         fi
 
-        #./manage.py syncdb --noinput
-        #mkdir -p /srv/flowspy/static/
-        mkdir -p "$static_dir"
-        ./manage.py collectstatic --noinput
+	##
+  echo "$0: step 2.4: preparing FoD static files and database" 1>&2
 
-        ##
+  echo "$0: step 2.4.1: preparing FoD static files" 1>&2
+
+  #mkdir -p /srv/flowspy/static/
+  mkdir -p "$static_dir"
+
+  ([ ! -f "fodenv.sh" ] || source "./fodenv.sh"; ./manage.py collectstatic --noinput)
+
+  ##
+
+  echo "$0: step 2.4.2.0: preparing DB and DB access" 1>&2
 
         #if [ "$init_db" = "mariadb" -o "$init_db" = "mysql" ]; then
         #  init_mysqllikedb "$DB__FOD_DBNAME" "$DB__FOD_USER" "$DB__FOD_PASSWORD"
@@ -448,84 +533,104 @@ else
           echo 1>&2
         fi
 
-        ##    
+  ##    
 
-        echo "deploying/updating database schema" 1>&2
-        ./manage.py migrate
-        ./manage.py loaddata initial_data
-        echo 1>&2
-        
-        #
+  echo "$0: step 2.4.2.0: preparing FoD DB schema and basic data" 1>&2
 
-        # ./manage.py aboove may have created debug.log with root permissions:
-        chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log" 
-        [ ! -d "/var/log/fod" ] || chown -R fod: "/var/log/fod"
+  echo "deploying/updating database schema" 1>&2
+  (
+    [ ! -f "fodenv.sh" ] || source "./fodenv.sh"
 
-        #
+    #./manage.py syncdb --noinput
 
-        echo "providing supervisord config" 1>&2
-        cp -f "$fod_dir/supervisord.conf.dist" "$fod_dir/supervisord.conf"
-        sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/supervisord.conf"
-        echo 1>&2
+    ./manage.py migrate
+    ./manage.py loaddata initial_data
+  )
+  echo 1>&2
 
-        #
+  ##
 
-        mkdir -p /var/run/fod
-        chown fod: /var/run/fod 
+  # ./manage.py above may have created debug.log with root permissions:
+  chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log" 
+  [ ! -d "/var/log/fod" ] || chown -R fod: "/var/log/fod"
 
-        #
+  #
+  echo "$0: step 2.5: preparing FoD run-time environment" 1>&2
 
-##
+  echo "$0: step 2.5.1: preparing necessary dirs" 1>&2
 
-        if [ "$ensure_installed_pythonenv_wrapper" = 1 -a \( "$inside_docker" = 1 -o ! -e "$fod_dir/pythonenv" \) ]; then
-          echo "adding pythonev wrapper" 1>&2
-          cat > "$fod_dir/pythonenv" <<EOF
+  mkdir -p /var/run/fod
+  chown fod: /var/run/fod 
+
+  ##
+
+  echo "$0: step 2.5.2: preparing FoD python wrapper" 1>&2
+
+  if [ "$ensure_installed_pythonenv_wrapper" = 1 -a \( "$inside_docker" = 1 -o ! -e "$fod_dir/pythonenv" \) ]; then
+    echo "adding pythonev wrapper" 1>&2
+    cat > "$fod_dir/pythonenv" <<EOF
 #!/bin/bash
 . "$venv_dir/bin/activate"
+[ ! -e "$fod_dir/fodenv.sh" ] || . "$fod_dir/fodenv.sh"
 exec "\$@"
 EOF
-          chmod +x "$fod_dir/pythonenv"
-          echo 1>&2
-        fi
+    chmod +x "$fod_dir/pythonenv"
+    echo 1>&2
+  fi
 
-##
+  ##
 
-        fod_systemd_dir="$fod_dir/systemd"
-        cp -f "$fod_systemd_dir/fod-gunicorn.service.dist" "$fod_systemd_dir/fod-gunicorn.service"
-        sed -i "s#/srv/flowspy#$fod_dir#g" "$fod_systemd_dir/fod-gunicorn.service"
+  echo "$0: step 2.5.3: preparing supervisord.conf" 1>&2
 
-        cp -f "$fod_systemd_dir/fod-celeryd.service.dist" "$fod_systemd_dir/fod-celeryd.service"
-        sed -i "s#/srv/flowspy#$fod_dir#g" "$fod_systemd_dir/fod-celeryd.service"
+  cp -f "$fod_dir/supervisord.conf.dist" "$fod_dir/supervisord.conf"
+  sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/supervisord.conf"
+  echo 1>&2
 
-        cp -f "$fod_systemd_dir/fod-status-email-user@.service.dist" "$fod_systemd_dir/fod-status-email-user@.service"
-        sed -i "s#/srv/flowspy#$fod_dir#g" "$fod_systemd_dir/fod-status-email-user@.service"
+  ##
 
-        if [ "$install_systemd_services" = 1 ]; then
-          echo 1>&2
-          echo "Installing systemd services" 1>&2
-          echo 1>&2
-          #cp -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "/etc/systemd/system/"
-          cp -v -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "$fod_systemd_dir/fod-status-email-user@.service" "/etc/systemd/system/" 1>&2
-          systemctl daemon-reload
+  
+  echo "$0: step 2.5.5: preparing systemd files" 1>&2
 
-          systemctl enable fod-gunicorn
-          systemctl enable fod-celeryd
+  fod_systemd_dir="$fod_dir/systemd"
+  cp -f "$fod_systemd_dir/fod-gunicorn.service.dist" "$fod_systemd_dir/fod-gunicorn.service"
+  sed -i "s#/srv/flowspy#$fod_dir#g" "$fod_systemd_dir/fod-gunicorn.service"
 
-          systemctl restart fod-gunicorn
-          systemctl restart fod-celeryd
+  cp -f "$fod_systemd_dir/fod-celeryd.service.dist" "$fod_systemd_dir/fod-celeryd.service"
+  sed -i "s#/srv/flowspy#$fod_dir#g" "$fod_systemd_dir/fod-celeryd.service"
 
-          sleep 5
-          SYSTEMD_COLORS=1 systemctl status fod-gunicorn | cat
-          echo
-          SYSTEMD_COLORS=1 systemctl status fod-celeryd | cat
-          echo
+  cp -f "$fod_systemd_dir/fod-status-email-user@.service.dist" "$fod_systemd_dir/fod-status-email-user@.service"
+  sed -i "s#/srv/flowspy#$fod_dir#g" "$fod_systemd_dir/fod-status-email-user@.service"
 
-        fi
+  if [ "$install_systemd_services" = 1 ]; then
+    echo 1>&2
+    echo "Installing systemd services" 1>&2
+    echo 1>&2
+    #cp -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "/etc/systemd/system/"
+    cp -v -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "$fod_systemd_dir/fod-status-email-user@.service" "/etc/systemd/system/" 1>&2
+    systemctl daemon-reload
+
+    systemctl enable fod-gunicorn
+    systemctl enable fod-celeryd
+
+    systemctl restart fod-gunicorn
+    systemctl restart fod-celeryd
+
+    sleep 5
+    SYSTEMD_COLORS=1 systemctl status fod-gunicorn | cat
+    echo
+    SYSTEMD_COLORS=1 systemctl status fod-celeryd | cat
+    echo
+
+  fi
 
   )
+  
+  echo "$0: step 2 done" 1>&2
 
   set +e
 
 fi
 
+#############################################################################
+#############################################################################
 

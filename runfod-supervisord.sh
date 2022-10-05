@@ -40,7 +40,12 @@ while [ $# -gt 0 ]; do
 
 done
 
-##
+##############################################################################
+##############################################################################
+
+if [ -e "$fod_dir/fodenv.sh" ]; then
+  . "$fod_dir/fodenv.sh"
+fi
 
 #. /srv/venv/bin/activate
 . "$venv_dir/bin/activate"
@@ -51,6 +56,7 @@ if [ ! -e "$fod_dir/pythonenv" ]; then
   cat > "$fod_dir/pythonenv" <<EOF
 #!/bin/bash
 . "$venv_dir/bin/activate"
+[ ! -e "$fod_dir/fodenv.sh" ] || . "$fod_dir/fodenv.sh"
 exec "\$@"
 EOF
   #chmod +x /srv/flowspy/pythonenv
@@ -102,7 +108,7 @@ systemctl disable redis
 
 #useradd -m fod
 (
-  set -x
+  #set -x
   #source /srv/venv/bin/activate
   source "$venv_dir/bin/activate"
   #cd /srv/flowspy && ./manage.py collectstatic --noinput
@@ -113,7 +119,13 @@ systemctl disable redis
 sysctl vm.overcommit_memory=1
 
 # supervisord.conf
-cp -f supervisord.conf /etc
+if [ -f supervisord.conf.prep ]; then
+  echo "$0: using supervisord.conf.prep" 1>&2
+  cp -f supervisord.conf.prep /etc/supervisord.conf
+else
+  echo "$0: using supervisord.conf" 1>&2
+  cp -f supervisord.conf /etc
+fi
 
 
 mkdir -p /var/run/fod /var/log/fod
@@ -127,4 +139,7 @@ chown fod "$fod_dir" "$fod_dir/log" "$fod_dir/logs" "$fod_dir/log/"* "$fod_dir/l
 
 mkdir -p /var/run/supervisor
 exec /usr/bin/supervisord -n -c /etc/supervisord.conf
+
+##############################################################################
+##############################################################################
 

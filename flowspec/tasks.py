@@ -33,20 +33,31 @@ from os import fork,_exit
 from sys import exit
 import time
 import redis
+from django.forms.models import model_to_dict
 
 from peers.models import *
 
 LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
 
+RULE_CHANGELOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'rule_changelog.log')
+
 # FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 # logging.basicConfig(format=FORMAT)
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(LOG_FILENAME)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+rule_changelog_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+rule_changelog_logger = logging.getLogger(__name__+"__rule_changelog")
+rule_changelog_logger.setLevel(logging.DEBUG)
+rule_changelog_handler = logging.FileHandler(RULE_CHANGELOG_FILENAME)
+rule_changelog_handler.setFormatter(rule_changelog_formatter)
+rule_changelog_logger.addHandler(rule_changelog_handler)
+
+##
 
 @shared_task(ignore_result=True, autoretry_for=(TimeoutError, TimeLimitExceeded, SoftTimeLimitExceeded), retry_backoff=True, retry_kwargs={'max_retries': settings.NETCONF_MAX_RETRY_BEFORE_ERROR})
 def add(routepk, callback=None):
@@ -158,7 +169,7 @@ def delete_route(routepk, **kwargs):
     from flowspec.models import Route
     route = Route.objects.get(pk=routepk)
     logger.info("tasks::delete_route(): initial route.status="+str(route.status))
-    if route.status != "INACTIVE":
+    if route.status != "INACTIVE" and route.status != "EXPIRED":
         logger.info("Deactivating active route...")
         # call deactivate_route() directly since we are already on background (celery task)
         try:
@@ -169,7 +180,7 @@ def delete_route(routepk, **kwargs):
         except Exception as e:
             logger.info("tasks::delete_route(): exception during deactivate_route: "+str(e))
         logger.info("tasks::delete_route(): deactivate_route done => route.status="+str(route.status))
-        if route.status != "INACTIVE" and delete_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
+        if route.status != "INACTIVE" and route.status != "EXPIRED" and delete_route.request.retries < settings.NETCONF_MAX_RETRY_BEFORE_ERROR:
             # Repeat due to error in deactivation
             route.status = "PENDING"
             route.save()
@@ -177,7 +188,7 @@ def delete_route(routepk, **kwargs):
               logger.error("Deactivation failed, repeat the deletion process.")
               raise TimeoutError()
             
-    if route.status == "INACTIVE":
+    if route.status == "INACTIVE" or route.status == "EXPIRED":
         announce("[%s] Deleting inactive rule : %s" % (route.applier_username_nice, route.name_visible), route.applier, route)
         logger.info("Deleting inactive route...")
         route.delete()
@@ -220,6 +231,10 @@ def batch_delete(routes, **kwargs):
 
 @shared_task(ignore_result=True)
 def announce(messg, user, route):
+
+  route_dict = model_to_dict(route)
+  rule_changelog_logger.info(messg+" route_dict="+str(route_dict))
+
   try:
     if user!=None:
       #peers = user.userprofile.peers.all()
@@ -282,10 +297,15 @@ def check_sync(route_name=None, selected_routes=[]):
         if route.has_expired() and (route.status != 'EXPIRED' and route.status != 'ADMININACTIVE' and route.status != 'INACTIVE' and route.status != 'INACTIVE_TODELETE' and route.status != 'PENDING_TODELETE'):
             if route.status != 'ERROR':
                 logger.info('Expiring %s route %s' %(route.status, route.name))
-                subtask(delete).delay(route, reason="EXPIRED")
+                subtask(deactivate_route).delay(str(route.id), reason="EXPIRED")
         else:
             if route.status != 'EXPIRED':
+                old_status = route.status
                 route.check_sync()
+                new_status = route.status
+                if old_status != new_status:
+                  logger.info('status of rule changed during check_sync %s : %s -> %s' % (route.name, old_status, new_status))
+                  announce("[%s] Rule status change after sync check: %s - Result: %s" % ("-", route.name_visible, ""), route.applier, route)
 
 
 @shared_task(ignore_result=True)

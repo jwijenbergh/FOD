@@ -463,20 +463,29 @@ class Route(models.Model):
         """Used for REST API created routes that should have no expiration date"""
         self.expires = datetime.date.today() + datetime.timedelta(days=365*100) 
 
+    def update_status(self, new_status):
+        if self.status!=new_status:
+          logger.info('models::route::update_status(): id='+str(self.id))
+          self.status = new_status
+          self.save()
+
+
     def check_sync(self):
         if not self.is_synced():
-            self.status = "OUTOFSYNC"
-            self.save()
+            #self.status = "OUTOFSYNC"
+            #self.save()
+            self.update_status("OUTOFSYNC")
 
     def is_synced(self):
         found = False
-        get_device = PR.Retriever()
-        device = get_device.fetch_device()
         try:
+            get_device = PR.Retriever()
+            device = get_device.fetch_device()
             routes = device.routing_options[0].routes
         except Exception as e:
-            self.status = "EXPIRED"
-            self.save()
+            #self.status = "EXPIRED"
+            #self.save()
+            self.update_status("EXPIRED")
             logger.error('No routing options on device. Exception: %s' % e)
             return True
         for route in routes:
@@ -618,8 +627,9 @@ class Route(models.Model):
                     pass
                 if found and self.status != "ACTIVE":
                     logger.error('Rule is applied on device but appears as offline')
-                    self.status = "ACTIVE"
-                    self.save()
+                    #self.status = "ACTIVE"
+                    #self.save()
+                    self.update_status("ACTIVE")
                     found = True
             if self.status == "ADMININACTIVE" or self.status == "INACTIVE" or self.status == "INACTIVE_TODELETE" or self.status == "PENDING_TODELETE" or self.status == "EXPIRED":
                 found = True

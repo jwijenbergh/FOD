@@ -102,6 +102,9 @@ sub get_snmp_rulename
   $dst =~ s/\/32//;
   $src =~ s/\/32//;
 
+  $src =~ s/^0.0.0.0\/0$/0\/0/;
+  $dst =~ s/^0.0.0.0\/0$/0\/0/;
+
   my $rulename = $dst.",".$src;
 
   my $proto = $protocol_num;  
@@ -116,8 +119,10 @@ sub get_snmp_rulename
   my $src_port_str = ($srcports!="-") ? get_ports_str($srcports) : undef;
   my $dst_port_str = ($dstports!="-") ? get_ports_str($dstports) : undef;
 
-  if (defined($proto)) {
-    $rulename .= ",proto=$proto";
+  if (defined($proto) && $proto ne '' && $proto ne '-') {
+    my $proto2 = $proto;
+    $proto2 =~ s/,/,=/g;
+    $rulename .= ",proto=$proto2";
   }
 
   if (defined($dst_port_str) && $dst_port_str ne "") {

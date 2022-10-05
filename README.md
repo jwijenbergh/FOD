@@ -22,8 +22,14 @@ Users are authenticated against Shibboleth. Authorization is performed via a com
                               |            |
                               +------------+
 
+## Currently supported devices
 
-## Inbound firewall rules required on your flowspec device
+Fod currently supports updating of router(s) via NETCONF 
+(for more information see doc/prerequisites/generic.md)
+FoD currently does not support updating directly routers via BGP.
+
+### Example of inbound firewall rules required on your flowspec device
+
 
 |Name     |Protocol | Port |
 |:--------|:-------:|:----:|
@@ -47,7 +53,9 @@ FoD provides a rest api. It uses token as authentication method. For usage instr
 ## Limitations
 
 A user can belong to more than one `Peer` without any limitations.
-The FoD UI polls the server to dynamically update the dashboard and the
+
+The FoD UI polls the FoD server to dynamically update the dashboard and the
+
 "Live Status" about the `Route`s they are aware of. In addition, the polling
 implementation fetches information for every `Peer` the user is associated
 with. Thus, if a user belongs to many `Peer`s too many AJAX calls will be sent

@@ -20,7 +20,7 @@ RUN apt-get -qqy install locales
 
 RUN mkdir -p /var/log/fod /srv
 #COPY . /srv/flowspy
-COPY install-debian.sh requirements.txt /srv/flowspy/
+COPY install-debian.sh requirements.txt* /srv/flowspy/
 
 RUN apt-get -qqy install patch
 
