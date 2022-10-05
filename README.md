@@ -52,7 +52,7 @@ FoD provides a rest api. It uses token as authentication method. For usage instr
 ## Limitations
 
 A user can belong to more than one `Peer` without any limitations.
-The FoD UI polls the server to dynamically update the dashboard and the
+The FoD UI polls the FoD server to dynamically update the dashboard and the
 "Live Status" about the `Route`s they are aware of. In addition, the polling
 implementation fetches information for every `Peer` the user is associated
 with. Thus, if a user belongs to many `Peer`s too many AJAX calls will be sent
