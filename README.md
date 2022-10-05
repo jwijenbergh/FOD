@@ -22,8 +22,13 @@ Users are authenticated against Shibboleth. Authorization is performed via a com
                               |            |
                               +------------+
 
+## Currently supported devices
 
-## Inbound firewall rules required on your flowspec device
+Fod currently supports updating of router(s) via NETCONF 
+(for more information see doc/prerequisites/generic.md)
+FoD currently does not support updating directly routers via BGP.
+
+### Example of inbound firewall rules required on your flowspec device
 
 |Name     |Protocol | Port |
 |:--------|:-------:|:----:|
