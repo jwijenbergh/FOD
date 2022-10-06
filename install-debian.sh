@@ -97,6 +97,23 @@ function conf_db_access () {
 
 }
 
+function debug_python_deps()
+{
+  venv_file="$1"
+  exit_code="$2"
+
+  echo "debug_python_deps(): venv_file=$venv_file exit_code=$exit_code" 1>&2
+
+  [ -z "$venv_file" ] || . "$venv_file"
+
+  echo 1>&2
+  echo "# Python dependencies: " 1>&2  
+  pip list
+  echo "# End of Python dependencies" 1>&2  
+
+  [ -z "$exit_code" ] || exit "$exit_code"
+}
+
 ##
 ##############################################################################
 ##############################################################################
@@ -458,7 +475,15 @@ else
   (
     cd flowspy # jump into settings subdir flowspy
 
-    if [ "$inside_docker" = 1 -a -e settings.py.docker ]; then # user has own settings prepared yet ?
+    if [ "$inside_docker" = 1 -a -e settings.py.docker.debian ]; then # user has own settings prepared yet ?
+
+      cp -f settings.py.docker.debian settings.py
+
+    elif [ settings.py.debian ]; then # user has own settings prepared yet ?
+
+      cp -f settings.py.debian settings.py
+
+    elif [ "$inside_docker" = 1 -a -e settings.py.docker ]; then # user has own settings prepared yet ?
 
       cp -f settings.py.docker settings.py
 
@@ -492,24 +517,25 @@ else
 
   ##
 
-  echo "$0: step 2.4.1: preparing log sub dirs" 1>&2
+  echo "$0: step 2.3.1: preparing log sub dirs" 1>&2
 
-        mkdir -p "$fod_dir/log" "$fod_dir/logs"
-        touch "$fod_dir/debug.log"
-        chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log"
-	
-        if [ "$try_install_docu" = 1 ]; then
-	  echo "$0: step 2.4.2: compiling internal docu" 1>&2
-          echo "trying to install mkdocs-based documentation" 1>&2
-          (
-            set -e
-            which mkdocs 2>/dev/null >/dev/null || apt-get install -y mkdocs
-            cd "$fod_dir" && mkdocs build
-            true # in case of failure override failure status, as the documentation is non-essential
-          )
-        fi
+  mkdir -p "$fod_dir/log" "$fod_dir/logs"
+  touch "$fod_dir/debug.log"
+  chown -R fod: "$fod_dir/log" "$fod_dir/logs" "$fod_dir/debug.log"
 
-	##
+  if [ "$try_install_docu" = 1 ]; then
+    echo "$0: step 2.3.2: compiling internal docu" 1>&2
+    echo "trying to install mkdocs-based documentation" 1>&2
+    (
+      set -e
+      which mkdocs 2>/dev/null >/dev/null || apt-get install -y mkdocs
+      cd "$fod_dir" && mkdocs build
+      true # in case of failure override failure status, as the documentation is non-essential
+    )
+  fi
+
+  ##
+
   echo "$0: step 2.4: preparing FoD static files and database" 1>&2
 
   echo "$0: step 2.4.1: preparing FoD static files" 1>&2
@@ -517,7 +543,13 @@ else
   #mkdir -p /srv/flowspy/static/
   mkdir -p "$static_dir"
 
-  ([ ! -f "fodenv.sh" ] || source "./fodenv.sh"; ./manage.py collectstatic --noinput)
+  (
+    [ ! -f "fodenv.sh" ] || source "./fodenv.sh"; 
+    
+    source "$venv_dir/bin/activate"
+
+    ./manage.py collectstatic --noinput || debug_python_deps "$venv_dir/bin/activate" 1
+  )
 
   ##
 
@@ -540,6 +572,8 @@ else
   echo "deploying/updating database schema" 1>&2
   (
     [ ! -f "fodenv.sh" ] || source "./fodenv.sh"
+
+    source "$venv_dir/bin/activate"
 
     #./manage.py syncdb --noinput
 
