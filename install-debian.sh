@@ -107,6 +107,10 @@ function debug_python_deps()
   [ -z "$venv_file" ] || . "$venv_file"
 
   echo 1>&2
+  echo "# Python version: " 1>&2  
+  python --version
+
+  echo 1>&2
   echo "# Python dependencies: " 1>&2  
   pip list
   echo "# End of Python dependencies" 1>&2  
@@ -479,7 +483,7 @@ else
 
       cp -f settings.py.docker.debian settings.py
 
-    elif [ settings.py.debian ]; then # user has own settings prepared yet ?
+    elif [ -e settings.py.debian ]; then # user has own settings prepared yet ?
 
       cp -f settings.py.debian settings.py
 
