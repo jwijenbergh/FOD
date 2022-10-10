@@ -69,6 +69,8 @@ You can contact us directly at dev{at}noc[dot]grnet(.)gr
 
 ## Copyright and license
 
+Copyright © 2017-2022 GEANT GN4-2/GN4-3 Project
+
 Copyright © 2010-2017 Greek Research and Technology Network (GRNET S.A.)
 
 This program is free software: you can redistribute it and/or modify
