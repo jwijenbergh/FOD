@@ -3,6 +3,8 @@
 #############################################################################
 
 flowspy/settings.py
+flowspy/settings.py.centos
+
 *.pyc
 celerybeat-schedule
 *.log

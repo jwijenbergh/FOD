@@ -28,13 +28,12 @@ parameter
 
 REST API provides the following endpoints that will be described in more detail in the next sections:
 
-* `/api/routes/`
-* `/api/thenactions/`
-* `/api/matchprotocol/`
-* `/api/matchdscp/`
+* `/api/matchprotocol/` 
 * `/api/fragmenttypes/`
+* `/api/matchdscp/` not supported yet
+* `/api/thenactions/`
+* `/api/routes/`
 * `/api/stats/routes/`
-
 
 # Usage Examples
 
@@ -42,7 +41,7 @@ Some basic usage examples will be provided including available
 actions. Examples will be provided in `cURL` form.
 
 An example will be provided for `ThenAction`. This example applies to most other
-models (`MatchPort`, `FragmentType`, `MatchProtocol`, `MatchDscp`) except
+models (`FragmentType`, `MatchProtocol`, `MatchDscp`) except
 `Route` which is more complex and will be treated separately.
 
 ## ThenAction
@@ -56,6 +55,8 @@ URL: `/api/thenactions/`
 Example:
 ```
 curl -X GET https://fod.example.com/api/thenactions/ -H "Authorization: Token <your-token>"
+# or on the FoD host locally:
+curl -X GET http://localhost:8000/api/thenactions/ -H "Authorization: Token <your-token>"
 
 RESPONSE:
 [
@@ -155,7 +156,10 @@ RESPONSE:
 
 ### POST
 
-Required fields:
+Starting from FoD v1.7 the REST API accepts parameters for POST, PUT and PATCH only via JSON documents,
+old method used in REST API of FoD v1.3 to specify parameters as single form values is not supported any more.
+
+Required fields (to be specified via JSON document):
 
 * `name`: a name for the route
 * `source`: a source subnet in CIDR formation
@@ -170,50 +174,60 @@ Example input data file `newroute.json`:
 
 ```
 {
-    "comments": "test comment",
-    "destination": "1.0.0.4/32",
-    "destinationport": "124",
-    "name": "test",
-    "protocol": [
-        "udp"
-    ],
+    "name": "test1",
+    "comments": "test1 comment",
     "source": "0.0.0.0/0",
-    "sourceport": "123",
-    "then": ["discard"]
+    "destination": "1.0.0.4/32",
+    "protocol": [
+        "udp", "tcp"
+    ],
+    "sourceport": "123,126,250-270",
+    "destinationport": "27,124,300-400,500-600",
+    "then": ["discard"],
+    "expires": "2022-10-20"
 }
 ```
 
 ```
-curl -X POST --data-binary @newroute.json  -H "Content-Type: application/json" -H "Authorization: Token <your-token>" https://fod.example.com/api/routes/
+# protocol: "icmp" | "udp" | "tcp" # actually choices returned by 'curl -X GET https://fod.example.com/api/matchprotocol/ ...)
+# fragmenttype: "is-fragment" | "dont-fragment" | "first-fragment" | "last-fragment" | "not-a-fragment" # actually choices returned by 'curl -X GET https://fod.example.com/api/fragmenttype/ ...)
+# dscp: not supported yet
+# packetlength: not supported yet
+# tcpflag: not supported yet
+# icmptype: not supported yet
+# icmpcode: not supported yet
+# port, sourceport, destinationport
+# then: "discard" | "rate-limit:10000k" | "rate-limit:1000k" | "rate-limit:100k" # actually choices returned by 'curl -X GET https://fod.example.com/api/thenactions/ ...)
+```
 
-RESPONSE:
+```
+curl -X POST https://fod.example.com/api/routes/ -H "Content-Type: application/json" -d@newroute.json -H "Authorization: Token <your-token>" 
+
 {
-    "name": "test_OLLFTU",
-    "id": 63,
-    "comments": "test comment",
-    "applier": "admin",
-    "source": "0.0.0.0/0",
-    "sourceport": "123",
-    "destination": "1.0.0.4/32",
-    "destinationport": "124",
-    "port": null,
-    "dscp": [],
-    "fragmenttype": [],
-    "icmpcode": null,
-    "packetlength": null,
-    "protocol": [
-        "udp"
+    "name":"testroute_9Q5Y90",
+    "id":5,
+    "comments":"Route for testing",
+    "applier":"admin",
+    "source":"62.217.45.75/32",
+    "sourceport":[],
+    "destination":"62.217.45.94/32",
+    "destinationport":[],
+    "port":[],
+    "dscp":[],
+    "fragmenttype":[],
+    "icmpcode":null,
+    "packetlength":null,
+    "protocol":[],
+    "tcpflag":null,
+    "then":[
+       "https://fod.example.com/api/thenactions/4/"
     ],
-    "tcpflag": null,
-    "then": [
-        "discard"
-    ],
-    "filed": "2021-04-14T12:11:58.352094Z",
-    "last_updated": "2021-04-14T12:11:58.352141Z",
-    "status": "PENDING",
-    "expires": "2021-05-13",
-    "response": null,
-    "requesters_address": null
+    "filed":"2017-03-29T14:21:03.261Z",
+    "last_updated":"2017-03-29T14:21:03.261Z",
+    "status":"PENDING",
+    "expires":"2017-04-05",
+    "response":null,
+    "requesters_address":null
 }
 ```
 
@@ -224,122 +238,79 @@ operation). After a while the `Route` application will be finished and the
 You can check this `Route`s status by issuing a `GET` request with the `id`
 the API returned.
 
-This `Route`, however, is totally useless, since it applies no action for the
-matched traffic. Let's add one with a `then` action which will discard it.
 
-To do that, we must first add a `ThenAction` (or pick one of the already
-existing) since we need it's `id`. Let's assume a `ThenAction` with an `id` of
-`4` exists. To create a new `Route` with this `ThenAction`:
-
-```
-curl -X POST https://fod.example.com/api/routes/ -F "source=62.217.45.75/32" -F "destination=62.217.45.91/32" -F "name=testroute" -F "comments=Route for testing" -F "then=https://fod.example.com/api/thenactions/4" -H "Authorization: Token <your-token>"
-
-{
-    "name":"testroute_9Q5Y90",
-    "id":5,
-    "comments":"Route for testing",
-    "applier":"admin",
-    "source":"62.217.45.75/32",
-    "sourceport":[],
-    "destination":"62.217.45.94/32",
-    "destinationport":[],
-    "port":[],
-    "dscp":[],
-    "fragmenttype":[],
-    "icmpcode":null,
-    "packetlength":null,
-    "protocol":[],
-    "tcpflag":null,
-    "then":[
-       "https://fod.example.com/api/thenactions/4/"
-    ],
-    "filed":"2017-03-29T14:21:03.261Z",
-    "last_updated":"2017-03-29T14:21:03.261Z",
-    "status":"PENDING",
-    "expires":"2017-04-05",
-    "response":null,
-    "requesters_address":null
-}
-```
-
-With the same process one can associate a `Route` with the `MatchPort`,
-`FragmentType`, `MatchProtocol` & `MatchDscp` models.
-
-NOTE:
-
-When adding multiple `ForeignKey` related fields (such as multiple
-`MatchPort` or `ThenAction` items) it is best to use a `json` file on the
-request instead of specifying each field as a form argument.
-
-Example:
-
-```
-curl -X POST https://fod.example.com/api/routes/ -d@data.json -H "Authorization: Token <your-token>"
-
-data.json:
-{
-    "name": "testroute",
-    "comments": "Route for testing",
-    "then": [
-        "https://fod.example.com/api/thenactions/4",
-        "https://fod.example.com/api/thenactions/5",
-    ],
-    "source": "62.217.45.75/32",
-    "destination": "62.217.45.91/32"
-}
-
-RESPONSE:
-{
-    "name":"testroute_9Q5Y90",
-    "id":5,
-    "comments":"Route for testing",
-    "applier":"admin",
-    "source":"62.217.45.75/32",
-    "sourceport":[],
-    "destination":"62.217.45.94/32",
-    "destinationport":[],
-    "port":[],
-    "dscp":[],
-    "fragmenttype":[],
-    "icmpcode":null,
-    "packetlength":null,
-    "protocol":[],
-    "tcpflag":null,
-    "then":[
-       "https://fod.example.com/api/thenactions/4/"
-    ],
-    "filed":"2017-03-29T14:21:03.261Z",
-    "last_updated":"2017-03-29T14:21:03.261Z",
-    "status":"PENDING",
-    "expires":"2017-04-05",
-    "response":null,
-    "requesters_address":null
-}
-```
 
 ### PUT, PATCH
 
+Starting from FoD v1.7 the REST API accepts parameters for POST, PUT and PATCH only via JSON documents,
+old method used in REST API of FoD v1.3 to specify parameters as single form values is not supported any more.
+
 `Route` objects can be modified using the `PUT` / `PATCH` HTTP methods.
 
-When using `PUT` all fields should be specified (see `POST` section).
-However, when using `PATCH` one can specify single fields too. This is useful
-for changing the `status` of an `INACTIVE` `Route` to `ACTIVE`.
+```
+# e.g., for rule id '10100'
+curl -X PUT https://fod.example.com/api/routes/10100/ -d@data.json -H "Authorization: Token <your-token>"
 
-The process is the same as described above with `POST`. Don't forget to use
-the correct method.
+curl -X PATCH https://fod.example.com/api/routes/10100/ -d@data.json -H "Authorization: Token <your-token>"
+``` 
+
+When using `PUT` all fields need to be specified (compare `POST` section).
+However, when using `PATCH` one can specify single fields, too. 
+This is especially useful for changing the `status` of an `INACTIVE` `Route` to `ACTIVE`
+or vice versa.
+
+A PATCH or PUT of an active rule towards status INACTIVE will trigger removal of that active
+rule from the configured NETCONF-linked router.
+A PATCH or PUT of an inactive rule towards status ACTIVE will trigger commiting of that inactive
+rule to the configured NETCONF-linked router.
+A PATCH or PUT of an inactive rule with no status change will not trigger any change towards
+the configured NETCONF-linked router.
+
+The result of PUT and PATCH are different in the following case:
+A PATCH without change of status value and change only of non-FlowSpec-specific
+match and action fields will not trigger a recommiting of even an active FlowSpec rule
+on the configured NETCONF-linked router.
+So, e.g., the comments or the rule expiration period can be changed without interrupting
+and active route.
+
+In contrast, a PUT of an active rule will always trigger a recommiting of that route 
+on the configured NETCONF-linked router, independent of the attribute values changed.
+So, this is useful
+for ensuring that a rule is really still actively installed on the configured NETCONF-linked router
+with all match and action parameters as is was last deployed by FoD,
+and not changed by some other means without FoD's notice, e.g., other tools or directly by the CLI of the router.
 
 ### DELETE
 
-See `ThenAction`s.
+```
+# e.g., for rule id '10100'
+curl -X DELETE https://fod.example.com/api/routes/10100/ -H "Authorization: Token <your-token>"
 
-### General notes on `Route` models:
+``` 
 
-* When `POST`ing a new `Route`, FoD will automatically commit it to the flowspec
-device. Thus, `POST`ing a new `Route` with a status of `INACTIVE` has no effect,
-since the `Route` will be activated and the status will be restored to `ACTIVE`.
-* When `DELETE`ing a `Route`, the actual `Route` object will remain. FoD will
-only delete the rule from the flowspec device and change the `Route`'s status to
-'INACTIVE'
-* When changing (`PUT`/`PATCH`) a `Route`, FoD will sync the changes to the
-flowspec device. Changing the status of the `Route` will activate / delete the
-rule respectively.
+A DELETE method applied to a Flowspec rule has now always the semantics of fully removing the rule
+also from data base (and so its history), not only deactivating it via NETCONF on the routers.
+Furthermore, the application of this method can be restricted depending on the settings.
+3 setting variables (ALLOW_DELETE_FULL_FOR_ADMIN, ALLOW_DELETE_FULL_FOR_USER_ALL, ALLOW_DELETE_FULL_FOR_USER_LIST)
+control whether admin users, normal users in general, or a specificly selected
+set of normal users is allowed to use DELETE method.
+The default values of the settings (flowspy/settings.py.dist) by this means 
+allow DELETE only for admins, only for a specificly defined set of normal users.
+
+### General notes on `Route` models (differences to REST API of FoD v1.7):
+
+* Starting from FoD v1.7 the REST API accepts parameters for POST, PUT and PATCH only via JSON documents,
+old method used in REST API of FoD v1.3 to specify parameters as single form values is not supported any more.
+
+* In contrast to REST API of FoD v1.3, REST API of current version v1.7 will honor the status
+value set in POST method calls.
+So, it is possible to create a Flowspec rule with status INACTIVE, 
+i.e., a rule which will not be automatically commited via NETCONF as result of the POST method call.
+
+* In contrast to REST API of FoD v1.3, REST API of current version v1.7,
+the reuslt of PUT and PATCH method differs in some occasions (see above).
+
+* In contrast to REST API of FoD v1.3, REST API of current version v1.7
+will behave differently regarding the DELETE method (see above).
+
+

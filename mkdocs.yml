@@ -18,6 +18,7 @@ nav:
         - 'v1.7':
           - 'Generic': 'installation/v1.7/generic.md'
           - 'DEBIAN/UBUNTU': 'installation/v1.7/debian_ubuntu.md'
+          - 'CentOS': 'installation/v1.7/centos.md'
           - 'Docker': 'installation/v1.7/docker.md'
           - 'Docker Extra for Testing': 'installation/v1.7/docker_extra.md'
     - 'Configuration': 

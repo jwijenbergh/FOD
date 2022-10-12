@@ -47,10 +47,19 @@ while [ $# -gt 0 ]; do
 
 done
 
+##############################################################################
+##############################################################################
+
+if [ -e "$fod_dir/fodenv.sh" ]; then
+  . "$fod_dir/fodenv.sh"
+fi
+
 ##
 
 #. /srv/venv/bin/activate
 . "$venv_dir/bin/activate"
+
+##
 
 #if [ ! -e /srv/flowspy/pythonenv ]; then
 if [ ! -e "$fod_dir/pythonenv" ]; then
@@ -58,6 +67,7 @@ if [ ! -e "$fod_dir/pythonenv" ]; then
   cat > "$fod_dir/pythonenv" <<EOF
 #!/bin/bash
 . "$venv_dir/bin/activate"
+[ ! -e "$fod_dir/fodenv.sh" ] || . "$fod_dir/fodenv.sh"
 exec "\$@"
 EOF
   #chmod +x /srv/flowspy/pythonenv
@@ -91,6 +101,9 @@ echo "Starting FoD gunicorn in foreground" 1>&2
 #exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1 --limit-request-fields 10000 --timeout 30
 #exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1
 #exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi -w 1 -k gevent --limit-request-fields 10000 --timeout 30 #--preload
-exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi --reload -w 1 -k gevent --limit-request-fields 10000 --timeout 30 
+#exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi --reload -w 1 -k gevent --limit-request-fields 10000 --timeout 30 
+exec gunicorn -b 0.0.0.0:8000 flowspy.wsgi --reload -w 10 -k gevent --limit-request-fields 10000 --timeout 30 
 
+##############################################################################
+##############################################################################
 

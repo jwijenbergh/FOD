@@ -3,7 +3,7 @@
 For the installation on recent DEBIAN or UBUNTU, e.g., UBUNTU focal (20.04),
 there is ./install-debian.sh .
 
-It understands several command liane switches:
+It understands several command line switches:
 
 - --fod_dir DIRNAME : specify FoD run-time directory, where FoD files are to be copied and to be run from 
 - --venv_dir DIRNAME : specify where Python virtualenv used by FoD will be located

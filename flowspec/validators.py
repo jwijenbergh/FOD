@@ -21,7 +21,7 @@ logger.addHandler(handler)
 
 def get_network(ip):
     try:
-        address = ip_network(ip)
+        address = ip_network(ip, strict=False)
     except ValueError as e:
         logger.info("validators::get_network(): ip="+str(ip)+" got exception type="+str(type(e))+" :"+str(e))
         return (False, _('Invalid network address format: '+str(e)))
@@ -69,7 +69,7 @@ def clean_source(user, source):
     if not success:
         return address
     for net in settings.PROTECTED_SUBNETS:
-        if address in ip_network(net):
+        if address in ip_network(net, strict=False):
             mail_body = "User %s %s attempted to set %s as the source address in a firewall rule" % (user.username, user.email, source)
             send_mail(
                 settings.EMAIL_SUBJECT_PREFIX + "Caught an attempt to set a protected IP/network as a source address",
@@ -87,7 +87,7 @@ def clean_destination(user, destination):
     if not success:
         return address
     for net in settings.PROTECTED_SUBNETS:
-        if address in ip_network(net):
+        if address in ip_network(net, strict=False):
             mail_body = "User %s %s attempted to set %s as the destination address in a firewall rule" % (user.username, user.email, destination)
             send_mail(
                 settings.EMAIL_SUBJECT_PREFIX + "Caught an attempt to set a protected IP/network as the destination address",
@@ -100,7 +100,7 @@ def clean_destination(user, destination):
     # make sure its a network prefix that
     # can be used, depending on settings.PREFIX_LENGTH
 
-    if ip_network(address).version>4:
+    if ip_network(address, strict=False).version>4:
       if address.prefixlen < settings.PREFIX_LENGTH_IPV6:
         return _("Currently no IPv6 prefix lengths < %s are allowed") % settings.PREFIX_LENGTH_IPV6
     else:
@@ -118,9 +118,9 @@ def clean_destination(user, destination):
     else:
         networks = PeerRange.objects.filter(peer__in=Peer.objects.all()).distinct()
     network_is_mine = False
-    dest_net = ip_network(destination)
+    dest_net = ip_network(destination, strict=False)
     for network in networks:
-        net = ip_network(network.network)
+        net = ip_network(network.network, strict=False)
 
         if dest_net.network_address in net and dest_net.prefixlen >= net.prefixlen:
             network_is_mine = True
@@ -218,7 +218,7 @@ def check_if_rule_exists(fields, queryset):
         return (False, None)
     routes = queryset.filter(
         source=fields.get('source'),
-        destination=ip_network(fields.get('destination')).compressed,
+        destination=ip_network(fields.get('destination'), strict=False).compressed,
     )
     if routes:
         ids = [str(item[0]) for item in routes.values_list('pk')]
@@ -228,7 +228,7 @@ def check_if_rule_exists(fields, queryset):
 
     routes = Route.objects.filter(
         source=fields.get('source'),
-        destination=ip_network(fields.get('destination')).compressed,
+        destination=ip_network(fields.get('destination'), strict=False).compressed,
     )
     for route in routes:
         return (

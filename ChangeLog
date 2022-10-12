@@ -1,3 +1,10 @@
+
+=======
+2022/08
+Many improvements and enhancements
+        - IPv6 rule support added
+        - Improved IP range matching between rules and peer IP ranges
+
 =======
 1.7 RELEASE (in 2021)
 Completed Reimplementation

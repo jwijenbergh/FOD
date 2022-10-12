@@ -57,10 +57,10 @@ SECRET_KEY = '@sa@5234#$%345345^@#$%*()123^@12!&!()$JMNDF#$@(@#8FRNJWX_'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
+        'ENGINE': 'django.db.backends.',  # DB_ENGINE # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '',                       # DB_NAME
+        'USER': '',                       # DB_USER
+        'PASSWORD': '',                   # DB_PASSWORD
         'HOST': '',                      # Set to empty string for localhost.
         'PORT': '',                      # Set to empty string for default.
     }
@@ -608,6 +608,8 @@ MAX_RULE_EXPIRE_DAYS = 30
 ##############################################################################
 ##############################################################################
 # rule deletion (via rest)
+
+RESTAPI_DEL_METHOD__FOR_NONALLOWED_USERS__DEACTIVATES = False
 
 ALLOW_DELETE_FULL_FOR_ADMIN = True
 ALLOW_DELETE_FULL_FOR_USER_ALL = False

@@ -36,6 +36,9 @@ from peers.models import PeerRange, Peer
 
 from flowspec.junos import create_junos_name
 
+#import flowspec.iprange_match
+from flowspec.iprange_match import find_matching_peer_by_ipprefix__simple
+
 from utils.randomizer import id_generator as id_gen
 
 FORMAT = '%(asctime)s %(levelname)s: %(message)s'
@@ -219,8 +222,8 @@ class Route(models.Model):
         source_ip_version = 4
         destination_ip_version = 4
         try:
-          source_ip_version = ip_network(route_obj.source).version
-          destination_ip_version = ip_network(route_obj.destination).version
+          source_ip_version = ip_network(route_obj.source, strict=False).version
+          destination_ip_version = ip_network(route_obj.destination, strict=False).version
         except Exception as e:
             logger.info("model::route::ip_version(): exception in trying to determine ip_version: "+str(e))
         pass
@@ -261,33 +264,37 @@ class Route(models.Model):
         from django.core.exceptions import ValidationError
         if self.destination:
             try:
-                address = ip_network(self.destination)
+                address = ip_network(self.destination, strict=False)
                 self.destination = address.exploded
             except Exception:
                 raise ValidationError(_('Invalid network address format at Destination Field'))
         if self.source:
             try:
-                address = ip_network(self.source)
+                address = ip_network(self.source, strict=False)
                 self.source = address.exploded
             except Exception:
                 raise ValidationError(_('Invalid network address format at Source Field'))
 
     def commit_add(self, *args, **kwargs):
         peers = self.applier.userprofile.peers.all()
-        username = None
-        for peer in peers:
-            if username:
-                break
-            for network in peer.networks.all():
-                net = ip_network(network)
-                if ip_network(self.destination) in net:
-                    username = peer
-                    break
+
+        #username = None
+        #for peer in peers:
+        #    if username:
+        #        break
+        #    for network in peer.networks.all():
+        #        net = ip_network(network, strict=False)
+        #        if ip_network(self.destination, strcit=False) in net:
+        #            username = peer
+        #            break
+        username = find_matching_peer_by_ipprefix__simple(peers, self.destination)
+
         if username:
             peer = username.peer_tag
         else:
             peer = None
-        send_message("[%s] Adding rule %s. Please wait..." % (self.applier_username_nice, self.name), peer)
+
+        send_message("[%s] Adding rule %s. Please wait..." % (self.applier_username_nice, self.name_visible), peer, self)
         response = add.delay(self.pk)
         logger.info('Got add job id: %s' % response)
         if not settings.DISABLE_EMAIL_NOTIFICATION:
@@ -322,26 +329,24 @@ class Route(models.Model):
 
     def commit_edit(self, *args, **kwargs):
         peers = self.applier.userprofile.peers.all()
-        username = None
-        for peer in peers:
-            if username:
-                break
-            for network in peer.networks.all():
-                net = ip_network(network)
-                if ip_network(self.destination) in net:
-                    username = peer
-                    break
+
+        #username = None
+        #for peer in peers:
+        #    if username:
+        #        break
+        #    for network in peer.networks.all():
+        #        net = ip_network(network, strict=False)
+        #        if ip_network(self.destination, strict=False) in net:
+        #            username = peer
+        #            break
+        username = find_matching_peer_by_ipprefix__simple(peers, self.destination)
+
         if username:
             peer = username.peer_tag
         else:
             peer = None
-        send_message(
-            '[%s] Editing rule %s. Please wait...' %
-            (
-                self.applier_username_nice,
-                self.name
-            ), peer
-        )
+
+        send_message('[%s] Editing rule %s. Please wait...' % (self.applier_username_nice, self.name_visible), peer, self)
         response = edit.delay(self.pk)
         logger.info('Got edit job id: %s' % response)
         if not settings.DISABLE_EMAIL_NOTIFICATION:
@@ -378,31 +383,37 @@ class Route(models.Model):
 
     def commit_deactivate(self, *args, **kwargs):
         username = None
+
         reason_text = ''
         reason = ''
         if "reason" in kwargs:
             reason = kwargs['reason']
             reason_text = 'Reason: %s.' % reason
+
         peers = self.applier.userprofile.peers.all()
-        for peer in peers:
-            if username:
-                break
-            for network in peer.networks.all():
-                net = ip_network(network)
-                if ip_network(self.destination) in net:
-                    username = peer
-                    break
+
+        #for peer in peers:
+        #    if username:
+        #        break
+        #    for network in peer.networks.all():
+        #        net = ip_network(network, strict=False)
+        #        if ip_network(self.destination, strict=False) in net:
+        #            username = peer
+        #            break
+        username = find_matching_peer_by_ipprefix__simple(peers, self.destination)
+
         if username:
             peer = username.peer_tag
         else:
             peer = None
-        send_message(
-            '[%s] Suspending rule %s. %sPlease wait...' % (
-                self.applier_username_nice,
-                self.name,
-                reason_text
-            ), peer
-        )
+        #send_message(
+        #    '[%s] Suspending rule %s. %sPlease wait...' % (
+        #        self.applier_username_nice,
+        #        self.name_visible,
+        #        reason_text
+        #    ), 
+        #    peer, self
+        #)
         if not settings.DISABLE_EMAIL_NOTIFICATION:
             fqdn = Site.objects.get_current().domain
             admin_url = 'https://%s%s' % (
@@ -452,20 +463,29 @@ class Route(models.Model):
         """Used for REST API created routes that should have no expiration date"""
         self.expires = datetime.date.today() + datetime.timedelta(days=365*100) 
 
+    def update_status(self, new_status):
+        if self.status!=new_status:
+          logger.info('models::route::update_status(): id='+str(self.id))
+          self.status = new_status
+          self.save()
+
+
     def check_sync(self):
         if not self.is_synced():
-            self.status = "OUTOFSYNC"
-            self.save()
+            #self.status = "OUTOFSYNC"
+            #self.save()
+            self.update_status("OUTOFSYNC")
 
     def is_synced(self):
         found = False
-        get_device = PR.Retriever()
-        device = get_device.fetch_device()
         try:
+            get_device = PR.Retriever()
+            device = get_device.fetch_device()
             routes = device.routing_options[0].routes
         except Exception as e:
-            self.status = "EXPIRED"
-            self.save()
+            #self.status = "EXPIRED"
+            #self.save()
+            self.update_status("EXPIRED")
             logger.error('No routing options on device. Exception: %s' % e)
             return True
         for route in routes:
@@ -607,8 +627,9 @@ class Route(models.Model):
                     pass
                 if found and self.status != "ACTIVE":
                     logger.error('Rule is applied on device but appears as offline')
-                    self.status = "ACTIVE"
-                    self.save()
+                    #self.status = "ACTIVE"
+                    #self.save()
+                    self.update_status("ACTIVE")
                     found = True
             if self.status == "ADMININACTIVE" or self.status == "INACTIVE" or self.status == "INACTIVE_TODELETE" or self.status == "PENDING_TODELETE" or self.status == "EXPIRED":
                 found = True
@@ -689,7 +710,7 @@ class Route(models.Model):
             #logger.info("containing_peer_ranges(): peers all="+str(PeerRange.objects.all()))
             #containing_peer_ranges = PeerRange.objects.filter(network__contains(destination_network))
             #containing_peer_ranges = [obj for obj in PeerRange.objects.all() if ip_network(obj.network).__contains__(destination_network)]
-            containing_peer_ranges = [obj for obj in PeerRange.objects.all() if ip_network(obj.network).network_address <= destination_network.network_address and ip_network(obj.network).broadcast_address >= destination_network.broadcast_address ]
+            containing_peer_ranges = [obj for obj in PeerRange.objects.all() if destination_network.version==ip_network(obj.network, strict=False).version and ip_network(obj.network, strict=False).network_address <= destination_network.network_address and ip_network(obj.network, strict=False).broadcast_address >= destination_network.broadcast_address ]
             logger.info("containing_peer_ranges(): containing_peer_ranges="+str(containing_peer_ranges))
         except Exception as e:
             logger.info("containing_peer_ranges(): exception occured: "+str(e))
@@ -703,6 +724,15 @@ class Route(models.Model):
         logger.info("containing_peers(): containing_peer_ranges="+str(containing_peer_ranges2))
         #return [obj.peer for obj in containing_peer_ranges2]
         return [obj for obj in Peer.objects.all() if len(set(obj.networks.all()).intersection(containing_peer_ranges2))>0]
+
+    def containing_ip_networks(self, ip_ranges):
+        try:
+            ip_networks = [ip_network(ip_range, strict=False) for ip_range in ip_ranges]
+            containing_ip_networks = [ip_net for ip_net in ip_networks if destination_network.version==ip_net.version and ip_net.network_address <= destination_network.network_address and ip_net.broadcast_address >= destination_network.broadcast_address ]
+        except Exception as e:
+            logger.info("containing_ip_networks(): exception occured: "+str(e))
+            containing_ip_networks = []
+        return containing_ip_networks
 
     @property
     def days_to_expire(self):
@@ -722,13 +752,30 @@ class Route(models.Model):
     def get_absolute_url(self):
         return reverse('route-details', kwargs={'route_slug': self.name})
 
+##
 
-def send_message(msg, user):
-#    username = user.username
-    peer = user
-    #b = beanstalkc.Connection()
-    #b.use(settings.POLLS_TUBE)
-    tube_message = json.dumps({'message': str(msg), 'username': peer})
-    #b.put(tube_message)
-    #b.close()
+def send_message(msg, peer, route):
+    ##    username = user.username
+    ##b = beanstalkc.Connection()
+    ##b.use(settings.POLLS_TUBE)
+    #tube_message = json.dumps({'message': str(msg), 'username': peer})
+    ##b.put(tube_message)
+    ##b.close()
+
+    # use new announce method in tasks.py
+    announce(msg, peer, route)
+
+#############################################################################
+#############################################################################
+# global helpers 
+
+# class1's attribute 'id' should be existing and be the primary key, e.g., be a Django model class
+def convert_container_to_queryset(list1, class1):
+         #temp1_ids = [obj.id for obj in list1]
+         temp1_ids = [obj.id for obj in list1 if obj != None]
+         temp2_ids = set(temp1_ids)
+         return class1.objects.filter(id__in=temp2_ids)
+
+#############################################################################
+#############################################################################
 

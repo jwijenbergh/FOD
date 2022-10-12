@@ -1,6 +1,6 @@
 # Installing Flowspy v1.7 Generic
 
-This guide provides general information about the installation of Flowspy. In case you use Debian Wheezy or Red Hat Linux, we provide detailed instructions for the installation.
+This guide provides general information about the installation of Flowspy. In case you use Debian/UBUNTU, we provide detailed instructions for the installation.
 
 Also it assumes that installation is carried out in `/srv/flowspy`
 directory. If other directory is to be used, please change the
@@ -15,41 +15,46 @@ TO UPDATE
 In order to install FoD properly, make sure the following software is installed on your computer.
 
 - apache 2
-- memcached
 - libapache2-mod-proxy-html
 - gunicorn
-- beanstalkd
+- redis
 - mysql
-- python
+- python3
+- python3-dev
+- python-virtualenv
 - pip
-- libxml2-dev
-- libxslt-dev
 - gcc
-- python-dev
+
+### Download Flowspy
+You can clone FoD from GEANT github repository. 
+
+    mkdir -p /srv/
+    cd /srv/
+    git clone https://github.com/GEANT/FoD flowspy
+
+### Python-virtualenv
+
+    cd /srv
+    virtualenv --python=python3 /srv/venv
+    . /srv/venv/bin/activate
 
 ### Pip
 In order to install the required python packages for Flowspy you can use pip:
 
-	pip install -r requirements.txt
+    . /srv/venv/bin/activate
+    cd /srv/flowspy
+    pip install -r requirements.txt
 
 ### Create a database
 If you are using mysql, you should create a database:
 
     mysql -u root -p -e 'create database fod'
 
-### Download Flowspy
-You can download Fod from GRNETs github repository. Then you have to unzip the file and place it under /srv.
-
-	cd /tmp
-	wget https://github.com/grnet/flowspy/archive/v1.2.zip
-	unzip v1.2.zip
-	mv flowspy-1.2 /srv/flowspy/
-
 ### Copy dist files
 
-	cd /srv/flowspy/flowspy
-	cp settings.py.dist settings.py
-	cp urls.py.dist urls.py
+    cd /srv/flowspy/flowspy
+    cp settings.py.dist settings.py
+    cp urls.py.dist urls.py
 
 ### Device Configuration
 Flowspy generates and commits flowspec rules to a
@@ -61,14 +66,26 @@ in settings.py. See Configuration for details.
 ### Adding some default data
 Into `/srv/flowspy` you will notice that there is a directory called `initial_data`. In there, there is a file called `fixtures_manual.xml` which contains some default static pages for django's flatpages app. In this file we have placed 4 flatpages (2 for Greek, 2 for English) with Information and Terms of Service about the service. To import the flatpages, run from `/srv/flowspy`:
 
-	./manage.py loaddata initial_data/fixtures_manual.xml
+    . /srv/venv/bin/activate
+    ./manage.py loaddata initial_data/fixtures_manual.xml
 
 
-### Beanstalkd
-Just start beanstalk already!
+### Redis
+Just make sure redis is installed and started
 
-	service beanstalkd start
+     # on DEBIAN/UBUNTU (>= DEBIAN 10/UBUNTU 18)
+     apt-get install redis-server
+     systemctl enable redis-server 
+     systemctl start redis-server 
 
+### mkdocs-based internal documentation
+Just make sure mkdocs is installed and prepare documentation with it
+(the documentation is optional and non-essential for the operation of FoD)
+
+     # on DEBIAN/UBUNTU (>= DEBIAN 10/UBUNTU 18)
+     apt-get install mkdocs
+     cd /srv/flowspy
+     mkdocs build
 
 ### Apache2
 Apache proxies gunicorn. Things are more flexible here as you may follow your own configuration and conventions.

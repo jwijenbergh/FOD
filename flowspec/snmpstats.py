@@ -197,9 +197,19 @@ def save_history(history, nowstr):
 def helper_stats_store_parse_ts(ts_string):
   try:
     ts = datetime.strptime(ts_string, '%Y-%m-%dT%H:%M:%S.%f')
+  except ValueError as e:
+    logger.info("helper_stats_store_parse_ts(): ts_string="+str(ts_string)+": got ValueError "+str(e))
+
+    try:
+      ts = datetime.strptime(ts_string, '%Y-%m-%dT%H:%M:%S')
+    except Exception as e:
+      logger.info("helper_stats_store_parse_ts(): ts_string="+str(ts_string)+": got exception "+str(e))
+      ts = None
+
   except Exception as e:
     logger.info("helper_stats_store_parse_ts(): ts_string="+str(ts_string)+": got exception "+str(e))
     ts = None
+
   return ts
 
 def helper_rule_ts_parse(ts_string):

@@ -1,5 +1,5 @@
 
-#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.debian.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.step2 -t fodpy3 .
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.debian.base -t fodpy3_debian_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.step2 -t fodpy3_debian .
 
 ##
 

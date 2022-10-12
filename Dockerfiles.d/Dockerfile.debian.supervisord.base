@@ -1,5 +1,5 @@
 
-#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisor.step2 -t fodpy3 .
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisord.base -t fodpy3_debian_svzd_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisord.step2 -t fodpy3_debian_svzd .
 
 ##
 
@@ -20,7 +20,7 @@ RUN apt-get -qqy install locales
 
 RUN mkdir -p /var/log/fod /srv
 #COPY . /srv/flowspy
-COPY install-debian.sh requirements.txt /srv/flowspy/
+COPY install-debian.sh requirements.txt* /srv/flowspy/
 
 RUN apt-get -qqy install patch
 

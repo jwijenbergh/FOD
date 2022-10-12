@@ -11,10 +11,14 @@ import requests
 
 assert settings.ROUTES_DUPLICATES_CHECKING == False
 
+#dirname1 = os.path.dirname(__file__)
+dirname1 = os.path.dirname(os.path.dirname(__file__)) # 2 dir components up as we are located in sub dir "flowspec"
+
 @pytest.fixture
 def test_settings(settings):
     settings.DEBUG = True
-    settings.LOG_FILE_LOCATION = "/srv/flowspy/log/testing"
+    #settings.LOG_FILE_LOCATION = "/srv/flowspy/log/testing"
+    settings.LOG_FILE_LOCATION = dirname1+"/log/testing"
 
 pytestmark = pytest.mark.django_db
 
@@ -22,7 +26,8 @@ pytestmark = pytest.mark.django_db
 def api_client(django_db_blocker):
   with django_db_blocker.unblock():
     settings.DEBUG = True
-    settings.LOG_FILE_LOCATION = "/srv/flowspy/log/testing"
+    #settings.LOG_FILE_LOCATION = "/srv/flowspy/log/testing"
+    settings.LOG_FILE_LOCATION = dirname1+"/log/testing"
 
     from rest_framework.test import APIClient
 
@@ -240,7 +245,8 @@ class TestRoute:
 
     def test_add_check(self, api_client, settings):
         settings.DEBUG = True
-        settings.LOG_FILE_LOCATION = "/srv/flowspy/log/testing"
+        #settings.LOG_FILE_LOCATION = "/srv/flowspy/log/testing"
+        settings.LOG_FILE_LOCATION = dirname1+"/log/testing"
 
         endpoint = '/api/routes/'
 
@@ -329,7 +335,8 @@ class TestRouteOuter:
         if environ.get('FOD_TOKEN') != None:
           token1 = environ.get('FOD_TOKEN')
         else:
-          f = open("/srv/flowspy/.admin_token1", "r")
+          #f = open("/srv/flowspy/.admin_token1", "r")
+          f = open(dirname1+"/.admin_token1", "r")
           token1 = f.read().rstrip() 
           f.close()
 

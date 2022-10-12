@@ -34,19 +34,43 @@ gunicorn will be accessible from outside the container by port 8000.
 
 #### Installation and starting of CENTOS docker container
 
+building docker container:
+```
 docker build -f Dockerfile -t fod-centos .
+or 
+docker build -f ./Dockerfiles.d/Dockerfile.centos.supervisord -t fod-centos . # for using supervisord inside container
+or 
+docker build -f ./Dockerfiles.d/Dockerfile.centos.base -t fodpy3_centos_base . && docker build -f ./Dockerfiles.d/Dockerfile.centos.step2 -t fod-centos . # for using a 2-step docker build (for faster rebuild on changes in the code, mainly useful for developers)
+or
+docker build -f ./Dockerfiles.d/Dockerfile.centos.supervisord.base -t fodpy3_centos_svzd_base . && docker build -f ./Dockerfiles.d/Dockerfile.centos.supervisord.step2 -t fod-centos . # for using supervisord inside container + using a 2-step docker build (for faster rebuild on changes in the code, mainly useful for developers)
+```
 
+starting built docker container:
+```
 docker run -p 8000:8000 fod-centos # run in foregrund
 
 docker run -d -p 8000:8000 fod-centos # run in background
+```
 
 #### Installation and starting of UBUNTU docker container
 
-docker build -f Dockerfile.debian -t fod-debian .
+building docker container:
+```
+docker build -f ./Dockerfiles.d/Dockerfile.debian -t fod-debian .
+or
+docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisord -t fod-debian . # for using supervisord inside container
+or 
+docker build -f ./Dockerfiles.d/Dockerfile.debian.base -t fodpy3_debian_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.step2 -t fod-debian . # for using a 2-step docker build (for faster rebuild on changes in the code, mainly useful for developers)
+or 
+docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisord.base -t fodpy3_debian_svzd_base . && docker build -f ./Dockerfiles.d/Dockerfile.debian.supervisord.step2 -t fod-debian . # for using supervisord inside container + using a 2-step docker build (for faster rebuild on changes in the code, mainly useful for developers)
+```
 
+starting built docker container:
+```
 docker run -p 8000:8000 fod-debian # run in foreground
 
 docker run -d -p 8000:8000 fod-debian # run in background
+```
 
 #### Configuring NETCONF in a running container 
 

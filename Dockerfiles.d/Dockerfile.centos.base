@@ -1,5 +1,5 @@
 
-#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.centos.base -t fodpy3_base . && docker build -f ./Dockerfiles.d/Dockerfile.centos.step2 -t fodpy3 .
+#use (from main dir): docker build -f ./Dockerfiles.d/Dockerfile.centos.base -t fodpy3_centos_base . && docker build -f ./Dockerfiles.d/Dockerfile.centos.step2 -t fodpy3_centos .
 
 ##
 
@@ -15,7 +15,8 @@ RUN yum -y install procps
 
 RUN mkdir -p /var/log/fod /srv
 #COPY . /srv/flowspy
-COPY install-centos.sh requirements.txt requirements-centos.txt /srv/flowspy/
+COPY install-centos.sh install-centos*.sh requirements.txt* requirements-centos.txt /srv/flowspy/
+#COPY supervisord-centos.conf /srv/flowspy/supervisord.conf
 
 RUN (cd /srv/flowspy; ./install-centos.sh --basesw;)
 
