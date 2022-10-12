@@ -94,4 +94,14 @@ public class ConfigFileReader {
 		 if(SQLPass != null) return SQLPass;
 		 else throw new RuntimeException("SQLPass not specified in the Configuration.properties file.");
 		 }
+	 public String getAPIToken() {
+		 String APIToken = properties.getProperty("APIToken");
+		 if(APIToken != null) return APIToken;
+		 else throw new RuntimeException("APIToken not specified in the Configuration.properties file.");
+		 }
+	 public String getSpecificItemIdForRESTAPI() {
+		 String SpecificItemIdForRESTAPI = properties.getProperty("SpecificItemIdForRESTAPI");
+		 if(SpecificItemIdForRESTAPI != null) return SpecificItemIdForRESTAPI;
+		 else throw new RuntimeException("SpecificItemIdForRESTAPI not specified in the Configuration.properties file.");
+		 }
 }

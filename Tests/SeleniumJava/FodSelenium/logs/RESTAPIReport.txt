@@ -1,0 +1,149 @@
+/
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+Find and My rules header: myrulesheader
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton
+
+Login
+Go to url: http://81.180.84.150:8080/altlogin
+Find login input: id_username 
+Add in login input data: admin
+Find password input: id_password
+Add in password input data: 1
+Find and click on Apply button: applybutton

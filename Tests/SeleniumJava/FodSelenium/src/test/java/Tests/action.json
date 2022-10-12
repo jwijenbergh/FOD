@@ -1,0 +1,4 @@
+{
+    "action": "{{action}}",
+    "action_value": "{{action_value}}" 
+}
