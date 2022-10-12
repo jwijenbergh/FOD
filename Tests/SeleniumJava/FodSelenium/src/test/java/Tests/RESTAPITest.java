@@ -311,6 +311,35 @@ public class RESTAPITest {
 				         
 			}
 	}
+	
+	@Test
+	public static void DeleteActionAPI() throws IOException 
+        {
+		
+		try(FileWriter fileWriter = new FileWriter(".\\logs\\RESTAPIReport.txt", true)) {
+			BufferedWriter buffer = new BufferedWriter(fileWriter);  
+			buffer.newLine();
+			buffer.append("DeleteActionAPI");
+			buffer.newLine();
+	
+			String postApi = url + "/api/routes/"+configFileReader.getSpecificItemIdForRESTAPI();
+					Unirest.delete(postApi)
+							.header("Authorization", "Token d956d48d09fa4911830881229dbf7ab95dbe1d8a")
+							.routeParam("id", configFileReader.getSpecificItemIdForRESTAPI())
+					        .asJson();
+					
+					 buffer.close(); 
+			}
+			catch(Exception e) {
+				try(FileWriter fileWriter = new FileWriter(".\\logs\\log.txt")) {
+				    fileWriter.write(e.getMessage());
+				    fileWriter.close();
+				} catch (IOException ex) {
+				    // Cxception handling
+				}
+				         
+			}
+	}
 
 
 	@BeforeClass	
