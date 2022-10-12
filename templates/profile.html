@@ -76,7 +76,7 @@
                     <dt>{% trans "Api Token" %}:</dt>
                     <dd>
                     {% if user.auth_token %}
-                        {{ user.auth_token }}
+                       <span id="generate_token"> {{ user.auth_token }}</span>
                     {% else %}
                         <a id="generate_token" href="{% url 'user-profile-token' %}">{% trans "Generate One" %}</a>
                     {% endif %}

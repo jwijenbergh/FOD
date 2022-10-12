@@ -180,8 +180,8 @@ public class AddRuleTest {
     					buffer.newLine();
     				}
     				try {
-    					driver.findElement(By.id("id_destination")).sendKeys("0.0.0.0/29");
-    					buffer.append("Put into Destination input: 0.0.0.0/29");
+    					driver.findElement(By.id("id_destination")).sendKeys("1.0.0.0/30");
+    					buffer.append("Put into Destination input: 1.0.0.0/30");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
@@ -478,8 +478,8 @@ public class AddRuleTest {
     					buffer.newLine();
     				}
     				try {
-    					driver.findElement(By.id("id_destination")).sendKeys("0.0.0.0/29");
-    					buffer.append("Put into Destination input: 0.0.0.0/29");
+    					driver.findElement(By.id("id_destination")).sendKeys("1.0.0.0/29");
+    					buffer.append("Put into Destination input: 1.0.0.0/29");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
@@ -694,8 +694,8 @@ public class AddRuleTest {
     					buffer.newLine();
     				}
     				try {
-    					driver.findElement(By.id("id_destination")).sendKeys("0.0.0.0/29");
-    					buffer.append("Put into Destination input: 0.0.0.0/29");
+    					driver.findElement(By.id("id_destination")).sendKeys("1.0.0.0/29");
+    					buffer.append("Put into Destination input: 1.0.0.0/29");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
@@ -828,8 +828,8 @@ public class AddRuleTest {
     					buffer.newLine();
     				}
     				try {
-    					driver.findElement(By.id("id_destination")).sendKeys("0.0.0.0/29");
-    					buffer.append("Put into Destination input: 0.0.0.0/29");
+    					driver.findElement(By.id("id_destination")).sendKeys("1.0.0.0/29");
+    					buffer.append("Put into Destination input: 1.0.0.0/29");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
@@ -952,8 +952,8 @@ public class AddRuleTest {
     					buffer.newLine();
     				}
     				try {
-    					driver.findElement(By.id("id_destination")).sendKeys("0.0.0.0/29");
-    					buffer.append("Put into Destination input: 0.0.0.0/29");
+    					driver.findElement(By.id("id_destination")).sendKeys("1.0.0.0/29");
+    					buffer.append("Put into Destination input: 1.0.0.0/29");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
@@ -1075,8 +1075,8 @@ public class AddRuleTest {
     					buffer.newLine();
     				}
     				try {
-    					driver.findElement(By.id("id_destination")).sendKeys("0.0.0.0/29");
-    					buffer.append("Put into Destination input: 0.0.0.0/29");
+    					driver.findElement(By.id("id_destination")).sendKeys("1.0.0.0/29");
+    					buffer.append("Put into Destination input: 1.0.0.0/29");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
