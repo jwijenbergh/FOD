@@ -173,7 +173,7 @@ public class RESTAPITest {
 			String searchQueryApi = url + "/api/thenactions/";
 					try {
 						JsonNode body = Unirest.get(searchQueryApi)
-								.header("Authorization", "Token d956d48d09fa4911830881229dbf7ab95dbe1d8a")
+								.header("Authorization", "Token "+configFileReader.getAPIToken())
 		                        .asJson()
 		                        .getBody();
 						buffer.append((CharSequence) body);         // gives the full json response
@@ -211,7 +211,7 @@ public class RESTAPITest {
 			String searchQueryApi = url + "/api/thenactions/"+configFileReader.getSpecificItemIdForRESTAPI();
 					try {
 						JsonNode body = Unirest.get(searchQueryApi)
-								.header("Authorization", "Token d956d48d09fa4911830881229dbf7ab95dbe1d8a")
+								.header("Authorization", "Token "+configFileReader.getAPIToken())
 		                        .asJson()
 		                        .getBody();
 						buffer.append((CharSequence) body);         // gives the full json response
@@ -254,7 +254,7 @@ public class RESTAPITest {
 			template.render(model);
 			String postApi = url + "/api/thenactions/";
 					Unirest.post(postApi)
-							.header("Authorization", "Token d956d48d09fa4911830881229dbf7ab95dbe1d8a")
+							.header("Authorization", "Token "+configFileReader.getAPIToken())
 					        .header("accept", "application/json")
 					        .header("Content-Type", "application/json")
 					        .body(template.render(model))
@@ -292,7 +292,7 @@ public class RESTAPITest {
 			String postApi = url + "/api/thenactions/"+configFileReader.getSpecificItemIdForRESTAPI();
 					Unirest.put(postApi)
 						.routeParam("action_value", "4k")
-							.header("Authorization", "Token d956d48d09fa4911830881229dbf7ab95dbe1d8a")
+							.header("Authorization", "Token "+configFileReader.getAPIToken())
 					        .header("accept", "application/json")
 					        .header("Content-Type", "application/json")
 					        .body(template.render(model))
@@ -324,7 +324,7 @@ public class RESTAPITest {
 	
 			String postApi = url + "/api/routes/"+configFileReader.getSpecificItemIdForRESTAPI();
 					Unirest.delete(postApi)
-							.header("Authorization", "Token d956d48d09fa4911830881229dbf7ab95dbe1d8a")
+							.header("Authorization", "Token "+configFileReader.getAPIToken())
 							.routeParam("id", configFileReader.getSpecificItemIdForRESTAPI())
 					        .asJson();
 					
