@@ -55,6 +55,7 @@ installchromedriver:
 	echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
 	apt-get -y update
 	apt-get -y install google-chrome-stable
+	apt-get -y install tidy
 
 	# TODO: find an suitable version:
 	#RUN wget -N https://chromedriver.storage.googleapis.com/$(google-chrome --version | grep -Eo "[0-9\.]+")/chromedriver_linux64.zip -P /root/
@@ -62,7 +63,7 @@ installchromedriver:
 	#wget -N https://chromedriver.storage.googleapis.com/90.0.4430.24/chromedriver_linux64.zip -P /root
 	chromium_version="$$(google-chrome --version | grep -Eo "[0-9\.]+" | grep -Eo "^[0-9]+")"; \
 	echo "chromium_version=$$chromium_version" 1>&2 ; \
-	driver_version="$$(curl https://chromedriver.storage.googleapis.com | grep -Eo "$$chromium_version"'\.0\.[0-9]+\.[0-9]+' | sort -s -u | head -1)"; \
+	driver_version="$$(curl https://chromedriver.storage.googleapis.com | tidy -xml | grep -Eo "$$chromium_version"'\.0\.[0-9]+\.[0-9]+' | sort -s -u | head -1)"; \
 	echo "driver_version=$$driver_version" 1>&2 ; \
 	wget -N "https://chromedriver.storage.googleapis.com/$$driver_version/chromedriver_linux64.zip" -P /root
 	#wget -N https://chromedriver.storage.googleapis.com/91.0.4472.19/chromedriver_linux64.zip -P /root

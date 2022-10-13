@@ -15,6 +15,7 @@ import org.openqa.selenium.support.ui.Wait;
 import org.testng.annotations.Test;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.AfterClass;
+import com.google.common.base.Preconditions;
 
 public class LogoutTest {
 
