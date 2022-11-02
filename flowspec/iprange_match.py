@@ -10,8 +10,7 @@ from intervaltree.intervaltree import IntervalTree, Interval
 
 ##
 
-import os
-import logging
+import logging, os
 
 LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'iprange_match.log')
 # FORMAT = '%(asctime)s %(levelname)s: %(message)s'
@@ -20,7 +19,7 @@ LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'iprange_match.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(LOG_FILENAME)
 handler.setFormatter(formatter)
 logger.addHandler(handler)

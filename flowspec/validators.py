@@ -7,13 +7,14 @@ from peers.models import PeerRange, Peer
 from flowspec.models import Route, MatchProtocol
 from django.urls import reverse
 
-import os
-import logging
+import logging, os
 FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'mylog.log')
+
+#LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'mylog.log')
+LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'flowspec_validators.log')
 handler = logging.FileHandler(LOG_FILENAME)
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 handler.setFormatter(formatter)

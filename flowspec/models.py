@@ -30,7 +30,7 @@ from utils import proxy as PR
 from ipaddress import *
 from ipaddress import ip_network
 import datetime
-import logging
+import logging, os
 import json
 from peers.models import PeerRange, Peer
 
@@ -41,11 +41,21 @@ from flowspec.iprange_match import find_matching_peer_by_ipprefix__simple
 
 from utils.randomizer import id_generator as id_gen
 
-FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#
 
+LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'flowspec_models.log')
+
+#FORMAT = '%(asctime)s %(levelname)s: %(message)s'
+#logging.basicConfig(format=FORMAT)
+formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+
+logger = logging.getLogger(__name__)
+#logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(LOG_FILENAME)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+#
 
 FRAGMENT_CODES = (
     ("dont-fragment", "Don't fragment"),
@@ -225,16 +235,16 @@ class Route(models.Model):
           source_ip_version = ip_network(route_obj.source, strict=False).version
           destination_ip_version = ip_network(route_obj.destination, strict=False).version
         except Exception as e:
-            logger.info("model::route::ip_version(): exception in trying to determine ip_version: "+str(e))
+          logger.error("model::route::ip_version(): exception in trying to determine ip_version: "+str(e))
         pass
 
-        logger.info("model::route::ip_version(): source_ip_version="+str(source_ip_version)+" destination_ip_version="+str(destination_ip_version))
+        logger.debug("model::route::ip_version(): source_ip_version="+str(source_ip_version)+" destination_ip_version="+str(destination_ip_version))
         if source_ip_version != destination_ip_version:
           logger.error("model::route::ip_version(): source_ip_version="+str(source_ip_version)+" != destination_ip_version="+str(destination_ip_version))
           return -1
 
         ip_version = source_ip_version and destination_ip_version
-        logger.info("model::route::ip_version(): ip_version="+str(ip_version))
+        logger.debug("model::route::ip_version(): ip_version="+str(ip_version))
 
         return ip_version
     

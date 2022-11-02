@@ -53,20 +53,21 @@ from django.template.defaultfilters import slugify
 from django.core.exceptions import PermissionDenied
 from flowspec.helpers import send_new_mail, get_peer_techc_mails
 import datetime
-import os
+import logging, os
 
 import flowspec.iprange_match
 
 ##
 
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'views.log')
+#LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'views.log')
+LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'flowspec_views.log')
 # FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 # logging.basicConfig(format=FORMAT)
 #formatter = logging.Formatter('%(asctime)s %(levelname)s %(user)s: %(message)s')
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(LOG_FILENAME)
 handler.setFormatter(formatter)
 logger.addHandler(handler)

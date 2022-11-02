@@ -1,10 +1,18 @@
 
-import logging
+from django.conf import settings
+import logging, os
 
-FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-logging.basicConfig(format=FORMAT)
+LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_junos.log')
+
+# FORMAT = '%(asctime)s %(levelname)s: %(message)s'
+# logging.basicConfig(format=FORMAT)
+formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(LOG_FILENAME)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 
 PROTOCOL_NUMBERS = {
@@ -267,7 +275,7 @@ def create_junos_name(rule):
     # protocols
     protocol_spec = rule.protocol.all()
     protocol_num = get_protocols_numbers(protocol_spec, ip_version)
-    logger.info("junos::create_junos_name(): protocol_spec="+str(protocol_spec)+" protocol_num="+str(protocol_num))
+    logger.debug("junos::create_junos_name(): protocol_spec="+str(protocol_spec)+" protocol_num="+str(protocol_num))
 
     name += protocol_num
 

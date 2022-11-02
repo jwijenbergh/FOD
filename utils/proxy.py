@@ -23,9 +23,8 @@ from ncclient.transport.errors import AuthenticationError, SSHError
 from ncclient.operations.rpc import RPCError
 from lxml import etree as ET
 from django.conf import settings
-import logging
+import logging, os
 from django.core.cache import cache
-import os
 import redis
 from celery.exceptions import TimeLimitExceeded, SoftTimeLimitExceeded
 from .portrange import parse_portrange
@@ -36,14 +35,15 @@ import xml.etree.ElementTree as ET
 cwd = os.getcwd()
 
 
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
+#LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
+LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_netconf.log')
 
 # FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 # logging.basicConfig(format=FORMAT)
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(LOG_FILENAME)
 handler.setFormatter(formatter)
 logger.addHandler(handler)

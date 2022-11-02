@@ -31,8 +31,7 @@ from peers.models import Peer
 from gevent.event import Event
 import redis
 
-import logging
-import os
+import logging, os
 
 # This component is used to retrieve stream of notifications from server into browser;
 # the notifications are "announced" by flowspec/tasks.py announce() method;
@@ -80,7 +79,7 @@ class Msgs(object):
         return cls._instance
 
     def __init__(self):
-        logger.info("initializing")
+        logger.debug("poller::views(): initializing")
         self.user = None
         self.user_cache = {}
         self.user_cursor = {}

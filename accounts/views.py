@@ -39,7 +39,7 @@ import os, logging
 LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'flowspec_accounts_view.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(LOG_FILENAME)
 handler.setFormatter(formatter)
 logger.addHandler(handler)

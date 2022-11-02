@@ -17,26 +17,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import logging
 from pysnmp.hlapi.asyncore import *
 from django.conf import settings
 from datetime import datetime, timedelta
 import json
-import os
+import logging, os
 import time
 
 from flowspec.models import Route
 from flowspec.junos import create_junos_name
 
 
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
+#LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
+LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_snmpstats.log')
 
 # FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 # logging.basicConfig(format=FORMAT)
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(LOG_FILENAME)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
@@ -68,7 +68,7 @@ def snmpCallback(snmpEngine, sendRequestHandle, errorIndication,
             elif name.startswith(settings.SNMP_CNTBYTES):
                 counter = "bytes"
             else:
-                logger.info('Finished {}.'.format(transportTarget))
+                logger.debug('Finished {}.'.format(transportTarget))
                 return 0
 
             ident = name[identoffset:]
@@ -152,7 +152,7 @@ def lock_history_file(wait=1, reason=""):
       first=0
       try:
           os.mkdir(settings.SNMP_TEMP_FILE+".lock") # TODO use regular file than dir
-          logger.info("lock_history_file(): creating lock dir succeeded (reason="+str(reason)+")")
+          logger.debug("lock_history_file(): creating lock dir succeeded (reason="+str(reason)+")")
           success=1
           return success
       except OSError as e:
@@ -169,10 +169,10 @@ def lock_history_file(wait=1, reason=""):
 def unlock_history_file():
     try:
       os.rmdir(settings.SNMP_TEMP_FILE+".lock") # TODO use regular file than dir
-      logger.info("unlock_history_file(): succeeded")
+      logger.debug("unlock_history_file(): succeeded")
       return 1
     except Exception as e:
-      logger.info("unlock_history_file(): failed "+str(e))
+      logger.debug("unlock_history_file(): failed "+str(e))
       return 0
 
 def load_history():
@@ -198,16 +198,16 @@ def helper_stats_store_parse_ts(ts_string):
   try:
     ts = datetime.strptime(ts_string, '%Y-%m-%dT%H:%M:%S.%f')
   except ValueError as e:
-    logger.info("helper_stats_store_parse_ts(): ts_string="+str(ts_string)+": got ValueError "+str(e))
+    logger.error("helper_stats_store_parse_ts(): ts_string="+str(ts_string)+": got ValueError "+str(e))
 
     try:
       ts = datetime.strptime(ts_string, '%Y-%m-%dT%H:%M:%S')
     except Exception as e:
-      logger.info("helper_stats_store_parse_ts(): ts_string="+str(ts_string)+": got exception "+str(e))
+      logger.error("helper_stats_store_parse_ts(): ts_string="+str(ts_string)+": got exception "+str(e))
       ts = None
 
   except Exception as e:
-    logger.info("helper_stats_store_parse_ts(): ts_string="+str(ts_string)+": got exception "+str(e))
+    logger.error("helper_stats_store_parse_ts(): ts_string="+str(ts_string)+": got exception "+str(e))
     ts = None
 
   return ts
@@ -220,28 +220,30 @@ def helper_rule_ts_parse(ts_string):
     try:
       ts = datetime.strptime(ts_string, '%Y-%m-%d %H:%M:%S.%f+00:00') # TODO TZ offset assumed to be 00:00
     except Exception as e:
-      logger.info("helper_rule_ts_parse(): ts_string="+str(ts_string)+": got exception "+str(type(e))+": "+str(e))
+      logger.error("helper_rule_ts_parse(): ts_string="+str(ts_string)+": got exception "+str(type(e))+": "+str(e))
       ts = None
   except Exception as e:
-    logger.info("helper_rule_ts_parse(): ts_string="+str(ts_string)+": got exception "+str(type(e))+": "+str(e))
+    logger.error("helper_rule_ts_parse(): ts_string="+str(ts_string)+": got exception "+str(type(e))+": "+str(e))
     ts = None
 
   #logger.info("helper_rule_ts_parse(): => ts="+str(ts))
   return ts
 
 def poll_snmp_statistics():
-    logger.info("poll_snmp_statistics(): Polling SNMP statistics.")
+    logger.debug("poll_snmp_statistics(): polling SNMP statistics.")
 
     # first, determine current ts, before calling get_snmp_stats
     now = datetime.now()
     nowstr = now.isoformat()
+    
+    logger.info("poll_snmp_statistics(): polling SNMP statistics nowstr="+str(nowstr))
 
     # get new data
     try:
-      logger.info("poll_snmp_statistics(): snmpstats: nowstr="+str(nowstr))
+      logger.debug("poll_snmp_statistics(): snmpstats: nowstr="+str(nowstr))
       newdata = get_snmp_stats()
     except Exception as e:
-      logger.info("poll_snmp_statistics(): get_snmp_stats failed: "+str(e))
+      logger.error("poll_snmp_statistics(): get_snmp_stats failed: "+str(e))
       return False
 
     if False:
@@ -264,9 +266,9 @@ def poll_snmp_statistics():
     try:
       last_poll_no_time = history['_last_poll_no_time']
     except Exception as e:
-      logger.info("poll_snmp_statistics(): got exception while trying to access history[_last_poll_time]: "+str(e))
+      logger.error("poll_snmp_statistics(): got exception while trying to access history[_last_poll_time]: "+str(e))
       last_poll_no_time=None
-    logger.info("poll_snmp_statistics(): snmpstats: last_poll_no_time="+str(last_poll_no_time))
+    logger.debug("poll_snmp_statistics(): snmpstats: last_poll_no_time="+str(last_poll_no_time))
     history['_last_poll_no_time']=nowstr
 
     try:
@@ -276,7 +278,7 @@ def poll_snmp_statistics():
      
     # do actual update 
     try:
-        logger.info("poll_snmp_statistics(): before store: snmpstats: nowstr="+str(nowstr)+", last_poll_no_time="+str(last_poll_no_time))
+        logger.debug("poll_snmp_statistics(): before store: snmpstats: nowstr="+str(nowstr)+", last_poll_no_time="+str(last_poll_no_time))
         #newdata = get_snmp_stats()
 
         # proper update history
@@ -300,7 +302,7 @@ def poll_snmp_statistics():
               if ts!=None and (now - ts).total_seconds() >= settings.SNMP_REMOVE_RULES_AFTER:
                   toremove.append(rule)
           except Exception as e:
-            logger.info("poll_snmp_statistics(): old rules remove loop: rule="+str(rule)+" got exception "+str(e))
+            logger.error("poll_snmp_statistics(): old rules remove loop: rule="+str(rule)+" got exception "+str(e))
         for rule in toremove:
             history.pop(rule, None)
 
@@ -320,7 +322,7 @@ def poll_snmp_statistics():
           for ruleobj in queryset:
             rule_id = str(ruleobj.id)
             rule_status = str(ruleobj.status).upper()
-            logger.info("snmpstats: STATISTICS_PER_RULE rule_id="+str(rule_id)+" rule_status="+str(rule_status))
+            logger.debug("snmpstats: STATISTICS_PER_RULE rule_id="+str(rule_id)+" rule_status="+str(rule_status))
             #rule_last_updated = str(ruleobj.last_updated) # e.g. 2018-06-21 08:03:21+00:00
             #rule_last_updated = datetime.strptime(str(ruleobj.last_updated), '%Y-%m-%d %H:%M:%S+00:00') # TODO TZ offset assumed to be 00:00
             rule_last_updated = helper_rule_ts_parse(str(ruleobj.last_updated))
@@ -332,7 +334,7 @@ def poll_snmp_statistics():
             #logger.info("snmpstats: STATISTICS_PER_RULE ruleobj.id="+str(rule_id))
             #logger.info("snmpstats: STATISTICS_PER_RULE ruleobj.status="+rule_status)
             flowspec_params_str=create_junos_name(ruleobj)
-            logger.info("snmpstats: STATISTICS_PER_RULE flowspec_params_str="+str(flowspec_params_str))
+            logger.debug("snmpstats: STATISTICS_PER_RULE flowspec_params_str="+str(flowspec_params_str))
 
             if rule_status=="ACTIVE":
               try:
@@ -349,10 +351,10 @@ def poll_snmp_statistics():
             try:
                 if not rule_id in history_per_rule:
                   if rule_status!="ACTIVE":
-                    logger.info("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case notexisting inactive")
+                    logger.debug("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case notexisting inactive")
                     #history_per_rule[rule_id] = [counter]
                   else:
-                    logger.info("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case notexisting active")
+                    logger.debug("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case notexisting active")
                     if counter_is_null:
                       history_per_rule[rule_id] = [counter_zero]
                     else:
@@ -360,7 +362,7 @@ def poll_snmp_statistics():
                 else:
                   rec = history_per_rule[rule_id]
                   if rule_status!="ACTIVE":
-                    logger.info("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case existing inactive")
+                    logger.debug("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case existing inactive")
                     rec.insert(0, counter)
                   else:
                     last_value = rec[0]
@@ -370,20 +372,20 @@ def poll_snmp_statistics():
                     else:
                       last_ts = helper_stats_store_parse_ts(last_value['ts'])
                       rule_newer_than_last = last_ts==None or rule_last_updated > last_ts
-                    logger.info("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" rule_last_updated="+str(rule_last_updated)+", last_value="+str(last_value))
+                    logger.debug("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" rule_last_updated="+str(rule_last_updated)+", last_value="+str(last_value))
                     if last_is_null and rule_newer_than_last:
-                      logger.info("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case existing active 11")
+                      logger.debug("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case existing active 11")
                       if counter_is_null:
                         rec.insert(0, counter_zero)
                       else:
                         rec.insert(0, counter_zero)
                         rec.insert(0, counter)
                     elif last_is_null and not rule_newer_than_last:
-                      logger.info("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case existing active 10")
+                      logger.debug("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case existing active 10")
                       rec.insert(0, counter_zero)
                       rec.insert(0, counter)
                     elif not last_is_null and rule_newer_than_last:
-                      logger.info("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case existing active 01")
+                      logger.debug("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case existing active 01")
                       if counter_is_null:
                         rec.insert(0, counter_null)
                         rec.insert(0, counter_zero)
@@ -392,29 +394,29 @@ def poll_snmp_statistics():
                         rec.insert(0, counter_zero)
                         rec.insert(0, counter)
                     elif not last_is_null and not rule_newer_than_last:
-                        logger.info("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case existing active 00")
+                        logger.debug("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case existing active 00")
                         rec.insert(0, counter)
 
                   history_per_rule[rule_id] = rec[:samplecount]
             except Exception as e:
-                logger.info("snmpstats: 2 STATISTICS_PER_RULE: exception: "+str(e))
+                logger.error("snmpstats: 2 STATISTICS_PER_RULE: exception: "+str(e))
 
           history['_per_rule'] = history_per_rule
 
         # store updated history
         save_history(history, nowstr)
-        logger.info("poll_snmp_statistics(): Polling finished.")
+        logger.debug("poll_snmp_statistics(): polling finished.")
 
     except Exception as e:
         #logger.error(e)
-        logger.error("poll_snmp_statistics(): Polling failed. exception: "+str(e))
+        logger.error("poll_snmp_statistics(): polling failed. exception: "+str(e))
         logger.error("poll_snmp_statistics(): ", exc_info=True)        
         
     unlock_history_file()
-    logger.info("poll_snmp_statistics(): Polling end: last_poll_no_time="+str(last_poll_no_time))
+    logger.info("poll_snmp_statistics(): polling end: old_nowstr="+str(nowstr)+" last_poll_no_time="+str(last_poll_no_time))
 
 def add_initial_zero_value(rule_id, zero_or_null=True):
-    logger.info("add_initial_zero_value(): rule_id="+str(rule_id))
+    logger.debug("add_initial_zero_value(): rule_id="+str(rule_id))
 
     # get new data
     now = datetime.now()
@@ -461,7 +463,7 @@ def add_initial_zero_value(rule_id, zero_or_null=True):
         save_history(history, nowstr)
 
     except Exception as e:
-        logger.info("add_initial_zero_value(): failure: exception: "+str(e))
+        logger.error("add_initial_zero_value(): failure: exception: "+str(e))
 
     unlock_history_file()
 

@@ -8,13 +8,16 @@ from flowspec.validators import (
     clean_source, clean_destination, clean_expires, clean_status, clean_route_form)
 
 from django.conf import settings
-import os
-import logging
+import logging, os
+
+#LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'mylog.log')
+LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'flowspec_serializers.log')
+
 FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'mylog.log')
+#logger.setLevel(logging.DEBUG)
+
 handler = logging.FileHandler(LOG_FILENAME)
 formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
 handler.setFormatter(formatter)
