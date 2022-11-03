@@ -21,26 +21,14 @@ from pysnmp.hlapi.asyncore import *
 from django.conf import settings
 from datetime import datetime, timedelta
 import json
-import logging, os
+import os
 import time
 
 from flowspec.models import Route
 from flowspec.junos import create_junos_name
 
-
-#LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_snmpstats.log')
-
-# FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-# logging.basicConfig(format=FORMAT)
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-
-logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(LOG_FILENAME)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "celery_snmpstats.log", False)
 
 identoffset = len(settings.SNMP_CNTPACKETS) + 1
 

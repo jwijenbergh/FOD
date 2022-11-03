@@ -32,22 +32,10 @@ import traceback
 from ipaddress import ip_network
 import xml.etree.ElementTree as ET
 
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "celery_netconf.log", False)
+
 cwd = os.getcwd()
-
-
-#LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_netconf.log')
-
-# FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-# logging.basicConfig(format=FORMAT)
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-
-logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(LOG_FILENAME)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
 
 def fod_unknown_host_cb(host, fingerprint):
     return True

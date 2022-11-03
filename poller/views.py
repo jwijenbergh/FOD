@@ -17,6 +17,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# This component is used to retrieve stream of notifications from server into browser;
+# the notifications are "announced" by flowspec/tasks.py announce() method;
+# all notifications are passed via redis, the key is created as notifstream_%s, where %s is a peertag.
+# The key is used to store stream of objects: {"m": "%s", "time": "timestamp"},
+# where %s is a notification message, and timestamp is in "%Y-%m-%d %H:%M:%S"
+# format.
+
 import json
 
 import uuid
@@ -31,23 +38,8 @@ from peers.models import Peer
 from gevent.event import Event
 import redis
 
-import logging, os
-
-# This component is used to retrieve stream of notifications from server into browser;
-# the notifications are "announced" by flowspec/tasks.py announce() method;
-# all notifications are passed via redis, the key is created as notifstream_%s, where %s is a peertag.
-# The key is used to store stream of objects: {"m": "%s", "time": "timestamp"},
-# where %s is a notification message, and timestamp is in "%Y-%m-%d %H:%M:%S"
-# format.
-
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'poller.log')
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = logging.FileHandler(LOG_FILENAME)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "poller.log", False)
 
 def create_message(message, user, msgid, time, peer_id):
     """Create new message that will be sent in a response to client with text "message".

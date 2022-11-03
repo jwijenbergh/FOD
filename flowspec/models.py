@@ -30,7 +30,6 @@ from utils import proxy as PR
 from ipaddress import *
 from ipaddress import ip_network
 import datetime
-import logging, os
 import json
 from peers.models import PeerRange, Peer
 
@@ -41,21 +40,9 @@ from flowspec.iprange_match import find_matching_peer_by_ipprefix__simple
 
 from utils.randomizer import id_generator as id_gen
 
-#
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "flowspec_models.log", False)
 
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'flowspec_models.log')
-
-#FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-#logging.basicConfig(format=FORMAT)
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-
-logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(LOG_FILENAME)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
-#
 
 FRAGMENT_CODES = (
     ("dont-fragment", "Don't fragment"),
@@ -496,22 +483,23 @@ class Route(models.Model):
             #self.status = "EXPIRED"
             #self.save()
             self.update_status("EXPIRED")
-            logger.error('No routing options on device. Exception: %s' % e)
+            logger.error('models::is_synced(): No routing options on device. Exception: %s' % e)
             return True
+
         for route in routes:
             if route.name == self.name:
                 found = True
-                logger.info('Found a matching rule name')
+                logger.debug('models::is_synced(): Found a matching rule name')
                 devicematch = route.match
                 try:
                     assert(self.destination)
                     assert(devicematch['destination'][0])
                     if self.destination == devicematch['destination'][0]:
                         found = found and True
-                        logger.info('Found a matching destination')
+                        logger.debug('models::is_synced(): Found a matching destination')
                     else:
                         found = False
-                        logger.info('Destination fields do not match')
+                        logger.debug('models::is_synced(): Destination fields do not match')
                 except:
                     pass
                 try:
@@ -519,10 +507,10 @@ class Route(models.Model):
                     assert(devicematch['source'][0])
                     if self.source == devicematch['source'][0]:
                         found = found and True
-                        logger.info('Found a matching source')
+                        logger.debug('models::is_synced(): Found a matching source')
                     else:
                         found = False
-                        logger.info('Source fields do not match')
+                        logger.debug('models::is_synced(): Source fields do not match')
                 except:
                     pass
 
@@ -534,10 +522,10 @@ class Route(models.Model):
                     intersect = list(set(devitems).intersection(set(dbitems)))
                     if ((len(intersect) == len(dbitems)) and (len(intersect) == len(devitems))):
                         found = found and True
-                        logger.info('Found a matching fragment type')
+                        logger.debug('models::is_synced(): Found a matching fragment type')
                     else:
                         found = False
-                        logger.info('Fragment type fields do not match')
+                        logger.debug('models::is_synced(): Fragment type fields do not match')
                 except:
                     pass
 
@@ -549,10 +537,10 @@ class Route(models.Model):
                     intersect = list(set(devitems).intersection(set(dbitems)))
                     if ((len(intersect) == len(dbitems)) and (len(intersect) == len(devitems))):
                         found = found and True
-                        logger.info('Found a matching port type')
+                        logger.debug('models::is_synced(): Found a matching port type')
                     else:
                         found = False
-                        logger.info('Port type fields do not match')
+                        logger.debug('models::is_synced(): Port type fields do not match')
                 except:
                     pass
 
@@ -564,10 +552,10 @@ class Route(models.Model):
                     intersect = list(set(devitems).intersection(set(dbitems)))
                     if ((len(intersect) == len(dbitems)) and (len(intersect) == len(devitems))):
                         found = found and True
-                        logger.info('Found a matching protocol type')
+                        logger.debug('models::is_synced(): Found a matching protocol type')
                     else:
                         found = False
-                        logger.info('Protocol type fields do not match')
+                        logger.debug('Protocol type fields do not match')
                 except:
                     pass
 
@@ -579,10 +567,10 @@ class Route(models.Model):
                     intersect = list(set(devitems).intersection(set(dbitems)))
                     if ((len(intersect) == len(dbitems)) and (len(intersect) == len(devitems))):
                         found = found and True
-                        logger.info('Found a matching destination port type')
+                        logger.debug('models::is_synced(): Found a matching destination port type')
                     else:
                         found = False
-                        logger.info('Destination port type fields do not match')
+                        logger.debug('models::is_synced(): Destination port type fields do not match')
                 except:
                     pass
 
@@ -594,10 +582,10 @@ class Route(models.Model):
                     intersect = list(set(devitems).intersection(set(dbitems)))
                     if ((len(intersect) == len(dbitems)) and (len(intersect) == len(devitems))):
                         found = found and True
-                        logger.info('Found a matching source port type')
+                        logger.debug('models::is_synced(): Found a matching source port type')
                     else:
                         found = False
-                        logger.info('Source port type fields do not match')
+                        logger.debug('models::is_synced(): Source port type fields do not match')
                 except:
                     pass
 
@@ -607,10 +595,10 @@ class Route(models.Model):
 #                    assert(devicematch['fragment'][0])
 #                    if self.fragmenttype == devicematch['fragment'][0]:
 #                        found = found and True
-#                        logger.info('Found a matching fragment type')
+#                        logger.debug('Found a matching fragment type')
 #                    else:
 #                        found = False
-#                        logger.info('Fragment type fields do not match')
+#                        logger.debug('Fragment type fields do not match')
 #                except:
 #                    pass
                 try:
@@ -618,10 +606,10 @@ class Route(models.Model):
                     assert(devicematch['icmp-code'][0])
                     if self.icmpcode == devicematch['icmp-code'][0]:
                         found = found and True
-                        logger.info('Found a matching icmp code')
+                        logger.debug('models::is_synced(): Found a matching icmp code')
                     else:
                         found = False
-                        logger.info('Icmp code fields do not match')
+                        logger.debug('models::is_synced(): Icmp code fields do not match')
                 except:
                     pass
                 try:
@@ -629,14 +617,14 @@ class Route(models.Model):
                     assert(devicematch['icmp-type'][0])
                     if self.icmptype == devicematch['icmp-type'][0]:
                         found = found and True
-                        logger.info('Found a matching icmp type')
+                        logger.debug('models::is_synced(): Found a matching icmp type')
                     else:
                         found = False
-                        logger.info('Icmp type fields do not match')
+                        logger.debug('models::is_synced(): Icmp type fields do not match')
                 except:
                     pass
                 if found and self.status != "ACTIVE":
-                    logger.error('Rule is applied on device but appears as offline')
+                    logger.error('models::is_synced(): Rule '+str(route)+' is applied on device but appears in DB as offline')
                     #self.status = "ACTIVE"
                     #self.save()
                     self.update_status("ACTIVE")

@@ -8,23 +8,9 @@ from peers.models import *
 from ipaddress import *
 from intervaltree.intervaltree import IntervalTree, Interval
 
-##
-
-import logging, os
-
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'iprange_match.log')
-# FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-# logging.basicConfig(format=FORMAT)
-#formatter = logging.Formatter('%(asctime)s %(levelname)s %(user)s: %(message)s')
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-
-logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(LOG_FILENAME)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
-##
+import os
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "iprange_match.log", False)
 
 def build_ival_trees_per_ipversion(user):
     

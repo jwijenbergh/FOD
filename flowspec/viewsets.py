@@ -22,20 +22,8 @@ from rest_framework.response import Response
 
 from flowspec.tasks import *
 
-import logging, os
-
-#LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'viewsets.log')
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'flowspec_viewsets.log')
-
-FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
-
-handler = logging.FileHandler(LOG_FILENAME)
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "flowspec_viewsets.log", False)
 
 class RouteViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)

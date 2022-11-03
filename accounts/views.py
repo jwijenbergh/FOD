@@ -34,15 +34,8 @@ from flowspec.forms import UserProfileForm
 from django_registration.backends.activation.views import ActivationView
 from django_registration.exceptions import ActivationError
 
-
-import os, logging
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'flowspec_accounts_view.log')
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(LOG_FILENAME)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "flowspec_accounts_view.log", False)
 
 def generate_token(request):
     user = request.user

@@ -25,10 +25,10 @@ from django.conf import settings
 import datetime
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-import logging, os
 from celery.exceptions import TimeLimitExceeded, SoftTimeLimitExceeded
 from ipaddress import *
 from os import fork,_exit
+import os
 from sys import exit
 import time
 import redis
@@ -36,25 +36,9 @@ from django.forms.models import model_to_dict
 
 from peers.models import *
 
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
-
-RULE_CHANGELOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'rule_changelog.log')
-
-# FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-# logging.basicConfig(format=FORMAT)
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(LOG_FILENAME)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
-rule_changelog_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-rule_changelog_logger = logging.getLogger(__name__+"__rule_changelog")
-#rule_changelog_logger.setLevel(logging.DEBUG)
-rule_changelog_handler = logging.FileHandler(RULE_CHANGELOG_FILENAME)
-rule_changelog_handler.setFormatter(rule_changelog_formatter)
-rule_changelog_logger.addHandler(rule_changelog_handler)
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "celery_jobs.log", False)
+rule_changelog_logger = flowspec.logging_utils.logger_init_default(__name__, "rule_changelog.log", False)
 
 ##
 

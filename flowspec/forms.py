@@ -39,6 +39,10 @@ import re
 from django.core.mail import send_mail
 from utils.portrange import parse_portrange
 
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "flowspec_forms.log", False)
+
+
 class PortRangeForm(forms.CharField):
     def clean(self, value):
         """Validation of Port Range value.
@@ -146,6 +150,8 @@ class RouteForm(forms.ModelForm):
             peers = user.userprofile.peers.all()
         existing_routes = Route.objects.all()
         existing_routes = existing_routes.filter(applier__userprofile__peers__in=peers)
+        logger.info("forms::clean(): (1) existing_routes="+str(existing_routes))
+
         name = self.cleaned_data.get('name', None)
         protocols = self.cleaned_data.get('protocol', None)
         source = self.cleaned_data.get('source', None)
@@ -160,6 +166,8 @@ class RouteForm(forms.ModelForm):
             existing_routes = existing_routes.filter(source=source)
         else:
             existing_routes = existing_routes.filter(source=None)
+        logger.info("forms::clean(): (2) existing_routes="+str(existing_routes))
+
         if protocols:
             route_pk_list=get_matchingprotocol_route_pks(protocols, existing_routes)
             if route_pk_list:
@@ -171,24 +179,31 @@ class RouteForm(forms.ModelForm):
 
         else:
             existing_routes = existing_routes.filter(protocol=None)
+        logger.info("forms::clean(): (3) existing_routes="+str(existing_routes))
+
         if sourceports:
             route_pk_list=get_matchingport_route_pks(sourceports, existing_routes)
             if route_pk_list:
                 existing_routes = existing_routes.filter(pk__in=route_pk_list)
         else:
             existing_routes = existing_routes.filter(sourceport=None)
+        logger.info("forms::clean(): (4) existing_routes="+str(existing_routes))
+
         if destinationports:
             route_pk_list=get_matchingport_route_pks(destinationports, existing_routes)
             if route_pk_list:
                 existing_routes = existing_routes.filter(pk__in=route_pk_list)
         else:
             existing_routes = existing_routes.filter(destinationport=None)
+        logger.info("forms::clean(): (5) existing_routes="+str(existing_routes))
+
         if port:
             route_pk_list=get_matchingport_route_pks(port, existing_routes)
             if route_pk_list:
                 existing_routes = existing_routes.filter(pk__in=route_pk_list)
         else:
             existing_routes = existing_routes.filter(port=None)
+        logger.info("forms::clean(): (6) existing_routes="+str(existing_routes))
             
         net_destination = ip_network(destination, strict=False) 
         for route in existing_routes:
@@ -197,6 +212,8 @@ class RouteForm(forms.ModelForm):
                 net_route_destination = ip_network(route.destination, strict=False) 
                 if net_destination in net_route_destination or net_route_destination in net_destination:
                     raise forms.ValidationError('Found an exact %s rule, %s with destination prefix %s<br>To avoid overlapping try editing rule <a href=\'%s\'>%s</a>' % (route.status, route.name, route.destination, existing_url, route.name))
+
+        logger.info("forms::clean(): (7) no existing_routes")
         return self.cleaned_data
 
 

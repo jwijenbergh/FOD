@@ -1,19 +1,8 @@
 
 from django.conf import settings
-import logging, os
 
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_junos.log')
-
-# FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-# logging.basicConfig(format=FORMAT)
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-
-logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(LOG_FILENAME)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "celery_junos.log", False)
 
 PROTOCOL_NUMBERS = {
     'HOPOPT': '0',
