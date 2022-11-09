@@ -2,12 +2,8 @@ from django.core.mail.message import EmailMessage
 from django.conf import settings
 
 import os
-import logging
-
-FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "flowspec_accounts_view.log", False)
 
 def send_new_mail(subject, message, from_email, recipient_list, bcc_list):
   try:

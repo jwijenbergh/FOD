@@ -23,9 +23,8 @@ from ncclient.transport.errors import AuthenticationError, SSHError
 from ncclient.operations.rpc import RPCError
 from lxml import etree as ET
 from django.conf import settings
-import logging
+import logging, os
 from django.core.cache import cache
-import os
 import redis
 from celery.exceptions import TimeLimitExceeded, SoftTimeLimitExceeded
 from .portrange import parse_portrange
@@ -33,21 +32,10 @@ import traceback
 from ipaddress import ip_network
 import xml.etree.ElementTree as ET
 
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "celery_netconf.log", False)
+
 cwd = os.getcwd()
-
-
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
-
-# FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-# logging.basicConfig(format=FORMAT)
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(LOG_FILENAME)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
 
 def fod_unknown_host_cb(host, fingerprint):
     return True

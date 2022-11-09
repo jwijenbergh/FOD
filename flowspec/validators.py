@@ -7,26 +7,17 @@ from peers.models import PeerRange, Peer
 from flowspec.models import Route, MatchProtocol
 from django.urls import reverse
 
-import os
-import logging
-FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'mylog.log')
-handler = logging.FileHandler(LOG_FILENAME)
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "flowspec_validators.log", False)
 
 def get_network(ip):
     try:
         address = ip_network(ip, strict=False)
     except ValueError as e:
-        logger.info("validators::get_network(): ip="+str(ip)+" got exception type="+str(type(e))+" :"+str(e))
+        logger.error("validators::get_network(): ip="+str(ip)+" got exception type="+str(type(e))+" :"+str(e))
         return (False, _('Invalid network address format: '+str(e)))
     except Exception as e:
-        logger.info("validators::get_network(): ip="+str(ip)+" got exception type="+str(type(e))+" :"+str(e))
+        logger.error("validators::get_network(): ip="+str(ip)+" got exception type="+str(type(e))+" :"+str(e))
         return (False, _('Invalid network address format'))
     else:
         return (True, address)
@@ -215,11 +206,13 @@ def check_if_rule_exists(fields, queryset):
     """
 
     if hasattr(settings, "ROUTES_DUPLICATES_CHECKING") and settings.ROUTES_DUPLICATES_CHECKING == False:
+        logger.info("ROUTES_DUPLICATES_CHECKING = False, so no checking")
         return (False, None)
     routes = queryset.filter(
-        source=fields.get('source'),
-        destination=ip_network(fields.get('destination'), strict=False).compressed,
+      source=fields.get('source'),
+      destination=ip_network(fields.get('destination'), strict=False).compressed,
     )
+    logger.info("ROUTES_DUPLICATES_CHECKING: routes="+str(routes))
     if routes:
         ids = [str(item[0]) for item in routes.values_list('pk')]
         return (

@@ -53,24 +53,44 @@ from django.template.defaultfilters import slugify
 from django.core.exceptions import PermissionDenied
 from flowspec.helpers import send_new_mail, get_peer_techc_mails
 import datetime
-import os
 
 import flowspec.iprange_match
 
-##
+#############################################################################
+#############################################################################
 
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'views.log')
-# FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-# logging.basicConfig(format=FORMAT)
-#formatter = logging.Formatter('%(asctime)s %(levelname)s %(user)s: %(message)s')
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+##LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'views.log')
+#LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'flowspec_views.log')
+#
+#if hasattr(settings, "LOGGING_FORMAT_DEFAULT"):
+#  FORMAT = settings.LOGGING_FORMAT_DEFAULT
+#else:
+#  FORMAT = '%(asctime)s %(levelname)s: %(message)s'
+#
+#logging.basicConfig(format=FORMAT)
+#formatter = logging.Formatter(FORMAT)
+#
+#logger = logging.getLogger(__name__)
+#handler = logging.FileHandler(LOG_FILENAME)
+#handler.setFormatter(formatter)
+#logger.addHandler(handler)
+#
+#orig_level = logger.level
+#if settings.DEBUG:
+#  logger.setLevel(logging.DEBUG)
+#else:
+#  logger.setLevel(logging.INFO)
+#
+#logger.error("log level orig="+str(orig_level)+" ; ERROR="+str(logging.ERROR)+" INFO="+str(logging.INFO)+" DEBUG="+str(logging.DEBUG))
+#logger.error("views: error test")
+#logger.info("views: info test")
+#logger.debug("views: debug test")
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(LOG_FILENAME)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "flowspec_views.log", False)
 
+#############################################################################
+#############################################################################
 
 @login_required
 def user_routes(request):
@@ -87,6 +107,9 @@ def user_routes(request):
 
 
 def welcome(request):
+    #logger.error("views::welcome(): error test")
+    #logger.info("views::welcome(): info test")
+    #logger.debug("views::welcome(): debug test")
     return render(
         request,
         'welcome.html',
@@ -326,6 +349,7 @@ def build_routes_json(ivaltrees_per_version, groutes, user, is_superuser):
 @login_required
 @never_cache
 def add_route(request):
+    logger.info("tasks.add(): called")
     applier_peer_networks = []
     applier = request.user.pk
     if request.user.is_superuser:
@@ -362,7 +386,9 @@ def add_route(request):
             except:
                 pass
         form = RouteForm(request_data)
+        logger.info("tasks.add(): form="+str(form))
         if form.is_valid():
+            logger.info("tasks.add(): foem is_valid")
             route = form.save(commit=False)
             if not request.user.is_superuser:
                 route.applier = request.user

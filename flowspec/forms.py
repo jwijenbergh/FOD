@@ -39,6 +39,10 @@ import re
 from django.core.mail import send_mail
 from utils.portrange import parse_portrange
 
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "flowspec_forms.log", False)
+
+
 class PortRangeForm(forms.CharField):
     def clean(self, value):
         """Validation of Port Range value.
@@ -132,6 +136,8 @@ class RouteForm(forms.ModelForm):
         return res
 
     def clean(self):
+        logger.debug("forms::clean(): (1) called self=%s", str(self))
+
         if self.errors:
             raise forms.ValidationError(_('Errors in form. Please review and fix them: %s' % ", ".join(self.errors)))
         error = clean_route_form(self.cleaned_data)
@@ -146,7 +152,11 @@ class RouteForm(forms.ModelForm):
             peers = user.userprofile.peers.all()
         existing_routes = Route.objects.all()
         existing_routes = existing_routes.filter(applier__userprofile__peers__in=peers)
+
         name = self.cleaned_data.get('name', None)
+        if hasattr(settings, "RULE_NAME_PREFIX"):
+          name = "%s%s" % (settings.RULE_NAME_PREFIX, name)
+
         protocols = self.cleaned_data.get('protocol', None)
         source = self.cleaned_data.get('source', None)
         sourceports = self.cleaned_data.get('sourceport', None)
@@ -160,43 +170,54 @@ class RouteForm(forms.ModelForm):
             existing_routes = existing_routes.filter(source=source)
         else:
             existing_routes = existing_routes.filter(source=None)
+
         if protocols:
             route_pk_list=get_matchingprotocol_route_pks(protocols, existing_routes)
             if route_pk_list:
                 existing_routes = existing_routes.filter(pk__in=route_pk_list)
             else:
-                existing_routes = existing_routes.filter(protocol=None)
+                existing_routes = existing_routes.filter(protocol=None) 
             if "icmp" in [str(i) for i in protocols] and (destinationports or sourceports or port):
                 raise forms.ValidationError(_('It is not allowed to specify ICMP protocol and source/destination ports at the same time.'))
 
         else:
             existing_routes = existing_routes.filter(protocol=None)
+
         if sourceports:
             route_pk_list=get_matchingport_route_pks(sourceports, existing_routes)
             if route_pk_list:
                 existing_routes = existing_routes.filter(pk__in=route_pk_list)
         else:
-            existing_routes = existing_routes.filter(sourceport=None)
+            existing_routes = existing_routes.filter(sourceport=None) | existing_routes.filter(sourceport="")
+
         if destinationports:
             route_pk_list=get_matchingport_route_pks(destinationports, existing_routes)
             if route_pk_list:
                 existing_routes = existing_routes.filter(pk__in=route_pk_list)
         else:
-            existing_routes = existing_routes.filter(destinationport=None)
+            existing_routes = existing_routes.filter(destinationport=None) | existing_routes.filter(destinationport="")
+
         if port:
             route_pk_list=get_matchingport_route_pks(port, existing_routes)
             if route_pk_list:
                 existing_routes = existing_routes.filter(pk__in=route_pk_list)
         else:
-            existing_routes = existing_routes.filter(port=None)
+            existing_routes = existing_routes.filter(port=None) | existing_routes.filter(port="")
+
+        if not settings.ROUTES_DUPLICATES_CHECKING:
+            return self.cleaned_data
             
         net_destination = ip_network(destination, strict=False) 
         for route in existing_routes:
             if name != route.name:
                 existing_url = reverse('edit-route', args=[route.name])
                 net_route_destination = ip_network(route.destination, strict=False) 
-                if net_destination in net_route_destination or net_route_destination in net_destination:
-                    raise forms.ValidationError('Found an exact %s rule, %s with destination prefix %s<br>To avoid overlapping try editing rule <a href=\'%s\'>%s</a>' % (route.status, route.name, route.destination, existing_url, route.name))
+                #if net_destination==net_route_destination or net_destination in net_route_destination or net_route_destination in net_destination:
+                if net_destination==net_route_destination:
+                    raise forms.ValidationError('Found an exactly matching %s rule, %s with destination prefix %s<br>To avoid overlapping try editing rule <a href=\'%s\'>%s</a>' % (route.status, route.name, route.destination, existing_url, route.name))
+                elif net_destination.overlaps(net_route_destination):
+                    raise forms.ValidationError('Found an overlapping %s rule, %s with destination prefix %s<br>To avoid overlapping try editing rule <a href=\'%s\'>%s</a>' % (route.status, route.name, route.destination, existing_url, route.name))
+
         return self.cleaned_data
 
 

@@ -20,16 +20,15 @@
 import pytest
 from utils import proxy as PR
 from celery import shared_task, subtask
-import logging
 import json
 from django.conf import settings
 import datetime
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-import os
 from celery.exceptions import TimeLimitExceeded, SoftTimeLimitExceeded
 from ipaddress import *
 from os import fork,_exit
+import os
 from sys import exit
 import time
 import redis
@@ -37,25 +36,9 @@ from django.forms.models import model_to_dict
 
 from peers.models import *
 
-LOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'celery_jobs.log')
-
-RULE_CHANGELOG_FILENAME = os.path.join(settings.LOG_FILE_LOCATION, 'rule_changelog.log')
-
-# FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-# logging.basicConfig(format=FORMAT)
-formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(LOG_FILENAME)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
-rule_changelog_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-rule_changelog_logger = logging.getLogger(__name__+"__rule_changelog")
-rule_changelog_logger.setLevel(logging.DEBUG)
-rule_changelog_handler = logging.FileHandler(RULE_CHANGELOG_FILENAME)
-rule_changelog_handler.setFormatter(rule_changelog_formatter)
-rule_changelog_logger.addHandler(rule_changelog_handler)
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "celery_jobs.log", False)
+rule_changelog_logger = flowspec.logging_utils.logger_init_default(__name__ + "__rule_changelog", "rule_changelog.log", False)
 
 ##
 
@@ -269,7 +252,7 @@ def announce(messg, user, route):
 
     #self.announce_redis_lowlevel(messg, username)
   except Exception as e:
-    logger.info("tasks::announce(): got excention e: " + str(e), exc_info=True)
+    logger.error("tasks::announce(): got excention e: " + str(e), exc_info=True)
 
 
 @shared_task(ignore_result=True)
@@ -338,7 +321,7 @@ def notify_expired():
                               mail_body, settings.SERVER_EMAIL,
                               [route.applier.email])
                 except Exception as e:
-                    logger.info("Exception: %s"%e)
+                    logger.error("Exception: %s"%e)
                     pass
     logger.info('Expiration notification process finished')
 
@@ -360,7 +343,7 @@ def snmp_lock_create(wait=0):
       first=0
       try:
           os.mkdir(settings.SNMP_POLL_LOCK)
-          logger.info("snmp_lock_create(): creating lock dir succeeded")
+          logger.debug("snmp_lock_create(): creating lock dir succeeded")
           success=1
           return success
       except OSError as e:
@@ -378,7 +361,7 @@ def snmp_lock_remove():
     try:
       os.rmdir(settings.SNMP_POLL_LOCK)
     except Exception as e:
-      logger.info("snmp_lock_remove(): failed "+str(e))
+      logger.error("snmp_lock_remove(): failed "+str(e))
 
 def exit_process():
     import sys
@@ -448,7 +431,7 @@ def snmp_add_initial_zero_value(rule_id, zero_or_null=True):
 
         try:
           snmpstats.add_initial_zero_value(rule_id, zero_or_null)
-          logger.info("snmp_add_initial_zero_value(): rule_id="+str(rule_id)+","+str(zero_or_null)+" sucesss")
+          logger.debug("snmp_add_initial_zero_value(): rule_id="+str(rule_id)+","+str(zero_or_null)+" sucesss")
         except Exception as e:
           logger.error("snmp_add_initial_zero_value(): rule_id="+str(rule_id)+","+str(zero_or_null)+" failed: "+str(e))
 

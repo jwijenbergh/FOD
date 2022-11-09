@@ -1,11 +1,8 @@
 
-import logging
+from django.conf import settings
 
-FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-logging.basicConfig(format=FORMAT)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
+import flowspec.logging_utils
+logger = flowspec.logging_utils.logger_init_default(__name__, "celery_junos.log", False)
 
 PROTOCOL_NUMBERS = {
     'HOPOPT': '0',
@@ -267,7 +264,7 @@ def create_junos_name(rule):
     # protocols
     protocol_spec = rule.protocol.all()
     protocol_num = get_protocols_numbers(protocol_spec, ip_version)
-    logger.info("junos::create_junos_name(): protocol_spec="+str(protocol_spec)+" protocol_num="+str(protocol_num))
+    logger.debug("junos::create_junos_name(): protocol_spec="+str(protocol_spec)+" protocol_num="+str(protocol_num))
 
     name += protocol_num
 
