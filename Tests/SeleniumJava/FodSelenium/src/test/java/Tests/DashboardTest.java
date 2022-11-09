@@ -389,7 +389,7 @@ public class DashboardTest {
         				}
         				try {
         					driver.findElement(By.id("apply_rule_header_id"));
-        					buffer.append("Find edir rule header: apply_rule_header_id");
+        					buffer.append("Find edit rule header: apply_rule_header_id");
         					buffer.newLine();
         				}catch(IOException exc) {
         					buffer.append(exc.getMessage() );
@@ -435,7 +435,7 @@ public class DashboardTest {
         				}
         				try {
         					driver.findElement(By.id("apply_rule_header_id"));
-        					buffer.append("Find edir rule header: apply_rule_header_id");
+        					buffer.append("Find edit rule header: apply_rule_header_id");
         					buffer.newLine();
         				}catch(IOException exc) {
         					buffer.append(exc.getMessage() );
@@ -481,7 +481,7 @@ public class DashboardTest {
         				}
         				try {
         					driver.findElement(By.id("myrulesheader"));
-        					buffer.append("Find edir rule header: myrulesheader");
+        					buffer.append("Find edit rule header: myrulesheader");
         					buffer.newLine();
         				}catch(IOException exc) {
         					buffer.append(exc.getMessage() );
@@ -527,7 +527,7 @@ public class DashboardTest {
         				}
         				try {
         					driver.findElement(By.id("my_profile_header_id"));
-        					buffer.append("Find edir my profile header: my_profile_header_id");
+        					buffer.append("Find edit my profile header: my_profile_header_id");
         					buffer.newLine();
         				}catch(IOException exc) {
         					buffer.append(exc.getMessage() );
@@ -796,7 +796,7 @@ public class DashboardTest {
         				}
         				try {
         					driver.findElement(By.id("my_profile_header_id"));
-        					buffer.append("Find edir my profile header: my_profile_header_id");
+        					buffer.append("Find edit my profile header: my_profile_header_id");
         					buffer.newLine();
         				}catch(IOException exc) {
         					buffer.append(exc.getMessage() );

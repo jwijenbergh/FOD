@@ -463,7 +463,7 @@ public class OverviewTest {
         				}
         				try {
         					driver.findElement(By.id("my_profile_header_id"));
-        					buffer.append("Find edir my profile header: my_profile_header_id");
+        					buffer.append("Find edit my profile header: my_profile_header_id");
         					buffer.newLine();
         				}catch(IOException exc) {
         					buffer.append(exc.getMessage() );
