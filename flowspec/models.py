@@ -186,7 +186,7 @@ class Route(models.Model):
         l = len(settings.RULE_NAME_PREFIX)
         prefix = self.name[0:l]
         if prefix==settings.RULE_NAME_PREFIX:
-          return self.name[l:-1]
+          return self.name[l:len(self.name)]
         else:
           return self.name
 
