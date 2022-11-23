@@ -72,8 +72,12 @@ DATABASES = {
 
 #LOG_FILE_LOCATION = "/var/log/fod"
 LOG_FILE_LOCATION = "/srv/flowspy/log/"
-#LOGGING_FORMAT_DEFAULT = '%(asctime)s %(name)s %(levelname)s: %(message)s'
-LOGGING_FORMAT_DEFAULT = '%(processName)s[%(process)d] %(asctime)s %(name)s %(levelname)s: %(message)s'
+
+LOGGING_FORMAT_DEFAULT = '%(asctime)s %(name)s %(levelname)s: %(message)s'
+#LOGGING_FORMAT_DEFAULT = '%(processName)s[%(process)d] %(asctime)s %(name)s %(levelname)s: %(message)s'
+
+# "error" | "warn" | "info" | "debug"
+LOG_LEVEL = "info"
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
