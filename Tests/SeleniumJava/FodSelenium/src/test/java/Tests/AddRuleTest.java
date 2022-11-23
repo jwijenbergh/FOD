@@ -838,7 +838,7 @@ public class AddRuleTest {
     				}
     				try {
     					driver.findElement(By.id("id_sourceport")).click();
-    					buffer.append("Find expires input: id_sourceport");
+    					buffer.append("Find source ports input: id_sourceport");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
@@ -846,7 +846,7 @@ public class AddRuleTest {
     				}
     				try {
     					driver.findElement(By.id("id_sourceport")).sendKeys("f//");
-    					buffer.append("Add wrond data into: id_sourceport 'f//'");
+    					buffer.append("Add wrong data into: id_sourceport 'f//'");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
@@ -962,7 +962,7 @@ public class AddRuleTest {
     				}
     				try {
     					driver.findElement(By.id("id_destinationport")).click();
-    					buffer.append("Find expires input: id_destinationport");
+    					buffer.append("Find destination port input: id_destinationport");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
@@ -970,7 +970,7 @@ public class AddRuleTest {
     				}
     				try {
     					driver.findElement(By.id("id_destinationport")).sendKeys("f//");
-    					buffer.append("Add wrond data into: id_destinationport 'f//'");
+    					buffer.append("Add wrong data into: id_destinationport 'f//'");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
@@ -1085,7 +1085,7 @@ public class AddRuleTest {
     				}
     				try {
     					driver.findElement(By.id("id_port")).click();
-    					buffer.append("Find expires input: id_port");
+    					buffer.append("Find ports input: id_port");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
@@ -1093,7 +1093,7 @@ public class AddRuleTest {
     				}
     				try {
     					driver.findElement(By.id("id_port")).sendKeys("f//");
-    					buffer.append("Add wrond data into: id_port 'f//'");
+    					buffer.append("Add wrong data into: id_port 'f//'");
     					buffer.newLine();
     				}catch(IOException exc) {
     					buffer.append(exc.getMessage());
