@@ -56,6 +56,7 @@ import datetime
 
 import flowspec.iprange_match
 
+from urllib.parse import urlencode
 #############################################################################
 #############################################################################
 
@@ -170,7 +171,11 @@ def dashboard(request):
 
 @login_required
 @never_cache
-def group_routes(request):
+def group_routes(request, new_routeid=None):   
+    if new_routeid!=None and new_routeid!="":
+      logger.info("group_routes(): new_routeid="+str(new_routeid))
+      return HttpResponseRedirect(reverse("group-routes"))
+
     try:
         request.user.userprofile.peers.select_related()
     except UserProfile.DoesNotExist:
@@ -386,9 +391,9 @@ def add_route(request):
             except:
                 pass
         form = RouteForm(request_data)
-        logger.info("tasks.add(): form="+str(form))
+        #logger.info("tasks.add(): form="+str(form))
         if form.is_valid():
-            logger.info("tasks.add(): foem is_valid")
+            #logger.info("tasks.add(): form is_valid")
             route = form.save(commit=False)
             if not request.user.is_superuser:
                 route.applier = request.user
@@ -408,7 +413,8 @@ def add_route(request):
             # We have to make the commit after saving the form
             # in order to have all the m2m relations.
             route.commit_add()
-            return HttpResponseRedirect(reverse("group-routes"))
+            #return HttpResponseRedirect(reverse("group-routes"))
+            return HttpResponseRedirect("/new_route/"+str(route.id))
         else:
             if not request.user.is_superuser:
                 form.fields['then'] = forms.ModelMultipleChoiceField(queryset=ThenAction.objects.filter(action__in=settings.UI_USER_THEN_ACTIONS).order_by('action'), required=True)
@@ -748,6 +754,7 @@ def user_login(request):
         error_mail = False
         has_entitlement = False
         error = ''
+
         username = lookupShibAttr(settings.SHIB_USERNAME, request.META)
         if not username:
             error_username = True
@@ -755,6 +762,10 @@ def user_login(request):
         lastname = lookupShibAttr(settings.SHIB_LASTNAME, request.META)
         mail = lookupShibAttr(settings.SHIB_MAIL, request.META)
         entitlement = lookupShibAttr(settings.SHIB_ENTITLEMENT, request.META)
+
+        ##
+
+        logger.info("view::user_login(): firstname='"+str(firstname)+"'")
       
         ##
 
