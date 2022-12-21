@@ -32,6 +32,7 @@ router.register(r'stats/routes', StatsRoutesViewSet, basename='statsroute')
 
 urlpatterns = [
     path('poll/', include('poller.urls')),
+    url(r'^new_route/(?P<new_routeid>[\d]+)$', flowspec_views.group_routes, name="group-routes"),
     path('', flowspec_views.group_routes, name="group-routes"),
     url(r'^routes_ajax/?$', flowspec_views.group_routes_ajax, name="group-routes-ajax"),
     url(r'^overview_ajax/?$', flowspec_views.overview_routes_ajax, name="overview-ajax"),
