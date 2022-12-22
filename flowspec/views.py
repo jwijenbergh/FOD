@@ -89,6 +89,7 @@ from urllib.parse import urlencode
 
 import flowspec.logging_utils
 logger = flowspec.logging_utils.logger_init_default(__name__, "flowspec_views.log", False)
+rule_changelog_logger = flowspec.logging_utils.logger_init_default(__name__ + "__rule_changelog", "rule_changelog.log", False)
 
 #############################################################################
 #############################################################################
@@ -846,6 +847,9 @@ def user_login(request):
             user_exists = True
           except:
             pass
+
+        user_dict = model_to_dict(user)
+        rule_changelog_logger.info("login user="+str(user.username)+": "+str(user_dict))
 
         user = authenticate(username=username, firstname=firstname, lastname=lastname, mail=mail, authsource='shibboleth')
         logger.debug('Authentication of %s' % user)
