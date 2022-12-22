@@ -60,7 +60,7 @@ public class ConfigFileReader {
 		 }
 	 
 	 public String getSourceIPAddress() {
-		 String sourceIPAddress = properties.getProperty("sourceipaddress");
+		 String sourceIPAddress = properties.getProperty("sourceIPAddress");
 		 if(sourceIPAddress != null) return sourceIPAddress;
 		 else throw new RuntimeException("source ip address not specified in the Configuration.properties file.");
 		 }
