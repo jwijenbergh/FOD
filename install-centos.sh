@@ -15,6 +15,7 @@ inside_docker=0
 install_basesw=1
 install_fodproper=1
 
+install_systemd_services=0
 ensure_installed_pythonenv_wrapper=1
 
 # workaround for old Django with old OS sqlite3 (CENTOS7 only):
@@ -29,8 +30,18 @@ if [ -e "/.dockerenv" ]; then
   echo "running inside docker assummed" 1>&2
   inside_docker=1
 fi
+
+if grep -q -E '^systemd$' /proc/1/comm; then 
+  echo "system is running systemd as init process, setting default install_systemd_services=1" 1>&2
+  install_systemd_services=1
+elif [ "$inside_docker" = 1 ]; then 
+  echo "inside_docker=$inside_docker, so setting default install_systemd_services=0" 1>&2
+  install_systemd_services=0
+fi
+
 ##############################################################################
 ##############################################################################
+
 while [ $# -gt 0 ]; do
 
   if [ $# -ge 1 -a "$1" = "--here" ]; then
@@ -63,7 +74,13 @@ while [ $# -gt 0 ]; do
     shift 1
     install_basesw=0
     install_fodproper=1
-  else
+  elif [ $# -ge 1 -a "$1" = "--systemd" ]; then
+    shift 1
+    install_systemd_services=1
+  elif [ $# -ge 1 -a "$1" = "--no_systemd" ]; then
+    shift 1
+    install_systemd_services=0
+ else
     break
   fi
 
@@ -293,7 +310,7 @@ else
   set -e
   
   echo "$0: step 2.2: setting-up FoD settings" 1>&2
-  
+
   #cd /srv/flowspy/
   cd "$fod_dir"
   (
@@ -381,7 +398,7 @@ else
   ##
 
   echo "$0: step 2.5: preparing FoD run-time environment" 1>&2
-  
+
   echo "$0: step 2.5.1: preparing necessary dirs" 1>&2
 
   mkdir -p /var/run/fod
@@ -419,8 +436,40 @@ EOF
   echo 1>&2
 
   ##
+
   
-  echo "$0: step 2.5.4: preparing runfod script" 1>&2
+  echo "$0: step 2.5.5: preparing systemd files" 1>&2
+
+  fod_systemd_dir="$fod_dir/systemd"
+  cp -f "$fod_systemd_dir/fod-gunicorn.service.dist" "$fod_systemd_dir/fod-gunicorn.service"
+  sed -i "s#/srv/flowspy#$fod_dir#g" "$fod_systemd_dir/fod-gunicorn.service"
+
+  cp -f "$fod_systemd_dir/fod-celeryd.service.dist" "$fod_systemd_dir/fod-celeryd.service"
+  sed -i "s#/srv/flowspy#$fod_dir#g" "$fod_systemd_dir/fod-celeryd.service"
+
+  cp -f "$fod_systemd_dir/fod-status-email-user@.service.dist" "$fod_systemd_dir/fod-status-email-user@.service"
+  sed -i "s#/srv/flowspy#$fod_dir#g" "$fod_systemd_dir/fod-status-email-user@.service"
+
+  if [ "$install_systemd_services" = 1 ]; then
+    echo 1>&2
+    echo "Installing systemd services" 1>&2
+    echo 1>&2
+    #cp -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "/etc/systemd/system/"
+    cp -v -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "$fod_systemd_dir/fod-status-email-user@.service" "/etc/systemd/system/" 1>&2
+    systemctl daemon-reload
+
+    systemctl enable fod-gunicorn
+    systemctl enable fod-celeryd
+
+    systemctl restart fod-gunicorn
+    systemctl restart fod-celeryd
+
+    sleep 5
+    SYSTEMD_COLORS=1 systemctl status fod-gunicorn | cat
+    echo
+    SYSTEMD_COLORS=1 systemctl status fod-celeryd | cat
+    echo
+  fi
 
   if [ "$assume__sqlite_version__to_old" = 1 ]; then
     echo "$0: assume__sqlite_version__to_old=$assume__sqlite_version__to_old => using runfod.centos.sh for old celery start syntax" 1>&2
