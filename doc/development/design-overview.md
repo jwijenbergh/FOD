@@ -1,33 +1,36 @@
 
-##
+# Design Overview
 
-./runfod.sh # default start wrapper
-
-##
+## Application Overview
 
 2 main components/programs/processes, both executing Python code, which is Django-based:
 
 - gunicorn # the HTTP front-end 
 - celeryd  # the back-end for actually performing NETCONF updates and SNMP statistics queries
+(compare ./runfod.sh, the default start wrapper script)
 
-+
+as well as 
 
 - a common database, either mysql or just an sqlite file; it contains the defined FlowSpec rules (active or inactive) + further model data
 - redis as a task broker (for tasks + messages)
 in between them
 
-##
+## Python Code Overview
 
-Default installation directory: /srv/flowspy
+### Installation directories
+
+Default installation directory proper: /srv/flowspy
 Python dependencies installed via virtualenv (/srv/venv is default location)
 
-##
+### Overview of directories and files in the repository 
+
+#### Django Config
 
 Django settings: ./flowspy/settings.py + ./flowspy/settings_local.py (the latter included from the former for separating non-host specific settings from host-specific ones in cases of multiple installations)
 
 ./flowspy/urls.py : # Django urls config
 
-#
+#### Overview of directories and files with code
 
 proper Python code, partly shared by gunicorn and celeryd components:
 
