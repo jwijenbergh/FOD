@@ -1,5 +1,7 @@
 # Basic Administration and Usage
 
+Early steps for administration and usage that can be done after FoD has been installed.
+
 ## 1: Setup NETCONF + FoD admin user 
 
 ### 1 (local): Setup NETCONF + FoD admin user (FoD running locally)
