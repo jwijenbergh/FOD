@@ -42,7 +42,7 @@ You can contact us directly at fod{at}geant[dot]net
 You can find more about FoD or raise your issues at [Github FoD
 repository].
 
-You can contact us directly at dev{at}noc[dot]grnet(.)gr
+You can contact GRNET at dev{at}noc[dot]grnet(.)gr
 
 # Repositories
 
@@ -53,7 +53,7 @@ You can contact us directly at dev{at}noc[dot]grnet(.)gr
 
 ## Copyright and license
 
-Copyright © 2017-2021 GÉANT4-3 WP8 T3
+Copyright © 2017-2023 GÈANT GN4-2/GN4-3 Project
 
 Copyright © 2010-2017 Greek Research and Technology Network (GRNET S.A.)
 
