@@ -161,11 +161,11 @@ For admin users only, allows to perform (Django) admin actions (see 2.1)
 
 overview of the own user account, showing first/last name etc.
 
-create REST API token (see [API v1.7](/doc/api/api-v1.7.md))
+create REST API token (see [API v1.7](../api/api-v1.7.md))
 
 #### 2.2.2 usage via REST API
 
-see [API v1.7](/doc/api/api-v1.7.md)
+see [API v1.7](../api/api-v1.7.md)
 
 #### 3. Further/Regular Administration
 
