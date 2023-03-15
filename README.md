@@ -65,7 +65,7 @@ keep the peers associated with any user under 5.
 
 ## Contact 
 
-You can contact us directly at fod{at}geant[dot]net
+You can contact us directly at fod{at}geant[dot]org
 
 ## Copyright and license
 
