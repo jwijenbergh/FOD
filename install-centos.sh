@@ -372,7 +372,15 @@ else
   #mkdir -p /srv/flowspy/static/
   mkdir -p "$static_dir"
 
-  ([ ! -f "fodenv.sh" ] || source "./fodenv.sh"; ./manage.py collectstatic --noinput)
+  (
+    set -e
+
+    [ ! -f "fodenv.sh" ] || source "./fodenv.sh"
+
+    cd "$fod_dir"
+
+    ./manage.py collectstatic -c --noinput
+  )
 
   ##
 
@@ -382,7 +390,11 @@ else
 
   echo "deploying/updating database schema" 1>&2
   (
+    set -e
+
     [ ! -f "fodenv.sh" ] || source "./fodenv.sh"
+
+    cd "$fod_dir"
   
     #./manage.py syncdb --noinput
 

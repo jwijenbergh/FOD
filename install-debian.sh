@@ -548,11 +548,15 @@ else
   mkdir -p "$static_dir"
 
   (
+    set -e
+
     [ ! -f "fodenv.sh" ] || source "./fodenv.sh"; 
     
     source "$venv_dir/bin/activate"
 
-    ./manage.py collectstatic --noinput || debug_python_deps "$venv_dir/bin/activate" 1
+    cd "$fod_dir"
+
+    ./manage.py collectstatic -c --noinput || debug_python_deps "$venv_dir/bin/activate" 1
   )
 
   ##
@@ -575,9 +579,13 @@ else
 
   echo "deploying/updating database schema" 1>&2
   (
+    set -e
+
     [ ! -f "fodenv.sh" ] || source "./fodenv.sh"
 
     source "$venv_dir/bin/activate"
+
+    cd "$fod_dir"
 
     #./manage.py syncdb --noinput
 
