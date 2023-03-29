@@ -53,7 +53,7 @@ case the flowspec capable device is an EX4200.
 You can find more about FoD or raise your issues at [Github FoD
 repository].
 
-You can contact us directly at fod{at}geant[dot]org
+You can contact us directly at fod{at}lists[dot]geant(.)org
 
 # GRNET Contact 
 
