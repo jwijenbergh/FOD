@@ -19,6 +19,7 @@ install_fodproper=1
 
 install_with_supervisord=0
 install_systemd_services=0
+install_systemd_services__onlyinstall=0
 ensure_installed_pythonenv_wrapper=1
 
 install_mta=""
@@ -43,6 +44,10 @@ setup_adminuser__pwd="admin"
 #setup_adminuser__email="admin@localhost"
 setup_adminuser__peer_name="testpeer"
 setup_adminuser__peer_ip_prefix1="0.0.0.0/0"
+
+#
+
+setup_exabgp=0
 
 ##############################################################################
 ##############################################################################
@@ -122,6 +127,8 @@ function debug_python_deps()
   echo "# Python version: " 1>&2  
   python --version
 
+  ls -l log/ 1>&2
+
   echo 1>&2
   echo "# Python dependencies: " 1>&2  
   pip list
@@ -142,9 +149,11 @@ fi
 if grep -q -E '^systemd$' /proc/1/comm; then 
   echo "system is running systemd as init process, setting default install_systemd_services=1" 1>&2
   install_systemd_services=1
+  install_systemd_services__onlyinstall=0
 elif [ "$inside_docker" = 1 ]; then 
   echo "inside_docker=$inside_docker, so setting default install_systemd_services=0" 1>&2
   install_systemd_services=0
+  install_systemd_services__onlyinstall=1
   #install_with_supervisord=1
 fi
 
@@ -193,6 +202,12 @@ while [ $# -gt 0 ]; do
   elif [ $# -ge 1 -a "$1" = "--systemd" ]; then
     shift 1
     install_systemd_services=1
+  elif [ $# -ge 1 -a "$1" = "--systemd_only_install" ]; then
+    shift 1
+    install_systemd_services__onlyinstall=1
+  elif [ $# -ge 1 -a "$1" = "--systemd_check_start" ]; then
+    shift 1
+    install_systemd_services__onlyinstall=0
   elif [ $# -ge 1 -a "$1" = "--no_systemd" ]; then
     shift 1
     install_systemd_services=0
@@ -247,6 +262,21 @@ while [ $# -gt 0 ]; do
     shift 1 
     setup_adminuser__peer_ip_prefix1="$1"
     shift 1 
+  elif [ $# -ge 1 -a "$1" = "--exabgp" ]; then # currently 6 params follow
+    shift 1
+    setup_exabgp=1
+    setup_exabgp__nodeid="$1"
+    shift 1
+    setup_exabgp__ip_addr="$1"
+    shift 1
+    setup_exabgp__asnr="$1"
+    shift 1
+    setup_exabgp__peer_nodeid="$1"
+    shift 1
+    setup_exabgp__peer_ip_addr="$1"
+    shift 1
+    setup_exabgp__peer_asnr="$1"
+    shift 1
   else
     break
   fi
@@ -600,7 +630,7 @@ else
   (
     set -e
 
-    [ ! -f "fodenv.sh" ] || source "./fodenv.sh"; 
+    [ ! -f "fodenv.sh" ] || source "./fodenv.sh" 
     
     source "$venv_dir/bin/activate"
 
@@ -692,16 +722,26 @@ EOF
   fi
 
   ##
+  
+  if [ "$setup_exabgp" = 1 ]; then
+    echo "$0: setting up exabgp fod conf" 1>&2
 
-  echo "$0: step 2.5.3: preparing supervisord.conf" 1>&2
+    echo -e '\n#added by install-*.sh:\nPROXY_CLASS="proxy_exabgp"' >> flowspy/settings_local.py
+  fi
+
+  ##
+ 
+  echo "$0: step 2.5.5: preparing systemd/supervisord files" 1>&2
+
+  echo "$0: step 2.5.5.1: preparing supervisord.conf templates" 1>&2
 
   cp -f "$fod_dir/supervisord.conf.dist" "$fod_dir/supervisord.conf"
   sed -i "s#/srv/flowspy#$fod_dir#" "$fod_dir/supervisord.conf"
   echo 1>&2
 
   ##
-  
-  echo "$0: step 2.5.5: preparing systemd files" 1>&2
+
+  echo "$0: step 2.5.5.2: installing systemd/supervisord files" 1>&2
 
   fod_systemd_dir="$fod_dir/systemd"
   cp -f "$fod_systemd_dir/fod-gunicorn.service.dist" "$fod_systemd_dir/fod-gunicorn.service"
@@ -715,29 +755,38 @@ EOF
 
   if [ "$install_systemd_services" = 1 ]; then
     echo 1>&2
-    echo "Installing systemd services" 1>&2
+    echo "$0: installing systemd services" 1>&2
     echo 1>&2
     #cp -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "/etc/systemd/system/"
     cp -v -f "$fod_systemd_dir/fod-gunicorn.service" "$fod_systemd_dir/fod-celeryd.service" "$fod_systemd_dir/fod-status-email-user@.service" "/etc/systemd/system/" 1>&2
-    systemctl daemon-reload
 
-    systemctl enable fod-gunicorn
-    systemctl enable fod-celeryd
 
-    systemctl restart fod-gunicorn
-    systemctl restart fod-celeryd
+    if [ "$install_systemd_services__onlyinstall" = 1 ]; then
+      #systemctl enable --machine --no-reload fod-gunicorn
+      #systemctl enable --machine --no-reload fod-celeryd
+      ln -s -f -v "/usr/lib/systemd/system/fod-gunicorn.service" /etc/systemd/system/multi-user.target.wants/
+      ln -s -f -v "/usr/lib/systemd/system/fod-celeryd.service" /etc/systemd/system/multi-user.target.wants/
+    else
+      systemctl daemon-reload
 
-    sleep 5
-    SYSTEMD_COLORS=1 systemctl status fod-gunicorn | cat
-    echo
-    SYSTEMD_COLORS=1 systemctl status fod-celeryd | cat
-    echo
+      systemctl enable fod-gunicorn
+      systemctl enable fod-celeryd
+
+      systemctl restart fod-gunicorn
+      systemctl restart fod-celeryd
+
+      sleep 5
+      SYSTEMD_COLORS=1 systemctl status fod-gunicorn | cat
+      echo
+      SYSTEMD_COLORS=1 systemctl status fod-celeryd | cat
+      echo
+    fi
   
     FOD_RUNMODE="via_systemd" 
   
   elif [ "$install_with_supervisord" = 1 ]; then
     echo 1>&2
-    echo "Installing supervisord conf" 1>&2
+    echo "$0: installing supervisord conf" 1>&2
     echo 1>&2
 
     # supervisord.conf
@@ -748,6 +797,7 @@ EOF
       echo "$0: using supervisord.conf" 1>&2
       cp -f supervisord.conf /etc/supervisord.conf
     fi
+    touch /etc/.supervisord.conf.fodready
   
     FOD_RUNMODE="via_supervisord" 
 
@@ -757,14 +807,76 @@ EOF
 
   fi
 
+  ##
+
+  echo "$0: step 2.5.6: writing ./runfod.conf" 1>&2
   (
     echo "FOD_RUNMODE=\"$FOD_RUNMODE\"" 
+    echo "USE_EXABGP=\"$setup_exabgp\""
   ) > "./runfod.conf"
+
+  ##
+
+  if [ "$setup_exabgp" = 1 ]; then
+    
+    echo "$0: step 2.5.7: preparing systemd/supervisord files" 1>&2
+
+    echo "$0: setting up exabgp" 1>&2
+
+    add1=()
+    if [ "$install_systemd_services" = 1 ]; then
+      add1=("--systemd")
+    fi
+
+    exabgp_systemd_servicename="exabgpForFod" # statically defined in ./exabgp/run-exabgp-generic
+
+    # ./exabgp/run-exabgp-generic
+    "$fod_dir/exabgp/run-exabgp-generic" --init-conf \
+            "$setup_exabgp__nodeid" "$setup_exabgp__ip_addr" "$setup_exabgp__asnr" \
+            "$setup_exabgp__peer_nodeid" "$setup_exabgp__peer_ip_addr" "$setup_exabgp__peer_asnr" \
+            -- "${add1[@]}"
+    # ./flowspy/settings.py
+    #echo -e '\n#added by install-*.sh:\nPROXY_CLASS="proxy_exabgp"' >> flowspy/settings_local.py
+
+    if [ "$install_systemd_services" = 1 ]; then # TODO support supervisord as well
+      echo "$0: installing systemd service file for exabgpForFod" 1>&2	   
+
+      if [ "$install_systemd_services__onlyinstall" = 1 ]; then
+        #systemctl enable --no-reload "$exabgp_systemd_servicename"
+        #systemctl --machine enable --no-reload "$exabgp_systemd_servicename"
+        ln -s -f -v "/usr/lib/systemd/system/$exabgp_systemd_servicename.service" /etc/systemd/system/multi-user.target.wants/
+      else
+        systemctl daemon-reload
+        systemctl enable "$exabgp_systemd_servicename"
+        systemctl restart "$exabgp_systemd_servicename"
+
+        sleep 5
+        SYSTEMD_COLORS=1 systemctl status "$exabgp_systemd_servicename" | cat
+        echo
+      fi
+
+    elif [ "$install_with_supervisord" = 1 ]; then
+      echo "$0: adding supervisord config for exabgpForFod" 1>&2	   
+
+      # ./supervisord.conf
+      cat >>/etc/supervisord.conf <<EOF
+
+[program:exabgp]
+command=./exabgp/run-exabgp-generic --run0
+directory=$fod_dir
+user=$FOD_SYSUSER
+stdout_logfile=./log/exabgp-stdout.log        ; stdout log path, NONE for none; default AUTO
+stderr_logfile=./log/exabgp-stderr.log        ; stderr log path, NONE for none; default AUTO
+EOF
+
+    fi
+ 
+  fi
 
   )
   
   if [ "$inst_dir_is_fod_dir" = 1 ]; then
-    echo "$0: finally fixing permissions as inst_dir_is_fod_dir=$inst_dir_is_fod_dir" 1>&2
+    echo "$0: step 2.9: finally fixing permissions as inst_dir_is_fod_dir=$inst_dir_is_fod_dir" 1>&2
     find "$fod_dir/" -not -user "$FOD_SYSUSER" -exec chown -v "$FOD_SYSUSER:" {} \;
   fi
   
