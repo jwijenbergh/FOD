@@ -36,6 +36,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+            ref: feature/exabgp_support2
 
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
@@ -75,7 +77,8 @@ jobs:
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
           context: .
-          file: ./inst/testing/fodexabgp-containerlab1/Dockerfile
+          #file: ./inst/testing/fodexabgp-containerlab1/Dockerfile
+          file: ./Dockerfile.fod.debian-exabgp
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
