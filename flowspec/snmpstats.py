@@ -456,17 +456,52 @@ def poll_snmp_statistics():
               try:
                 if xtype==xtype_default:
                   logger.info("poll_snmp_statistics(): 1a STATISTICS_PER_RULE rule_id="+str(rule_id))
-                  counter = {"ts": nowstr, "value": newdata[flowspec_params_str][xtype_default]}
+                  val_dropped = newdata[flowspec_params_str][xtype_default]
+                  counter = {"ts": nowstr, "value": val_dropped}
                 else:
                   logger.info("poll_snmp_statistics(): 1b STATISTICS_PER_RULE rule_id="+str(rule_id))
+
                   try:
                     val_dropped = newdata[flowspec_params_str][xtype_default]
                   except Exception:
                     val_dropped = 1
+
                   try:
                     val_matched = newdata[flowspec_params_str][xtype]
+
+                    logger.info("poll_snmp_statistics(): 1b STATISTICS_PER_RULE rule_id="+str(rule_id)+" before last_matched__remember_offset_value fix: val_matched="+str(val_matched))
+
+                    ##
+
+                    val_matched__pkts = newdata[flowspec_params_str][xtype]["packets"]
+                    val_matched__bytes = newdata[flowspec_params_str][xtype]["bytes"]
+
+                    key_remember_oldmatched = str(rule_id)+".remember_oldmatched_offset"
+                    try:
+                      last_matched__remember_offset_value = history_per_rule[key_remember_oldmatched]["value_matched"]
+                      logger.info("poll_snmp_statistics(): 1b STATISTICS_PER_RULE rule_id="+str(rule_id)+" before last_matched__remember_offset_value fix: last_matched__remember_offset_value="+str(last_matched__remember_offset_value))
+
+                      last_matched__remember_offset_value__pkts = last_matched__remember_offset_value["packets"]
+                      last_matched__remember_offset_value__bytes = last_matched__remember_offset_value["bytes"]
+                    except:
+                      last_matched__remember_offset_value__pkts = 0
+                      last_matched__remember_offset_value__bytes = 0
+
+                    val_matched__pkts = val_matched__pkts + last_matched__remember_offset_value__pkts
+                    val_matched__bytes = val_matched__bytes + last_matched__remember_offset_value__bytes
+
+                    newdata[flowspec_params_str][xtype]["packets"] = val_matched__pkts
+                    newdata[flowspec_params_str][xtype]["bytes"] = val_matched__bytes
+                  
+                    logger.info("poll_snmp_statistics(): 1b STATISTICS_PER_RULE rule_id="+str(rule_id)+" after last_matched__remember_offset_value fix: val_matched="+str(val_matched))
+
+                    ##
+
                   except Exception:
                     val_matched = 1
+
+                  ##
+
                   counter = { "ts": nowstr, "value": val_dropped, "value_matched": val_matched }
 
                 counter_is_null = False
@@ -526,6 +561,7 @@ def poll_snmp_statistics():
                     elif not last_is_null and not rule_newer_than_last:
                         logger.debug("poll_snmp_statistics(): STATISTICS_PER_RULE: rule_id="+str(rule_id)+" case existing active 00")
                         rec.insert(0, counter)
+                        history_per_rule[str(rule_id)+".last"] = counter
 
                   history_per_rule[rule_id] = rec[:samplecount]
             except Exception as e:
@@ -606,4 +642,113 @@ def add_initial_zero_value(rule_id, route_obj, zero_or_null=True):
         logger.error("add_initial_zero_value(): failure: exception: "+str(e))
 
     unlock_history_file()
+
+##
+
+# workaround for rate limiting rules whose rate limit is changed while the rule is active -> old (absoluet) matched statistics value would be lost afterwards and not be counted as part of the future (absolute) matched statistics value; because the oid keys for the matched value (depending on the rate limit) in the SNMP table have changed
+#
+# to be called before the rule's rate-limit is changed on the router
+#
+# TODO; call this function on change of an active rate limit rule whose rate limit is changed: remember_oldmatched__for_changed_ratelimitrules_whileactive()
+# TODO: on decativation of the rule the remembered matched value offset set in this function has to be cleared (add new function for this and call it appropriately): clean_oldmatched__for_changed_ratelimitrules_whileactive()
+# TODO: use the remembered matched value offset in get_snmp_stats (add to matched value gathered from SNMP)
+#
+
+def remember_oldmatched__for_changed_ratelimitrules_whileactive(rule_id, route_obj):
+    rule_id=str(rule_id)
+    logger.debug("remember_oldmatched__for_changed_ratelimitrules_whileactive(): rule_id="+str(rule_id))
+
+    # get new data
+    now = datetime.now()
+    nowstr = now.isoformat()
+
+    key_last_measurement = str(rule_id)+".last"
+    key_remember_oldmatched = str(rule_id)+".remember_oldmatched_offset"
+
+    # lock history file access
+    success = lock_history_file(wait=1, reason="remember_oldmatched__for_changed_ratelimitrules_whileactive("+str(rule_id)+")")
+    if not success: 
+      logger.error("remember_oldmatched__for_changed_ratelimitrules_whileactive(): locking history file failed, aborting");
+      return False
+
+    # load history
+    history = load_history()
+
+    try:
+      history_per_rule = history['_per_rule']
+    except Exception as e:
+      history_per_rule = {}
+
+    try:
+      last_matched__measurement_value = history_per_rule[key_last_measurement]["value_matched"]
+      last_matched__measurement_value__pkts = last_matched__measurement_value["packets"]
+      last_matched__measurement_value__bytes = last_matched__measurement_value["bytes"]
+    except:
+      last_matched__measurement_value__pkts = 0
+      last_matched__measurement_value__bytes = 0
+
+    try:
+      last_matched__remember_offset_value = history_per_rule[key_remember_oldmatched]["value_matched"]
+      last_matched__remember_offset_value__pkts = last_matched__remember_offset_value["packets"]
+      last_matched__remember_offset_value__bytes = last_matched__remember_offset_value["bytes"]
+    except:
+      last_matched__remember_offset_value__pkts = 0
+      last_matched__remember_offset_value__bytes = 0
+
+    #
+      
+    #logger.info("remember_oldmatched__for_changed_ratelimitrules_whileactive(): last_matched__measurement_value="+str(last_matched__measurement_value)+" last_matched__remember_offset_value="+str(last_matched__remember_offset_value));
+
+    last_matched__remember_offset_value__pkts = last_matched__remember_offset_value__pkts + last_matched__measurement_value__pkts
+    last_matched__remember_offset_value__bytes = last_matched__remember_offset_value__bytes + last_matched__measurement_value__bytes
+
+    counter = { "ts": nowstr, "value_matched": { "packets" : last_matched__remember_offset_value__pkts, "bytes" : last_matched__remember_offset_value__bytes } }
+        
+    try:
+        history_per_rule[key_remember_oldmatched] = counter
+
+        history['_per_rule'] = history_per_rule
+
+        # store updated history
+        save_history(history, nowstr)
+
+    except Exception as e:
+        logger.error("remember_oldmatched__for_changed_ratelimitrules_whileactive(): failure: exception: "+str(e))
+
+    unlock_history_file()
+
+
+def clean_oldmatched__for_changed_ratelimitrules_whileactive(rule_id, route_obj):
+    rule_id=str(rule_id)
+    logger.debug("clean_oldmatched__for_changed_ratelimitrules_whileactive(): rule_id="+str(rule_id))
+
+    key_remember_oldmatched = str(rule_id)+".remember_oldmatched_offset"
+
+    # lock history file access
+    success = lock_history_file(wait=1, reason="clean_oldmatched__for_changed_ratelimitrules_whileactive("+str(rule_id)+","+str(zero_or_null)+")")
+    if not success: 
+      logger.error("clean_oldmatched__for_changed_ratelimitrules_whileactive(): locking history file failed, aborting");
+      return False
+
+    # load history
+    history = load_history()
+
+    try:
+      history_per_rule = history['_per_rule']
+    except Exception as e:
+      history_per_rule = {}
+
+    try:
+        history_per_rule[key_remember_oldmatched] = {}
+
+        history['_per_rule'] = history_per_rule
+
+        # store updated history
+        save_history(history, nowstr)
+
+    except Exception as e:
+        logger.error("clean_oldmatched__for_changed_ratelimitrules_whileactive(): failure: exception: "+str(e))
+
+    unlock_history_file()
+
 
