@@ -6,7 +6,10 @@ parsed=0
 
 while [ $# -gt 0 ]; do
 
-  if [ "$1" = "--raw" ]; then 
+  if [ "$1" = "--raw_all" ]; then 
+    shift 1
+    parsed=-1
+  elif [ "$1" = "--raw" ]; then 
     shift 1
     parsed=0
   elif [ "$1" = "--parsed" ]; then 
@@ -42,8 +45,8 @@ shift 1
 
 [ -n "$NETCONF_DEVICE" ] || NETCONF_DEVICE="127.0.0.1"
 [ -n "$NETCONF_PORT" ] || NETCONF_PORT="830"
-[ -n "$NETCONF_USER" ] || NETCONF_USER="netconf"
-[ -n "$NETCONF_PASS" ] || NETCONF_PASS="netconf"
+[ -n "$NETCONF_USER" ] || NETCONF_USER="admin"
+[ -n "$NETCONF_PASS" ] || NETCONF_PASS="admin"
 
 echo "$0: using parsed=$parsed : NETCONF_DEVICE='$NETCONF_DEVICE' NETCONF_PORT='$NETCONF_PORT' NETCONF_USER='$NETCONF_USER' NETCONF_PASS='$NETCONF_PASS'" 1>&2
 
@@ -114,9 +117,16 @@ if $old_version:
     result = [route.__dict__ for r in device.routing_options for route in r.routes];
     import json
     print(json.dumps(result, indent=4));
-  else:
+  elif $parsed==0:
     applier = Applier();
     result = applier.get_existing_config_xml();
+    print(result);
+  else:
+    from ncclient import manager
+    with manager.connect(host=settings.NETCONF_DEVICE, port=settings.NETCONF_PORT, username=settings.NETCONF_USER, password=settings.NETCONF_PASS, hostkey_verify=False) as m:
+       #xmlconfig = m.get_config(source='running', filter=('subtree', '<configurationx/>')).data_xml
+       xmlconfig = m.get_config(source='running').data_xml
+
     print(result);
 else:
   retriever = PR0.Retriever(); 
