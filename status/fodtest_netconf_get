@@ -1,23 +1,32 @@
 #!/bin/bash
 
 use_netconf_settings=0
-old_version=0
+old_version=1
 parsed=0
+arg1=""
 
 while [ $# -gt 0 ]; do
 
-  if [ "$1" = "--raw_netconf__all_conf" ]; then 
+  if [ "$1" = "--raw_netconf__get_config_all" ]; then 
     shift 1
     parsed=-1
+  elif [ "$1" = "--raw_netconf__get_all" ]; then 
+    shift 1
+    parsed=-1.5
   elif [ "$1" = "--raw_netconf__client_capabilities" ]; then 
     shift 1
     parsed=-2
   elif [ "$1" = "--raw_netconf__server_capabilities" ]; then 
     shift 1
     parsed=-3
-  elif [ "$1" = "--raw_netconf__all" ]; then 
+  elif [ "$1" = "--raw_netconf__schema" ]; then 
     shift 1
     parsed=-4
+    arg1="$1"
+    shift 1 
+  elif [ "$1" = "--raw_netconf__test1" ]; then 
+    shift 1
+    parsed=-5
   elif [ "$1" = "--raw" ]; then 
     shift 1
     parsed=0
@@ -27,7 +36,10 @@ while [ $# -gt 0 ]; do
   elif [ "$1" = "--parsed_json" -o "$1" = "--json" ]; then 
     shift 1
     parsed=2
-  elif [ "$1" = "--old_version" ]; then 
+  elif [ "$1" = "--use_exabgp" -o "$1" = "--new_version" ]; then 
+    shift 1
+    old_version=0
+  elif [ "$1" = "--real_netconf" -o "$1" = "--old_version" ]; then 
     shift 1
     old_version=1
   elif [ "$1" = "--use_netconf_settings" ]; then 
@@ -136,6 +148,11 @@ if $old_version:
        #xmlconfig = m.get_config(source='running', filter=('subtree', '<configurationx/>')).data_xml
        xmlconfig = m.get_config(source='running').data_xml
        print(xmlconfig);
+  elif $parsed==-1.5:
+    from ncclient import manager
+    with manager.connect(host=settings.NETCONF_DEVICE, port=settings.NETCONF_PORT, username=settings.NETCONF_USER, password=settings.NETCONF_PASS, hostkey_verify=False) as m:
+       xmlconfig = m.get().data_xml
+       print(xmlconfig);
   elif $parsed==-2:
     from ncclient import manager
     with manager.connect(host=settings.NETCONF_DEVICE, port=settings.NETCONF_PORT, username=settings.NETCONF_USER, password=settings.NETCONF_PASS, hostkey_verify=False) as m:
@@ -149,9 +166,18 @@ if $old_version:
   elif $parsed==-4:
     from ncclient import manager
     with manager.connect(host=settings.NETCONF_DEVICE, port=settings.NETCONF_PORT, username=settings.NETCONF_USER, password=settings.NETCONF_PASS, hostkey_verify=False) as m:
+       #xmlconfig = m.get_schema(identifier="nokia-conf")
+       #xmlconfig = m.get_schema(identifier="nokia-types-filter")
+       xmlconfig = m.get_schema(identifier="$arg1")
+       print(xmlconfig);
+  elif $parsed==-5:
+    from ncclient import manager
+    with manager.connect(host=settings.NETCONF_DEVICE, port=settings.NETCONF_PORT, username=settings.NETCONF_USER, password=settings.NETCONF_PASS, hostkey_verify=False) as m:
        #xmlconfig = m.get_data(datastore='xxx').data_xml
        #xmlconfig = m.get_schema(identifier="nokia-conf", version="2023-05-19")
-       xmlconfig = m.get_schema(identifier="nokia-conf")
+       #xmlconfig = m.get_schema(identifier="nokia-conf")
+       #xmlconfig = m.get(filter=('subtree', 'nokia-types-filter'))
+       xmlconfig = m.get()
        print(xmlconfig);
 else:
   retriever = PR0.Retriever(); 
