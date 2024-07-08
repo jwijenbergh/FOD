@@ -6,9 +6,18 @@ parsed=0
 
 while [ $# -gt 0 ]; do
 
-  if [ "$1" = "--raw_all" ]; then 
+  if [ "$1" = "--raw_netconf__all_conf" ]; then 
     shift 1
     parsed=-1
+  elif [ "$1" = "--raw_netconf__client_capabilities" ]; then 
+    shift 1
+    parsed=-2
+  elif [ "$1" = "--raw_netconf__server_capabilities" ]; then 
+    shift 1
+    parsed=-3
+  elif [ "$1" = "--raw_netconf__all" ]; then 
+    shift 1
+    parsed=-4
   elif [ "$1" = "--raw" ]; then 
     shift 1
     parsed=0
@@ -121,13 +130,29 @@ if $old_version:
     applier = Applier();
     result = applier.get_existing_config_xml();
     print(result);
-  else:
+  elif $parsed==-1:
     from ncclient import manager
     with manager.connect(host=settings.NETCONF_DEVICE, port=settings.NETCONF_PORT, username=settings.NETCONF_USER, password=settings.NETCONF_PASS, hostkey_verify=False) as m:
        #xmlconfig = m.get_config(source='running', filter=('subtree', '<configurationx/>')).data_xml
        xmlconfig = m.get_config(source='running').data_xml
-
-    print(result);
+       print(xmlconfig);
+  elif $parsed==-2:
+    from ncclient import manager
+    with manager.connect(host=settings.NETCONF_DEVICE, port=settings.NETCONF_PORT, username=settings.NETCONF_USER, password=settings.NETCONF_PASS, hostkey_verify=False) as m:
+       for item in m.client_capabilities:
+          print(item)
+  elif $parsed==-3:
+    from ncclient import manager
+    with manager.connect(host=settings.NETCONF_DEVICE, port=settings.NETCONF_PORT, username=settings.NETCONF_USER, password=settings.NETCONF_PASS, hostkey_verify=False) as m:
+       for item in m.server_capabilities:
+          print(item)
+  elif $parsed==-4:
+    from ncclient import manager
+    with manager.connect(host=settings.NETCONF_DEVICE, port=settings.NETCONF_PORT, username=settings.NETCONF_USER, password=settings.NETCONF_PASS, hostkey_verify=False) as m:
+       #xmlconfig = m.get_data(datastore='xxx').data_xml
+       #xmlconfig = m.get_schema(identifier="nokia-conf", version="2023-05-19")
+       xmlconfig = m.get_schema(identifier="nokia-conf")
+       print(xmlconfig);
 else:
   retriever = PR0.Retriever(); 
   if $parsed==1:
